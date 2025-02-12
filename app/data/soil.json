@@ -1,0 +1,12 @@
+{
+  "soil": [],
+  "pile": [
+    {
+      "id": "1",
+      "pileDiameter": "60",
+      "pileLength": 1,
+      "stickUp": 0,
+      "waterDepth": 2
+    }
+  ]
+}
