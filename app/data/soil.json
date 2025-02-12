@@ -47,6 +47,36 @@
       "color": "",
       "shaftCapacity": 4.88,
       "bearingCapacity": 0.92
+    },
+    {
+      "id": "659c",
+      "soilType": "fine",
+      "density": "loose",
+      "soil": "Soft clay",
+      "startDepth": 4,
+      "endDepth": 5,
+      "nValue": 67,
+      "yMoist": 15,
+      "ySat": 15,
+      "soilName": "",
+      "description": "",
+      "color": ""
+    },
+    {
+      "id": "1901",
+      "soilType": "coarse",
+      "density": "dense",
+      "soil": "Well graded sand and gravel",
+      "startDepth": 5,
+      "endDepth": 33,
+      "nValue": 3,
+      "yMoist": 21,
+      "ySat": 23,
+      "soilName": "",
+      "description": "",
+      "color": "",
+      "shaftCapacity": 1040.97,
+      "bearingCapacity": 0.55
     }
   ],
   "pile": [
