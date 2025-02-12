@@ -1,5 +1,5 @@
 import { Toaster } from "@/app/components/ui/toaster"
-export default function SoilLayout({
+export default function ConfigurationLayout({
     children,
     modal,
 }: {

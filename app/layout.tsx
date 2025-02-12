@@ -3,7 +3,7 @@ import "./globals.css"
 
 export const metadata: Metadata = {
   title: "Pile Computations",
-  description: "This is a Pile Cmputations Website",
+  description: "Pile Computations Website",
 }
 
 export default function RootLayout({

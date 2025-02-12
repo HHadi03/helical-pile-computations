@@ -1,9 +1,58 @@
 {
-  "soil": [],
+  "soil": [
+    {
+      "id": "bd2d",
+      "soilType": "fine",
+      "density": "loose",
+      "soil": "Soft clay",
+      "startDepth": 0,
+      "endDepth": 2,
+      "nValue": 5,
+      "yMoist": 15,
+      "ySat": 15,
+      "soilName": "",
+      "description": "",
+      "color": "",
+      "shaftCapacity": 19.47,
+      "bearingCapacity": 0.84
+    },
+    {
+      "id": "a042",
+      "soilType": "fine",
+      "density": "dense",
+      "soil": "Very soft clay",
+      "startDepth": 2,
+      "endDepth": 3,
+      "nValue": 5,
+      "yMoist": 18,
+      "ySat": 18,
+      "soilName": "",
+      "description": "",
+      "color": "",
+      "shaftCapacity": 9.73,
+      "bearingCapacity": 0.84
+    },
+    {
+      "id": "839d",
+      "soilType": "coarse",
+      "density": "dense",
+      "soil": "Gravel",
+      "startDepth": 3,
+      "endDepth": 4,
+      "nValue": 5,
+      "yMoist": 18,
+      "ySat": 21,
+      "soilName": "",
+      "description": "",
+      "color": "",
+      "shaftCapacity": 4.88,
+      "bearingCapacity": 0.92
+    }
+  ],
   "pile": [
     {
       "id": "1",
-      "pileDiameter": "60",
+      "pileDiameter": "100",
       "pileLength": 1,
       "stickUp": 0,
       "waterDepth": 2
