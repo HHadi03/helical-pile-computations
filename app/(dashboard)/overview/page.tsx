@@ -105,7 +105,7 @@ export default async function OverviewPage() {
 
         return (
           <div key={soil.id || index}>
-            <div className="text-sm font-semibold text-gray-600 pl-3 pt-3 pb-1"> {startDepth.toFixed(1)} m </div>
+            {/* <div className="text-sm font-semibold text-gray-600 pl-3 pt-3 pb-1"> {startDepth.toFixed(1)} m </div> */}
 
             <div className=" my-2 ring-2 ring-offset-4 ring-gray-200 hover:ring-gray-400 hover:shadow-lg transition-all duration-200 relative" style={{ backgroundColor }}>
               <div className="flex">
@@ -158,7 +158,7 @@ export default async function OverviewPage() {
               </div>   
             </div>
 
-            {isLastLayer && (<div className="text-sm font-semibold text-gray-600 pl-3 pb-3 pt-1">{endDepth.toFixed(1)} m</div>)}
+            {/* {isLastLayer && (<div className="text-sm font-semibold text-gray-600 pl-3 pb-3 pt-1">{endDepth.toFixed(1)} m</div>)} */}
 
           </div>
         )
