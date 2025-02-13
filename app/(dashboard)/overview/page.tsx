@@ -42,7 +42,8 @@ export default async function OverviewPage() {
   const waterDepthPx = (pileData.waterDepth || 0) * SCALE_FACTOR
 
   return (
-    <main className="h-full px-4 border-2 border-black relative overflow-y-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-600">
+    //possibly look into container for responsive design? limit width? prevent sidebar expansion on smaller screens?
+    <main className="h-full mx-auto px-4 border-2 border-black relative overflow-y-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-600">
 
       {hasCapacityCalculations && (
         <div className="flex justify-center gap-2 py-4 border-b border-gray-200 z-30 sticky top-0">

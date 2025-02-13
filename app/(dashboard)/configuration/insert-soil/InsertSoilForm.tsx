@@ -16,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/app/components/ui/hover-card"
 import { useRouter } from "next/navigation"
 import { NumberInput } from "@/app/components/NumberInput"
-
+import { createPortal } from 'react-dom'
 export function SoilForm() {
   const { toast } = useToast()
   const router = useRouter()
@@ -307,9 +307,11 @@ export function SoilForm() {
                         <HoverCardTrigger asChild>
                           <Button type="button" variant="link" className="text-blue-600">I dont have N Number</Button>
                         </HoverCardTrigger>
-                        <HoverCardContent className="w-auto right-0" side="top" align="center">
-                          <img src="/NValuePicture.png" alt="N Number Guide Picture" className="max-w-none w-[700px]"/>
+                        {createPortal(
+                        <HoverCardContent className="w-auto" side="top" align="center">
+                          <img src="/NValuePicture.png" alt="N Number Guide Picture" className="max-w-none w-[650px]"/>
                         </HoverCardContent>
+                        ,document.body)}
                       </HoverCard>
                     </div>
                     <FormControl>
