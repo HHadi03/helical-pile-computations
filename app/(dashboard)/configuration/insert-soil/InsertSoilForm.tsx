@@ -125,7 +125,7 @@ export function SoilForm() {
                       <SelectContent>
                         <SelectItem value="coarse">Coarse Grain</SelectItem>
                         <SelectItem value="fine">Fine Grain</SelectItem>
-                        <SelectItem value="manmade">Man made</SelectItem>
+                        <SelectItem value="manmade">Man Made</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

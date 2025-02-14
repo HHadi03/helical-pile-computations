@@ -24,7 +24,7 @@ export default function DashboardLayout({
       {/*Main Content Area*/}
       <div className="flex-1 flex flex-col min-h-0">
 
-        <div className="bg-gradient-to-b from-slate-50 via-white to-blue-50 shadow-inner pt-5">
+        <div className="px-5 pt-5">
           <Setting/>
           <h1 className="flex justify-center text-2xl font-extrabold text-gray-800">Dashboard</h1>
           <Topbar/>
