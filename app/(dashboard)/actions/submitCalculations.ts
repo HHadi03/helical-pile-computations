@@ -69,6 +69,8 @@ export async function submitCalculations(values: Partial<TcalculateSchema>, soil
 
 export async function submitAllCalculations(soils: TsoilSchema[]): Promise<ReturnType> {
   try {
+    // can do the pilelength check here, if soillayer end depth is smaller than pile length then calculate the pile length, if soillayer end depth is greater than pile length then
+    // calculate end depth - pile length, then use this to determine the height of the soil to calculate.
     const pileData = await getPile()
     const updates = await Promise.all(soils.map(async (soil) => {
       try {

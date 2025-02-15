@@ -39,26 +39,26 @@ export default async function OverviewPage() {
 
   return (
     //possibly look into container for responsive design? limit width? prevent sidebar expansion on smaller screens?
-    <main className="h-full px-4 border-2 border-black relative overflow-y-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-600">
+    <main className="h-full border-2 p-4 border-black relative overflow-y-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-600">
 
       {hasCapacityCalculations && (
-        <div className="flex justify-center gap-2 py-4  z-30 sticky top-0">
+        <div className="flex justify-center gap-2 py-4 z-30 sticky top-0">
           <ArrowUp className="w-6 h-6 text-blue-600"/>
           <div className="font-semibold">Ultimate Pullout Capacity: <span className="text-blue-600">{ultimatePulloutCapacity.toFixed(2)} kN</span></div>
         </div>
       )}
-
-      {pileData.waterDepth && (
-         <div className="absolute left-4 right-4 z-20"style={{top:`250px`,}}>
-            <div className="w-full border-b-2 border-blue-400 border-dashed"></div>
-            <div className="absolute -top-7 pl-1 flex items-center text-blue-600">
-              <Waves className="w-5 h-5 mr-1"/>
-              <span className="font-semibold">Water Depth: {pileData.waterDepth.toFixed(1)} m</span>
-            </div>  
-        </div>
-      )}
-      
+  
       {soilsData.map((soil, index) => {
+        // {pileData.waterDepth && (
+        //  <div className="absolute left-4 right-4 z-20"style={{top:`250px`,}}>
+        //     <div className="w-full border-b-2 border-blue-400 border-dashed"></div>
+        //     <div className="absolute -top-7 pl-1 flex items-center text-blue-600">
+        //       <Waves className="w-5 h-5 mr-1"/>
+        //       <span className="font-semibold">Water Depth: {pileData.waterDepth.toFixed(1)} m</span>
+        //     </div>  
+        //   </div>
+        // )}
+
         const isLastLayer = index === soilsData.length - 1
         const h = soil.endDepth - soil.startDepth
         const startDepth = soil.startDepth
@@ -66,21 +66,22 @@ export default async function OverviewPage() {
         const backgroundColor = soil.color || "#e5e5e5"
         const isDark = getLuminance(backgroundColor) < 0.5
         const textColor = isDark ? "text-white" : "text-black"
-        let pileLengthDifference = soil.endDepth - pileData.pileLength
 
-        if (pileLengthDifference === 0) {
-          pileLengthDifference = h
-        }
-        const pileHeight = 154 * (Math.abs(pileLengthDifference) / h)
+        // let pileLengthDifference = soil.endDepth - pileData.pileLength
         
-        let pileImage = "url('/100mm-pile-edited.png')"
-        if (pileData.pileDiameter === "60") {
-          pileImage = "url('/60mm-pile.png')"
-        }
+        // if (pileLengthDifference === 0) {
+        //   pileLengthDifference = h
+        // }
+        // const pileHeight = 154 * (Math.abs(pileLengthDifference) / h)
+        
+        // let pileImage = "url('/100mm-pile-edited.png')"
+        // if (pileData.pileDiameter === "60") {
+        //   pileImage = "url('/60mm-pile.png')"
+        // }
         
         return (
           <div key={soil.id || index}>
-            {soil.endDepth < pileData.pileLength ? (
+            {/* {soil.endDepth < pileData.pileLength ? (
               <div 
                 className="absolute left-1/2 z-10 -ml-10"
                 style={{
@@ -114,7 +115,7 @@ export default async function OverviewPage() {
               >
                 {pileData.pileLength}
               </div>
-            ) : null}
+            ) : null} */}
 
             <div className="relative border-2 border-gray-500 my-1" style={{ backgroundColor }}>
               <div className="flex">
@@ -169,9 +170,6 @@ export default async function OverviewPage() {
 
               </div>
             </div>
-
-            {/* {isLastLayer && (<div className="text-sm font-semibold text-gray-600 pt-2 border-b border-gray-200">{endDepth.toFixed(1)} m</div>)} */}
-            
           </div>
         )
       })}
