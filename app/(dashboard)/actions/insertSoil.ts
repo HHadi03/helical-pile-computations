@@ -1,8 +1,9 @@
 "use server"
-import { soilSchema, TsoilSchema } from "@/app/lib/schemas/soilSchema"
-import { getSoils, } from "@/app/lib/api/getSoils" 
+import { soilSchema, TsoilSchema } from "@/app/schemas/soilSchema"
+import { getSoils } from "@/app/lib/api/getSoils" 
 import { API_URL } from "@/app/lib/api/getSoils"
 import { revalidatePath } from "next/cache"
+import { calculateResultsForFineSoil, calculateResultsForSoils } from "@/app/lib/equations"
 
 type ReturnType = {
     message: string
@@ -35,6 +36,9 @@ export async function insertSoil(soil: TsoilSchema): Promise<ReturnType> {
         }
     }
 
+    if (soil.soilType === "fine") {soil = { ...soil, ...calculateResultsForFineSoil(soil) }}
+    else {soil = { ...soil, ...await calculateResultsForSoils(soil) }}
+    
     try {
         const response = await fetch(`${API_URL}/soil`, {
             method: 'POST',

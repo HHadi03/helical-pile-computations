@@ -1,5 +1,5 @@
 "use server"
-import { pileSchema, TpileSchema } from "@/app/lib/schemas/pileSchema"
+import { pileSchema, TpileSchema } from "@/app/schemas/pileSchema"
 import { API_URL } from "@/app/lib/api/getSoils"
 import { getSoils } from "@/app/lib/api/getSoils"
 import { getPile } from "@/app/lib/api/getPile" 

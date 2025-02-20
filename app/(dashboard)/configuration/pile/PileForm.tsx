@@ -3,13 +3,14 @@ import { useToast } from "@/app/components/hooks/use-toast"
 import { ToastAction } from "@/app/components/ui/toast"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { pileSchema, TpileSchema } from "@/app/lib/schemas/pileSchema"
+import { pileSchema, TpileSchema } from "@/app/schemas/pileSchema"
 import { updatePile } from "@/app/(dashboard)/actions/updatePile"
 import { Button } from "@/app/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/app/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/components/ui/select"
 import { useRouter } from "next/navigation"
 import { NumberInput } from "@/app/components/NumberInput"
+import { Checkbox } from "@/app/components/ui/checkbox"
 
 type PileFormProps = {
   pile: TpileSchema 
@@ -20,9 +21,7 @@ export function PileForm({ pile }: PileFormProps) {
   const router = useRouter()
   const form = useForm<TpileSchema>({
     resolver: zodResolver(pileSchema),
-    defaultValues: {
-      ...pile 
-    }
+    defaultValues: {...pile}
   })
 
   const { formState } = form
@@ -32,29 +31,29 @@ export function PileForm({ pile }: PileFormProps) {
       
       if (result.errors) {
           Object.entries(result.errors).forEach(([key, value]) => {
-              form.setError(key as keyof TpileSchema, { message: Array.isArray(value) ? value[0] : String(value) })
+            form.setError(key as keyof TpileSchema, { message: Array.isArray(value) ? value[0] : String(value) })
           })
       }
       
       toast({
-          duration: 2500,
-          variant: result.errors ? "destructive" : "default",
-          title: result.errors ? "Pile Update Failed" : "Pile Update Successful",
-          description: result.message,
-          action: result.errors && <ToastAction altText="Try again">Try again</ToastAction>
+        duration: 2500,
+        variant: result.errors ? "destructive" : "default",
+        title: result.errors ? "Pile Update Failed" : "Pile Update Successful",
+        description: result.message,
+        action: result.errors && <ToastAction altText="Try again">Try again</ToastAction>
       })
       
       if (!result.errors) {
-          router.back()
+        router.back()
       }
   
-  } catch {
+    } catch {
       toast({
-          duration: 2500,
-          variant: "destructive",
-          title: "Uh oh! Something went wrong.",
-          description: "An unexpected error occurred. Please try again later.",
-          action: <ToastAction altText="Try again">Try again</ToastAction>
+        duration: 2500,
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "An unexpected error occurred. Please try again later.",
+        action: <ToastAction altText="Try again">Try again</ToastAction>
       })
     }
   }
@@ -101,10 +100,10 @@ export function PileForm({ pile }: PileFormProps) {
 
           <FormField
             control={form.control}
-            name="stickUp"
+            name="waterDepth"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Stick Up (m)</FormLabel>
+                <FormLabel>Water Depth (m)</FormLabel>
                 <FormControl>
                   <NumberInput field={field} placeholder="0"/>
                 </FormControl>
@@ -115,13 +114,13 @@ export function PileForm({ pile }: PileFormProps) {
 
           <FormField
             control={form.control}
-            name="waterDepth"
+            name="showBearingCapacity"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Water Depth (m)</FormLabel>
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                 <FormControl>
-                  <NumberInput field={field} placeholder="0"/>
+                  <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                 </FormControl>
+                <FormLabel>Enable Bearing Capacity Calculations</FormLabel>
                 <FormMessage />
               </FormItem>
             )}

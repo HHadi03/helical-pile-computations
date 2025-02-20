@@ -5,8 +5,8 @@ import { useToast } from "@/app/components/hooks/use-toast"
 import { ToastAction } from "@/app/components/ui/toast"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { soilOptions, soilProperties } from "@/app/data/soilData"
-import { soilSchema, TsoilSchema } from "@/app/lib/schemas/soilSchema"
+import { soilOptions, soilProperties } from "./soilData"
+import { soilSchema, TsoilSchema } from "@/app/schemas/soilSchema"
 import { insertSoil } from "../../actions/insertSoil"
 import { Button } from "@/app/components/ui/button"
 import { Input } from "@/app/components/ui/input"
@@ -17,6 +17,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/app/components/
 import { useRouter } from "next/navigation"
 import { NumberInput } from "@/app/components/NumberInput"
 import { createPortal } from 'react-dom'
+
 export function SoilForm() {
   const { toast } = useToast()
   const router = useRouter()
@@ -68,9 +69,7 @@ export function SoilForm() {
 
   async function onSubmit(values: TsoilSchema) {
     try {
-      isSubmitting
       const result = await insertSoil(values)
-  
       if (result.errors) {
         Object.entries(result.errors).forEach(([key, value]) => {
         form.setError(key as keyof TsoilSchema, { message: Array.isArray(value) ? value[0] : (value as string)})})
@@ -95,7 +94,6 @@ export function SoilForm() {
         description: "An unexpected error occurred. Please try again later.",
         action: <ToastAction altText="Try again">Try again</ToastAction>
       })
-
     } 
   }
   

@@ -1,6 +1,7 @@
 "use server"
-import { soilSchema, TsoilSchema } from "@/app/lib/schemas/soilSchema"
+import { soilSchema, TsoilSchema } from "@/app/schemas/soilSchema"
 import { API_URL } from "@/app/lib/api/getSoils"
+import { revalidatePath } from "next/cache"
 
 type ReturnType = {
   message: string
@@ -19,16 +20,17 @@ export async function updateSoil(soil: TsoilSchema): Promise<ReturnType> {
   try {
     const response = await fetch(`${API_URL}/soil/${soil.id}`, {
       method: "PATCH",
-      headers: {"Content-Type": "application/json"},
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(soil)
     })
 
     if (!response.ok) {
-      return {message: "Failed to update soil data. Please try again.", errors: {}}
+      return { message: "Failed to update soil data. Please try again.", errors: {} }
     }
+    revalidatePath("/Configuration")
     return { message: "Soil data updated successfully" }
 
   } catch {
-    return {message: "Failed to update soil data. Please try again later.", errors: {}}
+    return { message: "Failed to update soil data. Please try again later.", errors: {} }
   }
 }
