@@ -17,11 +17,13 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/app/components/
 import { useRouter } from "next/navigation"
 import { NumberInput } from "@/app/components/NumberInput"
 import { createPortal } from 'react-dom'
+import { useFormEdit } from "../FormContext"
 
 export function SoilForm() {
   const { toast } = useToast()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('soil')
+  const { setFormEdited, setHasUnsavedChanges } = useFormEdit()
   
   const form = useForm<TsoilSchema>({
     resolver: zodResolver(soilSchema),
@@ -67,6 +69,13 @@ export function SoilForm() {
     form.setValue("soil", "")
   }, [soilType, form])
 
+  useEffect(() => {
+    const subscription = form.watch(() => {
+      setFormEdited('insertSoil', true)
+    })
+    return () => subscription.unsubscribe()
+  }, [form, setFormEdited])
+
   async function onSubmit(values: TsoilSchema) {
     try {
       const result = await insertSoil(values)
@@ -82,7 +91,10 @@ export function SoilForm() {
         description: result.message,
         action: result.errors && <ToastAction altText="Try again">Try again</ToastAction>
       })
+      
       if (!result.errors){
+        setFormEdited('insertSoil', false)
+        setHasUnsavedChanges(true)
         router.back()
       }
 

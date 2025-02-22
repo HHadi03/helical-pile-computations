@@ -10,6 +10,7 @@ import type { TsoilSchema } from "@/app/schemas/soilSchema"
 import { useToast } from "@/app/components/hooks/use-toast"
 import { ToastAction } from "@/app/components/ui/toast"
 import { calculateAll } from "../actions/submitCalculations"
+import { useFormEdit } from "./FormContext"
 
 const soilTypeNames = {
   'fine': 'Fine Grain',
@@ -22,6 +23,7 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
   const { toast } = useToast()
   const [selectedRow, setSelectedRow] = useState<number | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const {isAnyFormEdited, hasCriticalChanges,  isTFieldEdited, resetFormStates} = useFormEdit()
 
   const handleDelete = async () => {
     if (selectedRow !== null && soilsData[selectedRow].id) {
@@ -38,7 +40,6 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
         if (!result.errors) {
           setSelectedRow(null)
           setIsDeleteDialogOpen(false)
-          router.refresh()
         }
   
       } catch {
@@ -61,7 +62,7 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
 
   const handleCalculate = async () => {
     try {
-      const result = await calculateAll(soilsData)
+      const result = await calculateAll(soilsData, hasCriticalChanges,  isTFieldEdited)
       toast({
         duration: 2500,
         variant: result.errors ? "destructive" : "default",
@@ -71,6 +72,7 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
       })
       
       if (!result.errors) {
+        resetFormStates() 
         router.refresh()
       }
   
@@ -88,7 +90,7 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
   return (
     <>
       <Toolbar onDelete={() => setIsDeleteDialogOpen(true)} onEdit={handleEdit} onCalculate={handleCalculate}
-       canCalculate canDelete={selectedRow !== null} canEdit={selectedRow !== null}
+       canCalculate={isAnyFormEdited} canDelete={selectedRow !== null} canEdit={selectedRow !== null}
       />
       <div className="pl-1 pt-3">
         <h1 className="text-2xl pl-3">Soil Layer Entries</h1>

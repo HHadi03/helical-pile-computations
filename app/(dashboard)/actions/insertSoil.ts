@@ -2,7 +2,7 @@
 import { soilSchema, TsoilSchema } from "@/app/schemas/soilSchema"
 import { getSoils } from "@/app/lib/api/getSoils" 
 import { API_URL } from "@/app/lib/api/getSoils"
-import { revalidatePath } from "next/cache"
+import { revalidateTag } from "next/cache"
 import { calculateResultsForFineSoil, calculateResultsForSoils } from "@/app/lib/equations"
 
 type ReturnType = {
@@ -18,7 +18,8 @@ export async function insertSoil(soil: TsoilSchema): Promise<ReturnType> {
             errors: parsed.error.flatten().fieldErrors
         }
     }
-
+    
+    // Server Validation
     const existingSoils = await getSoils()
     if (existingSoils.length === 0 && soil.startDepth > 0) {
         return {
@@ -36,9 +37,10 @@ export async function insertSoil(soil: TsoilSchema): Promise<ReturnType> {
         }
     }
 
-    if (soil.soilType === "fine") {soil = { ...soil, ...calculateResultsForFineSoil(soil) }}
+    if (soil.soilType === "fine") {soil = { ...soil, ...await calculateResultsForFineSoil(soil) }}
     else {soil = { ...soil, ...await calculateResultsForSoils(soil) }}
-    
+    // End of Server Validation
+
     try {
         const response = await fetch(`${API_URL}/soil`, {
             method: 'POST',
@@ -49,7 +51,7 @@ export async function insertSoil(soil: TsoilSchema): Promise<ReturnType> {
         if (!response.ok) {
             return {message: "Failed to submit soil data. Please try again.", errors: {}}
         }
-        revalidatePath('/Configuration')
+        revalidateTag('soils')
         return { message: "Soil data submitted successfully 🎉" }
 
     } catch {

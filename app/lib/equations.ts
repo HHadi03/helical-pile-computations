@@ -10,11 +10,13 @@ const roundToTwoDecimals = (value: number): number => {
   return Math.round(value * 100) / 100
 }
 
+//Coarse OR Manmade Soil Algorithm
 export const calculateResultsForSoils = async (data: TsoilSchema): Promise<Partial<TsoilSchema>> => {
   const pileData = await getPile()
   if (!pileData) {throw new Error}
 
   const h = roundToTwoDecimals(data.endDepth - data.startDepth)
+  
   const hMoist = Math.max(0, Math.min(pileData.waterDepth, data.endDepth) - data.startDepth)
   const hSat = Math.max(0, data.endDepth - Math.max(pileData.waterDepth, data.startDepth))
   const Po = roundToTwoDecimals((data.yMoist * hMoist) + (data.ySat * hSat) - (UNITWEIGHT * hSat))
@@ -30,26 +32,29 @@ export const calculateResultsForSoils = async (data: TsoilSchema): Promise<Parti
   const Qult = roundToTwoDecimals(12 * SPT * data.nValue)
 
   return {
+    h,
     Po,
     Angle,
     Ko,
     T,
     Qult,
-    h
   }
 }
 
-export const calculateResultsForFineSoil = (data: TsoilSchema): Partial<TsoilSchema> => {
+//Fine Soil Algorithm
+export const calculateResultsForFineSoil = async (data: TsoilSchema): Promise<Partial<TsoilSchema>> => {
   const h = roundToTwoDecimals(data.endDepth - data.startDepth)
   const Su = roundToTwoDecimals(data.nValue * SPT)
   const Qult = roundToTwoDecimals(11 * SPT * data.nValue)
 
   return {
+    h,
     Su,
     Qult,
-    h
   }
-} 
+}
+
+///todo fix units for calculations, revisit calculateall etc piledata check if soiltable is getting latest data
 
  // can do the pilelength check here, if soillayer end depth is smaller than pile length then calculate the pile length, if soillayer end depth is greater than pile length then
     // calculate end depth - pile length, then use this to determine the height of the soil to calculate.
@@ -57,18 +62,7 @@ export const calculateResultsForFineSoil = (data: TsoilSchema): Partial<TsoilSch
 
 //on calculateall we will run the equations in all instance except a state that declares the engineered props, then we will use these directly in the calculation.
 
-//  const fields: (keyof TsoilSchema)[] = ["nValue", "yMoist", "ySat"]
-//   const fieldsChanged = fields.some((field) => soil[field] !== existingSoil[field])
 
-//   let updatedSoil = { ...soil }
-
-//   if (fieldsChanged) {
-//     const newCalculations = soil.soilType === "fine" 
-//       ? calculateResultsForFineSoil(soil) : await calculateResultsForSoils(soil)
-
-//     updatedSoil = { ...soil, ...Object.fromEntries(Object.entries(newCalculations).map(([key, value]) => [
-//     key,soil[key as keyof TsoilSchema] !== existingSoil[key as keyof TsoilSchema] ? soil[key as keyof TsoilSchema]  : value]))}
-//   }
 
 
               // <FormField

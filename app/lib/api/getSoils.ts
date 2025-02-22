@@ -10,7 +10,7 @@ export async function getSoils(): Promise<TsoilSchema[]> {
     const soils = await fetchSoils(
       z.array(soilSchema),
       `${API_URL}/soil`,
-      {cache: "no-store"}
+      {next: {tags: ['soils']}}
     )
 
     return soils

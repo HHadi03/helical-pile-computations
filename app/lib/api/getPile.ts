@@ -8,7 +8,7 @@ export async function getPile() {
     const pile = await fetchWithZod(
       pileSchema, 
       `${API_URL}/pile/1`,
-      {cache: "no-store"}
+      {next: {tags: ['pile']}}
     )
 
     return pile

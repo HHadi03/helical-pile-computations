@@ -8,7 +8,7 @@ export async function getSoil(id: string) {
     const soil = await fetchWithZod(
       soilSchema,
       `${API_URL}/soil/${id}`,
-      {cache: "no-store"}
+      {next: {tags: ['soil']}}
     )
 
     return soil

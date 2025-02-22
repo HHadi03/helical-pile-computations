@@ -9,6 +9,8 @@ import { Button } from "@/app/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/app/components/ui/form"
 import { useRouter } from "next/navigation"
 import { NumberInput } from "@/app/components/NumberInput"
+import { useEffect } from "react"
+import { useFormEdit } from "../../FormContext"
 
 type EditFormProps = {
   soil: TsoilSchema
@@ -17,6 +19,7 @@ type EditFormProps = {
 export function EditForm({ soil }: EditFormProps) {
   const { toast } = useToast()
   const router = useRouter()
+  const { setHasUnsavedChanges, setFormEdited, setCriticalChanges, setTFieldEdited  } = useFormEdit()
 
   const form = useForm<TsoilSchema>({
     resolver: zodResolver(soilSchema),
@@ -25,6 +28,20 @@ export function EditForm({ soil }: EditFormProps) {
 
   const { formState } = form
 
+  useEffect(() => {
+    const subscription = form.watch((_, { name }) => {
+      if (name === 'T') {
+        setTFieldEdited(true)
+        setCriticalChanges(false)
+      } else if (name === 'Su' || name === 'Qult' || name === 'Angle') {
+        setCriticalChanges(true)
+        setTFieldEdited(false)
+      }
+    })
+  
+    return () => subscription.unsubscribe()
+  }, [form])
+  
   async function onSubmit(values: TsoilSchema) {
     try {
       const result = await updateSoil(values)
@@ -42,8 +59,11 @@ export function EditForm({ soil }: EditFormProps) {
       })
       
       if (!result.errors) {
+        setFormEdited('editSoil', false)
+        setHasUnsavedChanges(true) 
         router.back()
       }
+
     } catch {
       toast({
         duration: 2500,

@@ -11,6 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useRouter } from "next/navigation"
 import { NumberInput } from "@/app/components/NumberInput"
 import { Checkbox } from "@/app/components/ui/checkbox"
+import { useFormEdit } from "../FormContext"
+import { useEffect } from "react"
 
 type PileFormProps = {
   pile: TpileSchema 
@@ -19,20 +21,29 @@ type PileFormProps = {
 export function PileForm({ pile }: PileFormProps) {
   const { toast } = useToast()
   const router = useRouter()
+  const { setFormEdited, setHasUnsavedChanges } = useFormEdit()
+
   const form = useForm<TpileSchema>({
     resolver: zodResolver(pileSchema),
     defaultValues: {...pile}
   })
 
   const { formState } = form
+
+  useEffect(() => {
+    const subscription = form.watch(() => {
+      setFormEdited('configurePile', true)
+    })
+    return () => subscription.unsubscribe()
+  }, [form, setFormEdited])
+
   async function onSubmit(values: TpileSchema) {
     try {
       const result = await updatePile(values)
-      
       if (result.errors) {
-          Object.entries(result.errors).forEach(([key, value]) => {
-            form.setError(key as keyof TpileSchema, { message: Array.isArray(value) ? value[0] : String(value) })
-          })
+        Object.entries(result.errors).forEach(([key, value]) => {
+          form.setError(key as keyof TpileSchema, { message: Array.isArray(value) ? value[0] : String(value) })
+        })
       }
       
       toast({
@@ -44,6 +55,8 @@ export function PileForm({ pile }: PileFormProps) {
       })
       
       if (!result.errors) {
+        setFormEdited('configurePile', false)
+        setHasUnsavedChanges(true)
         router.back()
       }
   

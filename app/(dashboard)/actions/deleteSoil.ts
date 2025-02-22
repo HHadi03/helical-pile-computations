@@ -1,5 +1,6 @@
 "use server"
 import { API_URL } from "@/app/lib/api/getSoils"
+import { revalidateTag } from "next/cache"
 
 type ReturnType = {
   message: string
@@ -23,6 +24,7 @@ export async function deleteSoil(id: string): Promise<ReturnType> {
     if (!response.ok) {
       return {message: "Failed to delete soil. Please try again.", errors: {}}
     }
+    revalidateTag('soil')
     return { message: "Soil deleted successfully" }
 
   } catch {
