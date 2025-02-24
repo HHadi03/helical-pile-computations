@@ -73,7 +73,6 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
       
       if (!result.errors) {
         resetFormStates() 
-        router.refresh()
       }
   
     } catch {
@@ -90,7 +89,7 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
   return (
     <>
       <Toolbar onDelete={() => setIsDeleteDialogOpen(true)} onEdit={handleEdit} onCalculate={handleCalculate}
-       canCalculate={isAnyFormEdited} canDelete={selectedRow !== null} canEdit={selectedRow !== null}
+       canCalculate={isAnyFormEdited && soilsData.length > 0} canDelete={selectedRow !== null} canEdit={selectedRow !== null}
       />
       <div className="pl-1 pt-3">
         <h1 className="text-2xl pl-3">Soil Layer Entries</h1>

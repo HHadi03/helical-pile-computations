@@ -6,7 +6,7 @@ const UNITWEIGHT = 9.8
 const TAN = 0.01745
 const e = 2.71828183
 
-const roundToTwoDecimals = (value: number): number => {
+export const roundToTwoDecimals = (value: number): number => {
   return Math.round(value * 100) / 100
 }
 
@@ -53,58 +53,3 @@ export const calculateResultsForFineSoil = async (data: TsoilSchema): Promise<Pa
     Qult,
   }
 }
-
-///todo fix units for calculations, revisit calculateall etc piledata check if soiltable is getting latest data
-
- // can do the pilelength check here, if soillayer end depth is smaller than pile length then calculate the pile length, if soillayer end depth is greater than pile length then
-    // calculate end depth - pile length, then use this to determine the height of the soil to calculate.
-
-
-//on calculateall we will run the equations in all instance except a state that declares the engineered props, then we will use these directly in the calculation.
-
-
-
-
-              // <FormField
-              //   control={form.control}
-              //   name="Ko"
-              //   render={({ field }) => (
-              //     <FormItem>
-              //       <FormLabel>Coefficient of Lateral Pressure (Ko)</FormLabel>
-              //       <FormControl>
-              //         <div className="relative">
-              //           <NumberInput 
-              //             field={field}
-              //             placeholder="Enter Ko"
-              //           />
-              //           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm">
-              //             Ko
-              //           </span>
-              //         </div>
-              //       </FormControl>
-              //       <FormMessage />
-              //     </FormItem>
-              //   )}
-              // />
-
-              // <FormField
-              //   control={form.control}
-              //   name="Po"
-              //   render={({ field }) => (
-              //     <FormItem>
-              //       <FormLabel>Effective Overburden Stress (Po)</FormLabel>
-              //       <FormControl>
-              //         <div className="relative">
-              //           <NumberInput 
-              //             field={field}
-              //             placeholder="Enter Po"
-              //           />
-              //           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm">
-              //             kPa
-              //           </span>
-              //         </div>
-              //       </FormControl>
-              //       <FormMessage />
-              //     </FormItem>
-              //   )}
-              // />

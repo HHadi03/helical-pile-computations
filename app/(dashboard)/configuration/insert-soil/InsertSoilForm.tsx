@@ -42,7 +42,7 @@ export function SoilForm() {
     }
   })
 
-  const { formState: {isSubmitting} } = form
+  const { formState: { isSubmitting } } = form
   
   const soilType = form.watch("soilType")
   const soil = form.watch("soil")
@@ -237,7 +237,6 @@ export function SoilForm() {
               <Button type="button" className="w-24" onClick={handleNext} disabled={!showParametersTab}>Next</Button>
               <Button type="button" variant="outline" onClick={() => router.back()}>Close</Button>
             </div>
-
           </TabsContent>
 
           {showParametersTab && (<TabsContent value="parameters">
@@ -337,11 +336,12 @@ export function SoilForm() {
               <Button type="submit" className="w-24" disabled={isSubmitting}>
                 {isSubmitting ? (<> <Loader2 className="mr-2 h-4 w-4 animate-spin"/> Submitting... </>) : ("Submit")}
               </Button>
-              <Button type="button" variant="outline" onClick={() => router.back()}>Close</Button>
+              <Button type="button" variant="outline" disabled={isSubmitting} onClick={() => router.back()}>Close</Button>
             </div>
-
           </TabsContent>
-        )}</Tabs>
+          
+          )}
+        </Tabs>
       </form>
     </Form>
   )
