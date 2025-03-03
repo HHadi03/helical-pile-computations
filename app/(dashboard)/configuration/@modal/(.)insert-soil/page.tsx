@@ -3,7 +3,7 @@ import { Modal } from '@/app/components/Modal'
 
 export default function InsertSoilModal() {
     return (
-        <Modal title='Insert Soil Layer'>
+        <Modal title='Add Soil Layer'>
             <div className='px-4'>
                 <SoilForm/>
             </div>

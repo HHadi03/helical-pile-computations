@@ -17,6 +17,7 @@ export const calculateResultsForSoils = async (data: TsoilSchema): Promise<Parti
 
   const h = roundToTwoDecimals(data.endDepth - data.startDepth)
   
+  //first we calculate the thickness of the unsaturated portion of the soil layer, then the thickness of the saturated portion, hen finally 
   const hMoist = Math.max(0, Math.min(pileData.waterDepth, data.endDepth) - data.startDepth)
   const hSat = Math.max(0, data.endDepth - Math.max(pileData.waterDepth, data.startDepth))
   const Po = roundToTwoDecimals((data.yMoist * hMoist) + (data.ySat * hSat) - (UNITWEIGHT * hSat))

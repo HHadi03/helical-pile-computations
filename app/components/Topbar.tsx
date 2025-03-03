@@ -6,8 +6,8 @@ export const Topbar = () => {
   const pathname = usePathname()
   
   const navItems = [
-    { href: '/overview', label: 'Overview' },
     { href: '/configuration', label: 'Configuration' },
+    { href: '/overview', label: 'Overview' },
     { href: '/visulisation', label: 'Visulisation' }
   ] 
 

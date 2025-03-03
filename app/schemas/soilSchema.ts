@@ -44,6 +44,41 @@ export const soilSchema = soilIdentificationSchema
       message: "End depth must be greater than start depth",
     }
   )
+  .refine(
+    (data) => data.description === undefined || data.description.length <= 125,
+    {
+      path: ['description'],
+      message: "Description must be less than 125 characters long"
+    }
+  )
+  .refine(
+    (data) => data.Su === undefined || data.Su >= 1,
+    {
+      path: ['Su'],
+      message: "Su is required"
+    }
+  )
+  .refine(
+    (data) => data.Qult === undefined || data.Qult >= 1,
+    {
+      path: ['Qult'],
+      message: "Qult is required"
+    }
+  )
+  .refine(
+    (data) => data.Angle === undefined || data.Angle >= 1,
+    {
+      path: ['Angle'],
+      message: "Angle is required"
+    }
+  )
+  .refine(
+    (data) => data.T === undefined || data.T >= 1,
+    {
+      path: ['T'],
+      message: "T is required"
+    }
+  )
 
 export type TsoilSchema = z.infer<typeof soilSchema>
 

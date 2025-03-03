@@ -23,7 +23,7 @@ export function SoilForm() {
   const { toast } = useToast()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('soil')
-  const { setFormEdited, setHasUnsavedChanges } = useFormEdit()
+  const { setFormEdited, setHasUnsavedChanges, formEditStates } = useFormEdit()
   
   const form = useForm<TsoilSchema>({
     resolver: zodResolver(soilSchema),
@@ -41,7 +41,8 @@ export function SoilForm() {
       color: ""
     }
   })
-
+  
+  console.log(formEditStates)
   const { formState: { isSubmitting } } = form
   
   const soilType = form.watch("soilType")
@@ -55,6 +56,13 @@ export function SoilForm() {
     if (soilType && soil && density) {
       setActiveTab('parameters')
     }
+  }
+
+  const handleClose = () => {
+    if (formEditStates.insertSoil) {
+      setFormEdited('insertSoil', false)
+    }
+    router.back()
   }
 
   useEffect(() => {
@@ -235,7 +243,7 @@ export function SoilForm() {
 
             <div className="pt-2 flex justify-between">
               <Button type="button" className="w-24" onClick={handleNext} disabled={!showParametersTab}>Next</Button>
-              <Button type="button" variant="outline" onClick={() => router.back()}>Close</Button>
+              <Button type="button" variant="outline" onClick={handleClose}>Close</Button>
             </div>
           </TabsContent>
 
@@ -338,9 +346,8 @@ export function SoilForm() {
               </Button>
               <Button type="button" variant="outline" disabled={isSubmitting} onClick={() => router.back()}>Close</Button>
             </div>
-          </TabsContent>
-          
-          )}
+          </TabsContent>)}
+
         </Tabs>
       </form>
     </Form>

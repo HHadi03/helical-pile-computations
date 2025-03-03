@@ -11,16 +11,18 @@ type ReturnType = {
 }
 
 export async function calculateAll(soils: TsoilSchema[], hasCriticalChanges: boolean, isTFieldEdited: boolean): Promise<ReturnType> {
+  console.log("is T field edited", isTFieldEdited)
+  console.log("has critical changes", hasCriticalChanges)
   try {
     const pileData = await getPile()
     if (!pileData) {throw new Error}
 
     const calculations = await Promise.all(soils.map(async (soil) => {
       try {
-        
+
         //If soil layer starts below pile length, no need to calculate, return true for success message
-        if (soil.startDepth > pileData.pileLength) {
-          return true 
+        if (soil.startDepth >= pileData.pileLength) {
+          return true
         }
         
         //create a new soil object with calculated values
@@ -46,8 +48,23 @@ export async function calculateAll(soils: TsoilSchema[], hasCriticalChanges: boo
           const e = 2.71828183
           const TAN = 0.01745
           
+          //Condition 0 > If T and Qult is Edited
+          if (isTFieldEdited && hasCriticalChanges && soil.soilType === 'coarse') {
+            if (pileData.pileDiameter === "100") {
+              shaftCapacity = soil.T! * soilHeight * 0.314
+              bearingCapacity = soil.Qult! * 0.002463
+            } else {
+              shaftCapacity = soil.T! * soilHeight * 0.1884
+              bearingCapacity = soil.Qult! * 0.001223
+            }
+            updatedSoil = {
+              shaftCapacity: roundToTwoDecimals(shaftCapacity),
+              bearingCapacity: roundToTwoDecimals(bearingCapacity)
+            }
+          }
+
           //Condition 1 > If T is Edited
-          if (isTFieldEdited && soil.soilType === 'coarse') {
+          else if (isTFieldEdited && soil.soilType === 'coarse') {
             if (pileData.pileDiameter === "100") {
               shaftCapacity = soil.T! * soilHeight * 0.314
               bearingCapacity = calculatedValues.Qult! * 0.002463
@@ -118,8 +135,8 @@ export async function calculateAll(soils: TsoilSchema[], hasCriticalChanges: boo
             }
             updatedSoil = {
               ...calculatedValues,
-              shaftCapacity: Math.round(shaftCapacity * 100) / 100,
-              bearingCapacity: Math.round(bearingCapacity * 100) / 100
+              shaftCapacity: roundToTwoDecimals(shaftCapacity),
+              bearingCapacity: roundToTwoDecimals(bearingCapacity)
             }  
           }
         

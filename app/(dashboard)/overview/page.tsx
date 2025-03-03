@@ -1,11 +1,18 @@
 import { getSoils } from "@/app/lib/api/getSoils"
-import { ArrowUp, ArrowDown, Waves } from "lucide-react"
-import { getLuminance } from "@/app/components/GetLuminance"
+import { ArrowUp, ArrowDown } from "lucide-react"
 import { getPile } from "@/app/lib/api/getPile"
 
 export default async function OverviewPage() {
   const soilsData = await getSoils()
   const pileData = await getPile()
+
+  const getLuminance = (color: string) => {
+    const hex = color.replace("#", "");
+    const r = parseInt(hex.substring(0, 2), 16)
+    const g = parseInt(hex.substring(2, 4), 16)
+    const b = parseInt(hex.substring(4, 6), 16)
+    return (0.299 * r + 0.587 * g + 0.114 * b) / 255
+  }
 
   if (!pileData){
     return (
@@ -28,156 +35,138 @@ export default async function OverviewPage() {
       </div>
     )
   }
-
-  const hasCapacityCalculations = soilsData.some((soil) => soil.shaftCapacity != null || soil.bearingCapacity != null)
   
-  const ultimatePulloutCapacity = soilsData.reduce((sum, { shaftCapacity = 0 }) => sum + shaftCapacity, 0)
+  const relevantSoils = soilsData.filter(soil => soil.startDepth < pileData.pileLength)
+  const hasCapacityCalculations = relevantSoils.some(soil => soil.shaftCapacity != null || soil.bearingCapacity != null)
+  const ultimatePulloutCapacity = relevantSoils.reduce((sum, { shaftCapacity = 0 }) => sum + shaftCapacity, 0)
   
-  const bearingCapacity = soilsData.at(-1)?.bearingCapacity ?? 0
-  
+  const lastLayer = soilsData.find(soil => soil.startDepth < pileData.pileLength && pileData.pileLength <= soil.endDepth)
+  const bearingCapacity = lastLayer?.bearingCapacity ?? 0
   const ultimateBearingCapacity = ultimatePulloutCapacity + bearingCapacity
 
   return (
-    //possibly look into container for responsive design? limit width? prevent sidebar expansion on smaller screens?
-    <main className="h-full border-2 p-4 border-black relative overflow-y-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-600">
+    <main className="h-full px-4 border-black relative overflow-y-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-600">
 
       {hasCapacityCalculations && (
-        <div className="flex justify-center gap-2 py-4 z-30 sticky top-0">
+        <div className="flex justify-center gap-2 z-30 pb-5">
           <ArrowUp className="w-6 h-6 text-blue-600"/>
           <div className="font-semibold">Ultimate Pullout Capacity: <span className="text-blue-600">{ultimatePulloutCapacity.toFixed(2)} kN</span></div>
         </div>
       )}
-  
+
+      {/* set soil layer to scale based on height, add soil type an su/t property  */}
       {soilsData.map((soil, index) => {
-        // {pileData.waterDepth && (
-        //  <div className="absolute left-4 right-4 z-20"style={{top:`250px`,}}>
-        //     <div className="w-full border-b-2 border-blue-400 border-dashed"></div>
-        //     <div className="absolute -top-7 pl-1 flex items-center text-blue-600">
-        //       <Waves className="w-5 h-5 mr-1"/>
-        //       <span className="font-semibold">Water Depth: {pileData.waterDepth.toFixed(1)} m</span>
-        //     </div>  
-        //   </div>
-        // )}
+      const isLastLayer = (soil.startDepth < pileData.pileLength) && (pileData.pileLength <= soil.endDepth)
+      const isLayerBeyondPile = soil.startDepth >= pileData.pileLength
 
-        const isLastLayer = index === soilsData.length - 1
-        const h = soil.endDepth - soil.startDepth
-        const startDepth = soil.startDepth
-        const endDepth = soil.endDepth
-        const backgroundColor = soil.color || "#e5e5e5"
-        const isDark = getLuminance(backgroundColor) < 0.5
-        const textColor = isDark ? "text-white" : "text-black"
+      const backgroundColor = soil.color || "#e5e5e5"
+      const isDark = getLuminance(backgroundColor) < 0.5
+      const textColor = isDark ? "text-white" : "text-black"
 
-        // let pileLengthDifference = soil.endDepth - pileData.pileLength
-        
-        // if (pileLengthDifference === 0) {
-        //   pileLengthDifference = h
-        // }
-        // const pileHeight = 154 * (Math.abs(pileLengthDifference) / h)
-        
-        // let pileImage = "url('/100mm-pile-edited.png')"
-        // if (pileData.pileDiameter === "60") {
-        //   pileImage = "url('/60mm-pile.png')"
-        // }
-        
-        return (
-          <div key={soil.id || index}>
-            {/* {soil.endDepth < pileData.pileLength ? (
-              <div 
-                className="absolute left-1/2 z-10 -ml-10"
-                style={{
-                  height: `160px`,
-                  width: '96px',  
-                  backgroundImage: pileImage,
-                  backgroundSize: '100% 100%',
-                }}
-              />
-        
-            ) : soil.endDepth > pileData.pileLength && soil.startDepth >= pileData.pileLength ?  (
-              <div 
-                className="absolute left-1/2 z-10 -ml-10"
-                style={{
-                  height: `0px`,
-                  width: '96px',  
-                  backgroundImage: pileImage,
-                  backgroundSize: '100% 100%',
-                }}
-              />
+      let backgroundImage = "url(/100mm-pile-edited.png)"
+  
+      return (
+        <div key={soil.id || index}>
+          <div 
+            className="relative border border-slate-900" 
+            style={{ 
+              backgroundColor,
+              height: `${Math.max(soil.h! * 60, 180)}px` // At least 180px high
+            }}>
 
-            ) : soil.endDepth >= pileData.pileLength ? (
-              <div 
-                className="absolute left-1/2 z-10 -ml-10"
+            {!isLayerBeyondPile && (
+              <div
+                className={"absolute z-10 -ml-5"}
                 style={{
-                  height: `${pileHeight}px`,
-                  width: '96px',  
-                  backgroundImage: pileImage,
-                  backgroundSize: '100% 100%',
-                }}
-              >
-                {pileData.pileLength}
+                  backgroundImage,
+                  backgroundSize: "auto",
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "center",
+                  height: "14px", 
+                  width: "100%",  
+                }}>
               </div>
-            ) : null} */}
+            )}
 
-            <div className="relative border-2 border-gray-500 my-1" style={{ backgroundColor }}>
-              <div className="flex">
-
-                <div className="w-1/2 flex justify-start pl-4">
-                  <div className="py-4 flex flex-col gap-2">
-                    <div className="text-base font-semibold text-gray-600"> {startDepth.toFixed(1)} m </div>
-                    {soil.shaftCapacity !== undefined ? (
-                      <div className={textColor}>
-                        <span className="font-semibold">Shaft Capacity:</span>{" "}
-                        <span className={textColor}>{soil.shaftCapacity.toFixed(2)} kN</span>
-                      </div>
-                    ) : ( <div className={`${textColor} italic`}>Shaft capacity calculation needed</div> )}
-
-                    {isLastLayer && (
-                      soil.bearingCapacity !== undefined ? (
-                        <div className={textColor}>
-                          <span className="font-semibold">Bearing Capacity:</span>{" "}
-                          <span className={textColor}>{soil.bearingCapacity.toFixed(2)} kN</span>
-                        </div>
-                      ) : (<div className={`${textColor} italic`}>Bearing capacity calculation needed</div>))}
-                    
-                    {isLastLayer && (<div className="text-base font-semibold text-gray-600">{endDepth.toFixed(1)} m</div>)}
-                  </div>
-                </div>
-
-                <div className="w-1/2 flex py-4 pl-10">
-                  <div className="flex gap-8">
-                    <div>
-                      <h3 className={`font-semibold ${textColor}`}>{soil.soilName || soil.soil}</h3>
-                      <div className="space-y-2 pt-2">
-                        <p className={textColor}><span className="font-semibold">Unit Weight (Moist):</span>{" "}{soil.yMoist} kN/m³</p>
-                        <p className={textColor}><span className="font-semibold">Unit Weight (Saturated):</span>{" "}{soil.ySat} kN/m³</p>
-                        <p className={textColor}><span className="font-semibold">SPT Blow Count (N):</span> {soil.nValue}</p>
-                      </div>
+        <div className="flex items-center h-full">
+          {/* Left Side of the Pile Data */}
+          <div className="w-1/2 flex justify-start pl-4 items-center relative">
+            {/* Start Depth - Top Left */}
+            <div className="absolute top-0 left-4 text-base font-semibold text-gray-600">
+              {soil.startDepth.toFixed(1)} m
+            </div>
+            
+            {/* End Depth - Bottom Left */}
+            <div className="absolute bottom-0 left-4 text-base font-semibold text-gray-600">
+              {soil.endDepth.toFixed(1)} m
+            </div>
+            
+            <div className="py-4 flex flex-col gap-2 mt-8 mb-8">
+              {isLayerBeyondPile ? (
+                <div className={`${textColor} italic`}>Soil layer outside of provided pile length, no calculations required.</div>
+              ) : (
+                <>
+                  {soil.shaftCapacity !== undefined ? (
+                    <div className={textColor}>
+                      <span className="font-semibold">Shaft Capacity:</span>{" "}
+                      <span className={textColor}>{soil.shaftCapacity} kN</span>
                     </div>
+                  ) : (
+                    <div className={`${textColor} italic`}>Shaft capacity calculation missing.</div>
+                  )}
 
-                    {soil.description && (
-                      <div className="flex-1">
-                        <h4 className={`font-semibold ${textColor}`}>Description:</h4>
-                        <p className={`text-sm ${textColor}`}>{soil.description}</p>
+                  {isLastLayer && pileData.showBearingCapacity && (
+                    soil.bearingCapacity !== undefined ? (
+                      <div className={textColor}>
+                        <span className="font-semibold">Bearing Capacity:</span>{" "}
+                        <span className={textColor}>{soil.bearingCapacity} kN</span>
                       </div>
-                    )}
-                  </div>
-                </div>
-
-                <div
-                  className={`absolute right-4 bottom-0 -translate-y-1/2 px-2 py-1 shadow text-sm font-semibold
-                  ${isDark ? "text-white bg-gray-700" : "text-black bg-white"}`}>
-                  {h.toFixed(1)} m
-                </div> 
-
-              </div>
+                    ) : (
+                      <div className={`${textColor} italic`}>Bearing capacity calculation missing.</div>
+                    )
+                  )}
+                </>
+              )}
             </div>
           </div>
-        )
-      })}
-        
-      {hasCapacityCalculations && (
-        <div className="flex justify-center gap-2 py-4 z-30 sticky bottom-0">
+          
+          {/* Right Side of the Pile Data */}
+          <div className="w-1/2 flex py-4 pl-10 items-center">
+            <div className="flex gap-8">
+              <div>
+                <h1 className={`font-semibold ${textColor}`}>{soil.soilName || soil.soil}</h1>
+                <div className="space-y-2 pt-2">
+                  <p className={textColor}><span className="font-semibold">Unit Weight (Moist):</span> {soil.yMoist} kN/m³</p>
+                  <p className={textColor}><span className="font-semibold">Unit Weight (Saturated):</span> {soil.ySat} kN/m³</p>
+                  <p className={textColor}><span className="font-semibold">SPT Blow Count (N):</span> {soil.nValue}</p>
+                  <p className={textColor}><span className="font-semibold">Shear Strength ({soil.soilType === "fine" ? "Su" : "T"}):</span> {soil.soilType === "fine" ? soil.Su! : soil.T!} kPa</p>
+                </div>
+              </div>
+
+              {soil.description && (
+                <div className="flex-1">
+                  <h1 className={`font-semibold ${textColor}`}>Description</h1>
+                  <p className={`text-sm ${textColor}`}>{soil.description}</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div
+            className={`absolute right-4 bottom-0 -translate-y-1/2 px-2 py-1 shadow text-sm font-semibold
+            ${isDark ? "text-white bg-gray-700" : "text-black bg-white"}`}>
+            {soil.h!.toFixed(1)} m
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+})}
+      
+      {hasCapacityCalculations && pileData.showBearingCapacity && (
+        <div className="flex justify-center gap-2 z-30 pt-6">
           <ArrowDown className="w-6 h-6 text-red-600" />
-          <div className="font-semibold">Ultimate Bearing Capacity: <span className="text-red-600">{ultimateBearingCapacity.toFixed(2)} kN</span> </div>
+          <div className="font-semibold">Ultimate Bearing Capacity: <span className="text-red-600">{ultimateBearingCapacity.toFixed(2)} kN</span></div>
         </div>
       )}
       

@@ -5,14 +5,11 @@ import { Input } from './components/ui/input'
 export default function LandingPage() {
   return (
     <main className="min-h-screen relative bg-cover bg-center" 
-          style={{
-            backgroundImage: "url('/castle-background.jpg')",
-            backgroundColor: 'rgba(0, 0, 0, 0.3)',
-            backgroundBlendMode: 'darken'
-          }}>
+      style={{backgroundImage: "url('/castle-background.jpg')", backgroundColor: 'rgba(0, 0, 0, 0.3)', backgroundBlendMode: 'darken'}}>
+      
       {/* Logo/Title Section */}
       <div className="absolute top-4 left-4 flex items-center space-x-2">
-        <img src="/logo.png" alt="Helical Pile Calculator" className="w-24 h-10" />
+        <img src="/logo.png" alt="Helical Pile Calculator" className="w-60 h-10" />
         <div className="text-gray-600 font-bold text-2xl">Helical Pile Computations</div>
       </div>
 
@@ -37,7 +34,7 @@ export default function LandingPage() {
               />
             </div>
             <div className="space-y-4">
-              <Link href="/overview">
+              <Link href="/configuration">
               <Button className="w-full bg-blue-600 hover:bg-blue-700">
                 Login
               </Button>

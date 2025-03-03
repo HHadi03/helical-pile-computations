@@ -1,16 +1,17 @@
 'use client'
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableCaption, } from "@/app/components/ui/table"
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/app/components/ui/table"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from "@/app/components/ui/alert-dialog"
-import { Check } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { deleteSoil } from "@/app/(dashboard)/actions/deleteSoil"
-import { Toolbar } from "@/app/components/Toolbar"
 import type { TsoilSchema } from "@/app/schemas/soilSchema"
 import { useToast } from "@/app/components/hooks/use-toast"
 import { ToastAction } from "@/app/components/ui/toast"
 import { calculateAll } from "../actions/submitCalculations"
 import { useFormEdit } from "./FormContext"
+import { Calculator, PlusCircle, Edit2, Trash2, RectangleVertical, ShieldCheck } from 'lucide-react'
+import { Button } from "@/app/components/ui/button"
+import Link from 'next/link'
 
 const soilTypeNames = {
   'fine': 'Fine Grain',
@@ -58,6 +59,7 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
     if (selectedRow !== null && soilsData[selectedRow].id) {
       router.push(`/configuration/edit-soil/${soilsData[selectedRow].id}`)
     }
+    
   }
 
   const handleCalculate = async () => {
@@ -88,46 +90,82 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
 
   return (
     <>
-      <Toolbar onDelete={() => setIsDeleteDialogOpen(true)} onEdit={handleEdit} onCalculate={handleCalculate}
-       canCalculate={isAnyFormEdited && soilsData.length > 0} canDelete={selectedRow !== null} canEdit={selectedRow !== null}
-      />
-      <div className="pl-1 pt-3">
-        <h1 className="text-2xl pl-3">Soil Layer Entries</h1>
+      <div className="flex bg-white sticky top-0 z-10 space-x-3 ml-1">
+        <Link href="/configuration/safety-factors" >
+          <Button variant="ghost" className="hover:bg-amber-100">
+            <ShieldCheck className="h-5 w-5 text-amber-900"/> Define Parameters
+          </Button>
+        </Link>
+        
+        <Link href="/configuration/insert-soil">
+          <Button variant="ghost" className="hover:bg-blue-100">
+            <PlusCircle className="h-5 w-5 text-blue-500"/> Add Soil Layer
+          </Button>
+        </Link>
+
+        <Link href="/configuration/pile">
+          <Button variant="ghost" className="hover:bg-purple-100">
+            <RectangleVertical className="h-5 w-5 text-purple-500"/> Configure Pile
+          </Button>
+        </Link>
+
+        {isAnyFormEdited && soilsData.length > 0 && (
+          <Button variant="ghost" className="hover:bg-green-100" onClick={handleCalculate}>
+            <Calculator className="h-5 w-5 text-green-700" /> Calculate Changes
+          </Button>
+        )}
+      </div>
+
+      <div className="mx-3 mt-3">
+        <h1 className="pl-1 text-2xl">Soil Layer Entries ({soilsData.length})</h1>
         {soilsData.length > 0 ? (
-          <Table>
-            <TableCaption className="caption-bottom">
-              Summary of Soil Types and Properties
-            </TableCaption>
-            <TableHeader>
+          <div className="overflow-hidden rounded-xl border border-gray-200 shadow-gray-200 shadow-md mt-2">
+          <Table className="w-full">
+            <TableHeader className="bg-gray-300">
               <TableRow>
-                <TableHead>Layer</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead className="whitespace-nowrap">Start Depth</TableHead>
-                <TableHead className="whitespace-nowrap">End Depth</TableHead>
-                <TableHead>Parameters</TableHead>
+                <TableHead className="font-semibold">Layer</TableHead>
+                <TableHead className="whitespace-nowrap font-semibold">Start Depth</TableHead>
+                <TableHead className="whitespace-nowrap font-semibold">End Depth</TableHead>
+                <TableHead className="font-semibold">Type</TableHead>
+                <TableHead className="font-semibold">Name</TableHead>
+                <TableHead className="font-semibold">Description</TableHead>
               </TableRow>
             </TableHeader>
+
             <TableBody>
               {soilsData.map((soil: TsoilSchema, index: number) => (
-                <TableRow key={soil.id} className={`cursor-pointer hover:bg-gray-50 ${selectedRow === index ? 'bg-gray-100' : ''}`}  onClick={() => setSelectedRow(index)}>
+                <TableRow key={soil.id} className={`cursor-pointer hover:bg-slate-50 ${selectedRow === index ? 'bg-slate-100' : ''}`}  onClick={() => setSelectedRow(index)}>
                   <TableCell>{index + 1}</TableCell>
-                  <TableCell className="whitespace-nowrap">{soilTypeNames[soil.soilType] || soil.soilType}</TableCell>
-                  <TableCell className="whitespace-nowrap">{soil.soilName ? soil.soilName : soil.soil}</TableCell>
-                  <TableCell>{soil.description}</TableCell>
                   <TableCell>{`${soil.startDepth} m`}</TableCell>
                   <TableCell>{`${soil.endDepth} m`}</TableCell>
-                  <TableCell>
-                    <Check className="h-5 w-5 text-green-700" />
-                  </TableCell>
+                  <TableCell>{soilTypeNames[soil.soilType]}</TableCell>
+                  <TableCell>{soil.soilName ? soil.soilName : soil.soil}</TableCell>
+                  <TableCell>{soil.description}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-        ) : (<p className="pl-3 pt-2 text-gray-500">No soil data available. Please add some entries.</p>)}
-      </div>
+          </div>
+        ) : (<p className="pl-1 pt-2 text-gray-500">No soil data available. Please add some entries.</p>)}
 
+        {soilsData.length > 0 && (
+          <div className="sticky bottom-0 z-10 pt-3 pb-2 pr-2 pointer-events-none flex justify-end">
+            <div className="border border-gray-300 rounded-sm shadow-sm bg-white pointer-events-auto">
+              <Button variant="ghost" className={`hover:bg-zinc-200 border-r border-gray-300 ${selectedRow === null ? 'cursor-not-allowed' : ''}`}
+                onClick={handleEdit} disabled={selectedRow === null}>
+                <Edit2 className="h-5 w-5 text-zinc-600"/> Edit
+              </Button>
+
+              <Button variant="ghost" className={`hover:bg-red-100 ${selectedRow === null ? 'cursor-not-allowed' : ''}`} 
+                onClick={() => setIsDeleteDialogOpen(true)} disabled={selectedRow === null}>
+                <Trash2 className="h-5 w-5 text-red-500"/> Delete
+              </Button>
+            </div>  
+          </div>
+        )}
+
+      </div>
+      
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

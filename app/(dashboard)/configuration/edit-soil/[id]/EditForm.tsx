@@ -35,13 +35,11 @@ export function EditForm({ soil, pile }: EditFormProps) {
     const subscription = form.watch((_, { name }) => {
       if (name === 'T') {
         setTFieldEdited(true)
-        setCriticalChanges(false)
+
       } else if (name === 'Su' || name === 'Qult' || name === 'Angle') {
         setCriticalChanges(true)
-        setTFieldEdited(false)
       }
     })
-  
     return () => subscription.unsubscribe()
   }, [form, setTFieldEdited, setCriticalChanges])
   
@@ -140,7 +138,7 @@ export function EditForm({ soil, pile }: EditFormProps) {
                 name="Su"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Undrained Soil Shear Strength (Su)</FormLabel>
+                    <FormLabel>Undrained Shear Soil Strength (Su)</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <NumberInput field={field} placeholder="Enter Su"/>
@@ -159,7 +157,7 @@ export function EditForm({ soil, pile }: EditFormProps) {
                 name="Angle"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Internal Friction Angle (φ)</FormLabel>
+                    <FormLabel>Angle of Internal Friction (φ)</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <NumberInput field={field} placeholder="Enter Angle"/>
