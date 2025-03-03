@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useRouter } from "next/navigation"
 import { NumberInput } from "@/app/components/NumberInput"
 import { useEffect } from "react"
-import { useFormEdit } from "../../FormContext"
+import { UseFormContext } from "../../FormContext"
 import { Loader2 } from "lucide-react"
 
 type EditFormProps = {
@@ -22,7 +22,7 @@ type EditFormProps = {
 export function EditForm({ soil, pile }: EditFormProps) {
   const { toast } = useToast()
   const router = useRouter()
-  const { setHasUnsavedChanges, setFormEdited, setCriticalChanges, setTFieldEdited  } = useFormEdit()
+  const { setHasUnsavedChanges, setCriticalChanges, setTFieldEdited } = UseFormContext()
 
   const form = useForm<TsoilSchema>({
     resolver: zodResolver(soilSchema),
@@ -60,7 +60,6 @@ export function EditForm({ soil, pile }: EditFormProps) {
       })
       
       if (!result.errors) {
-        setFormEdited('editSoil', false)
         setHasUnsavedChanges(true) 
         router.back()
       }

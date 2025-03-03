@@ -1,5 +1,5 @@
 import { Toaster } from "@/app/components/ui/toaster"
-import { FormEditProvider } from "./FormContext"
+import { FormContextProvider } from "./FormContext"
 
 export default function ConfigurationLayout({
     children,
@@ -10,11 +10,11 @@ export default function ConfigurationLayout({
 }) {
     return (
         <>
-        <FormEditProvider>
+        <FormContextProvider>
         {children}
         {modal}
         <Toaster/>
-        </FormEditProvider>
+        </FormContextProvider>
         </>
     )
 }

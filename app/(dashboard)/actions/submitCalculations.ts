@@ -10,9 +10,19 @@ type ReturnType = {
   errors?: Record<string, string[]>
 }
 
+type UpdatedSoil = {
+  shaftCapacity?: number
+  bearingCapacity?: number
+  Po?: number
+  Angle?: number
+  Ko?: number
+  T?: number
+  Su?: number
+  Qult?: number
+  h?: number
+}
+
 export async function calculateAll(soils: TsoilSchema[], hasCriticalChanges: boolean, isTFieldEdited: boolean): Promise<ReturnType> {
-  console.log("is T field edited", isTFieldEdited)
-  console.log("has critical changes", hasCriticalChanges)
   try {
     const pileData = await getPile()
     if (!pileData) {throw new Error}
@@ -27,6 +37,7 @@ export async function calculateAll(soils: TsoilSchema[], hasCriticalChanges: boo
         
         //create a new soil object with calculated values
         const calculatedValues = soil.soilType === "fine" ? await calculateResultsForFineSoil(soil) : await calculateResultsForSoils(soil)
+        console.log(calculatedValues)
 
         //determine soil height based on pile length
         let soilHeight: number
@@ -44,7 +55,7 @@ export async function calculateAll(soils: TsoilSchema[], hasCriticalChanges: boo
         if (soilHeight > 0) {
           let shaftCapacity: number
           let bearingCapacity: number
-          let updatedSoil: any = {}
+          let updatedSoil: UpdatedSoil = {}
           const e = 2.71828183
           const TAN = 0.01745
           

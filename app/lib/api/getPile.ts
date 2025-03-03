@@ -13,7 +13,7 @@ export async function getPile() {
 
     return pile
 
-  } catch (error) {
+  } catch {
     return null
   }
 }

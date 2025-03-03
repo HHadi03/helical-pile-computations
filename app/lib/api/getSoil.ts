@@ -13,7 +13,7 @@ export async function getSoil(id: string) {
 
     return soil
 
-  } catch (error) {
+  } catch {
     return null
   }
 }

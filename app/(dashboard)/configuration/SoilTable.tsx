@@ -8,7 +8,7 @@ import type { TsoilSchema } from "@/app/schemas/soilSchema"
 import { useToast } from "@/app/components/hooks/use-toast"
 import { ToastAction } from "@/app/components/ui/toast"
 import { calculateAll } from "../actions/submitCalculations"
-import { useFormEdit } from "./FormContext"
+import { UseFormContext } from "./FormContext"
 import { Calculator, PlusCircle, Edit2, Trash2, RectangleVertical, ShieldCheck } from 'lucide-react'
 import { Button } from "@/app/components/ui/button"
 import Link from 'next/link'
@@ -24,7 +24,7 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
   const { toast } = useToast()
   const [selectedRow, setSelectedRow] = useState<number | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const {isAnyFormEdited, hasCriticalChanges,  isTFieldEdited, resetFormStates} = useFormEdit()
+  const {isAnyFormEdited, hasCriticalChanges,  isTFieldEdited, resetFormStates} = UseFormContext()
 
   const handleDelete = async () => {
     if (selectedRow !== null && soilsData[selectedRow].id) {
@@ -59,12 +59,11 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
     if (selectedRow !== null && soilsData[selectedRow].id) {
       router.push(`/configuration/edit-soil/${soilsData[selectedRow].id}`)
     }
-    
   }
 
   const handleCalculate = async () => {
     try {
-      const result = await calculateAll(soilsData, hasCriticalChanges,  isTFieldEdited)
+      const result = await calculateAll(soilsData, hasCriticalChanges, isTFieldEdited)
       toast({
         duration: 2500,
         variant: result.errors ? "destructive" : "default",

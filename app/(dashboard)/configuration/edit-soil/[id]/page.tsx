@@ -10,15 +10,11 @@ type Props = {
 }
 
 export default async function EditSoilPage({ params }: Props) {
-  const { id } = await params
+  const { id } =  await params
   const soil = await getSoil(id)
   const pile = await getPile()
   
-  if (!pile){
-    return <NotFound/>
-  }
-
-  if (!soil?.id) {
+  if (!soil?.id || !pile) {
     return <NotFound/>
   }
 

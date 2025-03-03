@@ -11,8 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useRouter } from "next/navigation"
 import { NumberInput } from "@/app/components/NumberInput"
 import { Checkbox } from "@/app/components/ui/checkbox"
-import { useFormEdit } from "../FormContext"
-import { useEffect } from "react"
+import { UseFormContext } from "../FormContext"
 import { Loader2 } from "lucide-react"
 
 type PileFormProps = {
@@ -22,22 +21,15 @@ type PileFormProps = {
 export function PileForm({ pile }: PileFormProps) {
   const { toast } = useToast()
   const router = useRouter()
-  const { setFormEdited, setHasUnsavedChanges } = useFormEdit()
-
+  const { setHasUnsavedChanges } = UseFormContext()
+  
   const form = useForm<TpileSchema>({
     resolver: zodResolver(pileSchema),
     defaultValues: {...pile}
   })
 
   const { formState: { isDirty, isSubmitting } } = form
-
-  useEffect(() => {
-    const subscription = form.watch(() => {
-      setFormEdited('configurePile', true)
-    })
-    return () => subscription.unsubscribe()
-  }, [form, setFormEdited])
-
+ 
   async function onSubmit(values: TpileSchema) {
     try {
       const result = await updatePile(values)
@@ -56,7 +48,6 @@ export function PileForm({ pile }: PileFormProps) {
       })
       
       if (!result.errors) {
-        setFormEdited('configurePile', false)
         setHasUnsavedChanges(true)
         router.back()
       }

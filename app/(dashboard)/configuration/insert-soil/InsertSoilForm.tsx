@@ -17,13 +17,13 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/app/components/
 import { useRouter } from "next/navigation"
 import { NumberInput } from "@/app/components/NumberInput"
 import { createPortal } from 'react-dom'
-import { useFormEdit } from "../FormContext"
+import { UseFormContext } from "../FormContext"
 
 export function SoilForm() {
   const { toast } = useToast()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('soil')
-  const { setFormEdited, setHasUnsavedChanges, formEditStates } = useFormEdit()
+  const { setHasUnsavedChanges } = UseFormContext()
   
   const form = useForm<TsoilSchema>({
     resolver: zodResolver(soilSchema),
@@ -42,9 +42,8 @@ export function SoilForm() {
     }
   })
   
-  console.log(formEditStates)
   const { formState: { isSubmitting } } = form
-  
+
   const soilType = form.watch("soilType")
   const soil = form.watch("soil")
   const density = form.watch("density")
@@ -58,13 +57,6 @@ export function SoilForm() {
     }
   }
 
-  const handleClose = () => {
-    if (formEditStates.insertSoil) {
-      setFormEdited('insertSoil', false)
-    }
-    router.back()
-  }
-
   useEffect(() => {
     if (selectedSoil && selectedDensity && soilProperties[selectedSoil]) {
       const values = soilProperties[selectedSoil][selectedDensity]
@@ -76,13 +68,6 @@ export function SoilForm() {
   useEffect(() => {
     form.setValue("soil", "")
   }, [soilType, form])
-
-  useEffect(() => {
-    const subscription = form.watch(() => {
-      setFormEdited('insertSoil', true)
-    })
-    return () => subscription.unsubscribe()
-  }, [form, setFormEdited])
 
   async function onSubmit(values: TsoilSchema) {
     try {
@@ -101,7 +86,6 @@ export function SoilForm() {
       })
       
       if (!result.errors){
-        setFormEdited('insertSoil', false)
         setHasUnsavedChanges(true)
         router.back()
       }
@@ -243,7 +227,7 @@ export function SoilForm() {
 
             <div className="pt-2 flex justify-between">
               <Button type="button" className="w-24" onClick={handleNext} disabled={!showParametersTab}>Next</Button>
-              <Button type="button" variant="outline" onClick={handleClose}>Close</Button>
+              <Button type="button" variant="outline" onClick={() => router.back()}>Close</Button>
             </div>
           </TabsContent>
 

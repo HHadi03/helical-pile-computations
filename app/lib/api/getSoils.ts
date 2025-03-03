@@ -15,7 +15,7 @@ export async function getSoils(): Promise<TsoilSchema[]> {
 
     return soils
     
-  } catch (error) {
+  } catch {
     return []
   }
 }

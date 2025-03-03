@@ -4,6 +4,7 @@ import { Input } from './components/ui/input'
 
 export default function LandingPage() {
   return (
+    //hydration issue occurs here
     <main className="min-h-screen relative bg-cover bg-center" 
       style={{backgroundImage: "url('/castle-background.jpg')", backgroundColor: 'rgba(0, 0, 0, 0.3)', backgroundBlendMode: 'darken'}}>
       
