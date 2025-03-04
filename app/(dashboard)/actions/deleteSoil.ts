@@ -22,12 +22,12 @@ export async function deleteSoil(id: string): Promise<ReturnType> {
     })
 
     if (!response.ok) {
-      return {message: "Failed to delete soil. Please try again.", errors: {}}
+      return { message: "Failed to delete soil. Please try again.", errors: {}}
     }
     revalidateTag('soil')
     return { message: "Soil deleted successfully" }
 
   } catch {
-    return {message: "Failed to delete soil. Please try again later.", errors: {}}
+    return { message: "Failed to delete soil. Please try again later.", errors: {}}
   }
 }

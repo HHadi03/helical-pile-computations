@@ -2,10 +2,10 @@ import { createZodFetcher } from "zod-fetch"
 import { soilSchema } from "@/app/schemas/soilSchema"
 import { API_URL } from "./getSoils"
 
-const fetchWithZod = createZodFetcher()
+const fetchSoil = createZodFetcher()
 export async function getSoil(id: string) {
   try {
-    const soil = await fetchWithZod(
+    const soil = await fetchSoil(
       soilSchema,
       `${API_URL}/soil/${id}`,
       {next: {tags: ['soil']}}

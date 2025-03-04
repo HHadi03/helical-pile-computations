@@ -128,7 +128,7 @@ export function PileForm({ pile }: PileFormProps) {
               <FormItem>
                 <FormLabel>Water Depth (m)</FormLabel>
                 <FormControl>
-                  <NumberInput field={field} placeholder="0"/>
+                  <NumberInput field={field} placeholder="Enter water depth"/>
                 </FormControl>
                 <FormMessage />
               </FormItem>

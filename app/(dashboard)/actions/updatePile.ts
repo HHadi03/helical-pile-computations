@@ -55,12 +55,12 @@ export async function updatePile(pile: TpileSchema): Promise<ReturnType> {
     })
 
     if (!response.ok) {
-      return {message: "Failed to update pile data. Please try again.", errors: {}}
+      return { message: "Failed to update pile data. Please try again.", errors: {}}
     }
     revalidateTag('pile')
     return { message: "Pile data updated successfully" }
 
   } catch {
-    return {message: "Failed to update pile data. Please try again later.", errors: {}}
+    return { message: "Failed to update pile data. Please try again later.", errors: {}}
   }
 }

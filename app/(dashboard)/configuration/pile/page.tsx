@@ -3,6 +3,7 @@ import { getPile } from '@/app/lib/api/getPile'
 
 export default async function PilePage() {
   const existingPileData = await getPile()
+  
   if (!existingPileData) {
     return <div>Failed to load pile data.</div>
   }

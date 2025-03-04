@@ -155,8 +155,8 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
                 <Edit2 className="h-5 w-5 text-zinc-600"/> Edit
               </Button>
 
-              <Button variant="ghost" className={`hover:bg-red-100 ${selectedRow === null ? 'cursor-not-allowed' : ''}`} 
-                onClick={() => setIsDeleteDialogOpen(true)} disabled={selectedRow === null}>
+              <Button variant="ghost" className={`hover:bg-red-100 ${selectedRow === null || selectedRow !== soilsData.length - 1 ? 'cursor-not-allowed' : ''}`} 
+                onClick={() => setIsDeleteDialogOpen(true)} disabled={selectedRow === null || selectedRow !== soilsData.length - 1}>
                 <Trash2 className="h-5 w-5 text-red-500"/> Delete
               </Button>
             </div>  
@@ -172,7 +172,7 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete{" "}
               {selectedRow !== null ? soilsData[selectedRow].soilName || soilsData[selectedRow].soil : "selected soil"}{" "}
-              and remove it from our servers.
+              and remove it from the table.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
