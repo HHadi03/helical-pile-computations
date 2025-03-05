@@ -37,8 +37,7 @@ export async function calculateAll(soils: TsoilSchema[], hasCriticalChanges: boo
         
         //create a new soil object with calculated values
         const calculatedValues = soil.soilType === "fine" ? await calculateResultsForFineSoil(soil) : await calculateResultsForSoils(soil)
-        console.log(calculatedValues)
-
+    
         //determine soil height based on pile length
         let soilHeight: number
         if (soil.endDepth <= pileData.pileLength) {

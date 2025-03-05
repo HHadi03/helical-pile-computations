@@ -62,7 +62,8 @@ export function SafetyFactorsForm({ safetyFactors }: SafetyFactorsFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
-        <div className="space-y-6 border-t-2 pt-3 pb-5">
+        
+        <div className="space-y-8 border-t-2 py-3">
           <FormField
             control={form.control}
             name="permanentActions"
@@ -91,15 +92,15 @@ export function SafetyFactorsForm({ safetyFactors }: SafetyFactorsFormProps) {
             )}
           />
         </div>
-        
+
         <Tabs defaultValue="set1" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="set1">Combination 1</TabsTrigger>
             <TabsTrigger value="set2">Combination 2</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="set1" className="border-b-2 py-3">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <TabsContent value="set1" className="border-y-2 py-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <FormField
                 control={form.control}
                 name="gammaG1"
@@ -158,8 +159,8 @@ export function SafetyFactorsForm({ safetyFactors }: SafetyFactorsFormProps) {
             </div>
           </TabsContent>
 
-          <TabsContent value="set2" className="border-b-2 py-3">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <TabsContent value="set2" className="border-y-2 py-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <FormField
                 control={form.control}
                 name="gammaG2"
@@ -218,6 +219,8 @@ export function SafetyFactorsForm({ safetyFactors }: SafetyFactorsFormProps) {
             </div>
           </TabsContent>
         </Tabs>
+       
+        
 
         <div className="flex gap-3 pt-2">
           <Button type="submit" className="w-24" disabled={!isDirty || isSubmitting}>

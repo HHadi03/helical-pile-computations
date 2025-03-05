@@ -89,7 +89,7 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
 
   return (
     <>
-      <div className="flex bg-white sticky top-0 z-10 space-x-3 ml-1">
+      <div className="flex bg-white pl-1 sticky top-0 z-10 space-x-3">
         <Link href="/configuration/safety-factors" >
           <Button variant="ghost" className="hover:bg-amber-100">
             <ShieldCheck className="h-5 w-5 text-amber-900"/> Define Parameters
@@ -115,7 +115,7 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
         )}
       </div>
 
-      <div className="mx-3 mt-3">
+      <div className="px-3 pt-3">
         <h1 className="pl-1 text-2xl">Soil Layer Entries ({soilsData.length})</h1>
         {soilsData.length > 0 ? (
           <div className="overflow-hidden rounded-xl border border-gray-200 shadow-gray-200 shadow-md mt-2">
