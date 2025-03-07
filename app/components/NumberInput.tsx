@@ -26,10 +26,10 @@ export const NumberInput = ({ field, placeholder}: NumberInputProps) => {
       }}
 
       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-        let value = e.target.value
-        if (/^\d{0,5}(\.\d{0,4})?$/.test(value)) {
-            field.onChange(value)
-          }
+        const value = e.target.value
+        if (/^\d{0,4}(\.\d{0,2})?$/.test(value)) {
+          field.onChange(value)
+        }
       }}
 
       placeholder={placeholder}

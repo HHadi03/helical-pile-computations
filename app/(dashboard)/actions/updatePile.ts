@@ -1,8 +1,9 @@
 "use server"
-import { pileSchema, TpileSchema } from "@/app/lib/schemas/pileSchema"
+import { pileSchema, TpileSchema } from "@/app/schemas/pileSchema"
 import { API_URL } from "@/app/lib/api/getSoils"
 import { getSoils } from "@/app/lib/api/getSoils"
-import { getPile } from "@/app/lib/api/getPile" 
+import { getPile } from "@/app/lib/api/getPile"
+import { revalidateTag } from "next/cache"
 
 type ReturnType = {
   message: string
@@ -18,6 +19,7 @@ export async function updatePile(pile: TpileSchema): Promise<ReturnType> {
     }
   }
 
+  // Server Validation
   const existingPile = await getPile()
   if (!existingPile) {
     return { message: "Failed to update pile data. Please try again.", errors: {}}
@@ -43,6 +45,7 @@ export async function updatePile(pile: TpileSchema): Promise<ReturnType> {
       }
     }
   }
+  // End of Server Validation
 
   try {
     const response = await fetch(`${API_URL}/pile/${pile.id}`, {
@@ -52,11 +55,12 @@ export async function updatePile(pile: TpileSchema): Promise<ReturnType> {
     })
 
     if (!response.ok) {
-      return {message: "Failed to update pile data. Please try again.", errors: {}}
+      return { message: "Failed to update pile data. Please try again.", errors: {}}
     }
+    revalidateTag('pile')
     return { message: "Pile data updated successfully" }
 
   } catch {
-    return {message: "Failed to update pile data. Please try again later.", errors: {}}
+    return { message: "Failed to update pile data. Please try again later.", errors: {}}
   }
 }

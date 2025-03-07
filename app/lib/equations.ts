@@ -1,33 +1,23 @@
-import { z } from 'zod'
-import { TsoilSchema } from './soilSchema'
-import { getPile } from '../api/getPile'
-
-export const calculateSchema = z.object({
-    Su: z.number(), 
-    Qult: z.number(), 
-    Po: z.number(), 
-    Ko: z.number(), 
-    Angle: z.number(), 
-    T: z.number(), 
-    h: z.number() 
-})
-
-export type TcalculateSchema = z.infer<typeof calculateSchema>
+import { getPile } from './api/getPile'
+import { TsoilSchema } from '../schemas/soilSchema'
 
 const SPT = 6.2
 const UNITWEIGHT = 9.8
 const TAN = 0.01745
 const e = 2.71828183
 
-const roundToTwoDecimals = (value: number): number => {
+export const roundToTwoDecimals = (value: number): number => {
   return Math.round(value * 100) / 100
 }
 
-export const calculateResultsForSoils = async (data: TsoilSchema): Promise<Partial<TcalculateSchema>> => {
+//Coarse OR Manmade Soil Algorithm
+export const calculateResultsForSoils = async (data: TsoilSchema): Promise<Partial<TsoilSchema>> => {
   const pileData = await getPile()
   if (!pileData) {throw new Error}
 
   const h = roundToTwoDecimals(data.endDepth - data.startDepth)
+  
+  //first we calculate the thickness of the unsaturated portion of the soil layer, then the thickness of the saturated portion, hen finally 
   const hMoist = Math.max(0, Math.min(pileData.waterDepth, data.endDepth) - data.startDepth)
   const hSat = Math.max(0, data.endDepth - Math.max(pileData.waterDepth, data.startDepth))
   const Po = roundToTwoDecimals((data.yMoist * hMoist) + (data.ySat * hSat) - (UNITWEIGHT * hSat))
@@ -43,23 +33,24 @@ export const calculateResultsForSoils = async (data: TsoilSchema): Promise<Parti
   const Qult = roundToTwoDecimals(12 * SPT * data.nValue)
 
   return {
-      Po,
-      Angle,
-      Ko,
-      T,
-      Qult,
-      h
+    h,
+    Po,
+    Angle,
+    Ko,
+    T,
+    Qult,
   }
 }
 
-export const calculateResultsForFineSoil = (data: TsoilSchema): Partial<TcalculateSchema> => {
+//Fine Soil Algorithm
+export const calculateResultsForFineSoil = async (data: TsoilSchema): Promise<Partial<TsoilSchema>> => {
   const h = roundToTwoDecimals(data.endDepth - data.startDepth)
   const Su = roundToTwoDecimals(data.nValue * SPT)
   const Qult = roundToTwoDecimals(11 * SPT * data.nValue)
 
   return {
-      Su,
-      Qult,
-      h
+    h,
+    Su,
+    Qult,
   }
 }

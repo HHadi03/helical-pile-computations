@@ -4,6 +4,7 @@ import Link from 'next/link'
 
 export const Sidebar = () => {
   const [expanded, setExpanded] = useState(false)
+  
   return (
     <aside className={`flex flex-col border-r border-gray-300 p-2 bg-gradient-to-tr from-slate-50 via-white to-blue-50 shadow-inner ${expanded ? 'w-[260px]' : 'w-[70px]'} transition-all duration-300`}>
       <div className='pt-2 flex gap-2'>

@@ -5,8 +5,8 @@ import { useToast } from "@/app/components/hooks/use-toast"
 import { ToastAction } from "@/app/components/ui/toast"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { soilOptions, soilProperties } from "@/app/data/soilData"
-import { soilSchema, TsoilSchema } from "@/app/lib/schemas/soilSchema"
+import { soilOptions, soilProperties } from "./soilData"
+import { soilSchema, TsoilSchema } from "@/app/schemas/soilSchema"
 import { insertSoil } from "../../actions/insertSoil"
 import { Button } from "@/app/components/ui/button"
 import { Input } from "@/app/components/ui/input"
@@ -17,10 +17,13 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/app/components/
 import { useRouter } from "next/navigation"
 import { NumberInput } from "@/app/components/NumberInput"
 import { createPortal } from 'react-dom'
+import { UseFormContext } from "../FormContext"
+
 export function SoilForm() {
   const { toast } = useToast()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('soil')
+  const { setHasUnsavedChanges } = UseFormContext()
   
   const form = useForm<TsoilSchema>({
     resolver: zodResolver(soilSchema),
@@ -38,9 +41,9 @@ export function SoilForm() {
       color: ""
     }
   })
-
-  const { formState: {isSubmitting} } = form
   
+  const { formState: { isSubmitting } } = form
+
   const soilType = form.watch("soilType")
   const soil = form.watch("soil")
   const density = form.watch("density")
@@ -68,9 +71,7 @@ export function SoilForm() {
 
   async function onSubmit(values: TsoilSchema) {
     try {
-      isSubmitting
       const result = await insertSoil(values)
-  
       if (result.errors) {
         Object.entries(result.errors).forEach(([key, value]) => {
         form.setError(key as keyof TsoilSchema, { message: Array.isArray(value) ? value[0] : (value as string)})})
@@ -83,7 +84,9 @@ export function SoilForm() {
         description: result.message,
         action: result.errors && <ToastAction altText="Try again">Try again</ToastAction>
       })
+      
       if (!result.errors){
+        setHasUnsavedChanges(true)
         router.back()
       }
 
@@ -95,7 +98,6 @@ export function SoilForm() {
         description: "An unexpected error occurred. Please try again later.",
         action: <ToastAction altText="Try again">Try again</ToastAction>
       })
-
     } 
   }
   
@@ -227,7 +229,6 @@ export function SoilForm() {
               <Button type="button" className="w-24" onClick={handleNext} disabled={!showParametersTab}>Next</Button>
               <Button type="button" variant="outline" onClick={() => router.back()}>Close</Button>
             </div>
-
           </TabsContent>
 
           {showParametersTab && (<TabsContent value="parameters">
@@ -327,11 +328,11 @@ export function SoilForm() {
               <Button type="submit" className="w-24" disabled={isSubmitting}>
                 {isSubmitting ? (<> <Loader2 className="mr-2 h-4 w-4 animate-spin"/> Submitting... </>) : ("Submit")}
               </Button>
-              <Button type="button" variant="outline" onClick={() => router.back()}>Close</Button>
+              <Button type="button" variant="outline" disabled={isSubmitting} onClick={() => router.back()}>Close</Button>
             </div>
+          </TabsContent>)}
 
-          </TabsContent>
-        )}</Tabs>
+        </Tabs>
       </form>
     </Form>
   )
