@@ -3,11 +3,11 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from "@/app/components/ui/alert-dialog"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { deleteSoil } from "@/app/(dashboard)/actions/deleteSoil"
+import { deleteSoil } from "@/app/(dashboard)/configuration/actions/deleteSoil"
 import type { TsoilSchema } from "@/app/schemas/soilSchema"
 import { useToast } from "@/app/components/hooks/use-toast"
 import { ToastAction } from "@/app/components/ui/toast"
-import { calculateAll } from "../actions/submitCalculations"
+import { calculateAll } from "./actions/submitCalculations"
 import { UseFormContext } from "./FormContext"
 import { Calculator, PlusCircle, Edit2, Trash2, RectangleVertical, ShieldCheck } from 'lucide-react'
 import { Button } from "@/app/components/ui/button"
