@@ -1,5 +1,5 @@
 import { createZodFetcher } from "zod-fetch"
-import { safetySchema } from "@/app/schemas/safetyFactorsSchema"
+import { safetySchema } from "@/app/schemas/safetySchema"
 import { API_URL } from "./getSoils"
 
 const fetchFactors = createZodFetcher()

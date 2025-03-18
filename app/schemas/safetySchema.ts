@@ -20,6 +20,3 @@ export const safetySchema = z.object({
 })
 
 export type TsafetySchema = z.infer<typeof safetySchema>
-
-
-//add optional for results 

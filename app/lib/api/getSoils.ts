@@ -1,7 +1,7 @@
 import { createZodFetcher } from "zod-fetch"
 import { z } from "zod"
 import { soilSchema, TsoilSchema } from "@/app/schemas/soilSchema"
-export const API_URL = process.env.API_URL || "http://localhost:3500" //https://dl1kvzlj-3500.uks1.devtunnels.ms
+export const API_URL = process.env.API_URL || "http://localhost:3500"
 
 const fetchSoils = createZodFetcher()
 export async function getSoils(): Promise<TsoilSchema[]> {

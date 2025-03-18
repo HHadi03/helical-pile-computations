@@ -16,41 +16,40 @@ export const calculateResultsForSoils = async (data: TsoilSchema): Promise<Parti
   if (!pileData) {throw new Error}
 
   const h = roundToTwoDecimals(data.endDepth - data.startDepth)
-  
-  //first we calculate the thickness of the unsaturated portion of the soil layer, then the thickness of the saturated portion, hen finally 
+   
   const hMoist = Math.max(0, Math.min(pileData.waterDepth, data.endDepth) - data.startDepth)
   const hSat = Math.max(0, data.endDepth - Math.max(pileData.waterDepth, data.startDepth))
-  const Po = roundToTwoDecimals((data.yMoist * hMoist) + (data.ySat * hSat) - (UNITWEIGHT * hSat))
+  const po = roundToTwoDecimals((data.yMoist * hMoist) + (data.ySat * hSat) - (UNITWEIGHT * hSat))
 
-  let Angle = 25 + 28 * (data.nValue / Po)
-  if (Angle > 45) {
-      Angle = 45
+  let angle = 25 + 28 * (data.nValue / po)
+  if (angle > 45) {
+      angle = 45
   }
-  Angle = roundToTwoDecimals(Angle)
+  angle = roundToTwoDecimals(angle)
 
-  const Ko = roundToTwoDecimals(0.09 * Math.pow(e, (0.08 * Angle)))
-  const T = roundToTwoDecimals(Ko * Po * Math.tan(Angle * TAN))
-  const Qult = roundToTwoDecimals(12 * SPT * data.nValue)
+  const ko = roundToTwoDecimals(0.09 * Math.pow(e, (0.08 * angle)))
+  const t = roundToTwoDecimals(ko * po * Math.tan(angle * TAN))
+  const qult = roundToTwoDecimals(12 * SPT * data.nValue)
 
   return {
     h,
-    Po,
-    Angle,
-    Ko,
-    T,
-    Qult,
+    po,
+    angle,
+    ko,
+    t,
+    qult,
   }
 }
 
 //Fine Soil Algorithm
 export const calculateResultsForFineSoil = async (data: TsoilSchema): Promise<Partial<TsoilSchema>> => {
   const h = roundToTwoDecimals(data.endDepth - data.startDepth)
-  const Su = roundToTwoDecimals(data.nValue * SPT)
-  const Qult = roundToTwoDecimals(11 * SPT * data.nValue)
+  const su = roundToTwoDecimals(data.nValue * SPT)
+  const qult = roundToTwoDecimals(11 * SPT * data.nValue)
 
   return {
     h,
-    Su,
-    Qult,
+    su,
+    qult,
   }
 }

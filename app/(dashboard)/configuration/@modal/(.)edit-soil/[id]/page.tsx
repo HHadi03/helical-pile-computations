@@ -17,7 +17,9 @@ export default async function EditSoilModal({ params }: Props) {
   if (!soil?.id || !pile) {
     return (
       <Modal title="Edit Soil Parameters">
-        <h1 className="text-2xl">No Soil Found for that ID, or pile data missing.</h1>
+        <div className="text-red-500 text-sm">
+          <p>Could not find soil data, or pile data is missing.</p>
+        </div>
       </Modal>
     )
   }

@@ -1,6 +1,6 @@
 "use server"
 import { API_URL } from "@/app/lib/api/getSoils"
-import { safetySchema, TsafetySchema } from "@/app/schemas/safetyFactorsSchema"
+import { safetySchema, TsafetySchema } from "@/app/schemas/safetySchema"
 import { roundToTwoDecimals } from "@/app/lib/equations"
 
 type ReturnType = {
