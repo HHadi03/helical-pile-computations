@@ -13,12 +13,12 @@ type ReturnType = {
 type UpdatedSoil = {
   shaftCapacity?: number
   bearingCapacity?: number
-  Po?: number
-  Angle?: number
-  Ko?: number
-  T?: number
-  Su?: number
-  Qult?: number
+  po?: number
+  angle?: number
+  ko?: number
+  t?: number
+  su?: number
+  qult?: number
   h?: number
 }
 
@@ -61,11 +61,11 @@ export async function calculateAll(soils: TsoilSchema[], hasCriticalChanges: boo
           //Condition 0 > If T and Qult is Edited
           if (isTFieldEdited && hasCriticalChanges && soil.soilType === 'coarse') {
             if (pileData.pileDiameter === "100") {
-              shaftCapacity = soil.T! * soilHeight * 0.314
-              bearingCapacity = soil.Qult! * 0.002463
+              shaftCapacity = soil.t! * soilHeight * 0.314
+              bearingCapacity = soil.qult! * 0.002463
             } else {
-              shaftCapacity = soil.T! * soilHeight * 0.1884
-              bearingCapacity = soil.Qult! * 0.001223
+              shaftCapacity = soil.t! * soilHeight * 0.1884
+              bearingCapacity = soil.qult! * 0.001223
             }
             updatedSoil = {
               shaftCapacity: roundToTwoDecimals(shaftCapacity),
@@ -76,11 +76,11 @@ export async function calculateAll(soils: TsoilSchema[], hasCriticalChanges: boo
           //Condition 1 > If T is Edited
           else if (isTFieldEdited && soil.soilType === 'coarse') {
             if (pileData.pileDiameter === "100") {
-              shaftCapacity = soil.T! * soilHeight * 0.314
-              bearingCapacity = calculatedValues.Qult! * 0.002463
+              shaftCapacity = soil.t! * soilHeight * 0.314
+              bearingCapacity = calculatedValues.qult! * 0.002463
             } else {
-              shaftCapacity = soil.T! * soilHeight * 0.1884
-              bearingCapacity = calculatedValues.Qult! * 0.001223
+              shaftCapacity = soil.t! * soilHeight * 0.1884
+              bearingCapacity = calculatedValues.qult! * 0.001223
             }
             updatedSoil = {
               shaftCapacity: roundToTwoDecimals(shaftCapacity),
@@ -92,20 +92,20 @@ export async function calculateAll(soils: TsoilSchema[], hasCriticalChanges: boo
           else if (hasCriticalChanges) {
             if (pileData.pileDiameter === "100") {
               if (soil.soilType === "fine") {
-                shaftCapacity = soil.Su! * soilHeight * 0.314
-                bearingCapacity = soil.Qult! * 0.002463
+                shaftCapacity = soil.su! * soilHeight * 0.314
+                bearingCapacity = soil.qult! * 0.002463
                 updatedSoil = {
                   shaftCapacity: roundToTwoDecimals(shaftCapacity),
                   bearingCapacity: roundToTwoDecimals(bearingCapacity)
                 }
               } else {
-                const Ko = 0.09 * Math.pow(e, (0.08 * soil.Angle!))
-                const T = Ko * calculatedValues.Po! * Math.tan(soil.Angle! * TAN)
+                const Ko = 0.09 * Math.pow(e, (0.08 * soil.angle!))
+                const T = Ko * calculatedValues.po! * Math.tan(soil.angle! * TAN)
                 shaftCapacity = T * soilHeight * 0.314
-                bearingCapacity = soil.Qult! * 0.002463
+                bearingCapacity = soil.qult! * 0.002463
                 updatedSoil = {
-                  Ko: roundToTwoDecimals(Ko),
-                  T: roundToTwoDecimals(T),
+                  ko: roundToTwoDecimals(Ko),
+                  t: roundToTwoDecimals(T),
                   shaftCapacity: roundToTwoDecimals(shaftCapacity),
                   bearingCapacity: roundToTwoDecimals(bearingCapacity)
                 }
@@ -113,20 +113,20 @@ export async function calculateAll(soils: TsoilSchema[], hasCriticalChanges: boo
 
             } else {
               if (soil.soilType === "fine") {
-                shaftCapacity = soil.Su! * soilHeight * 0.1884
-                bearingCapacity = soil.Qult! * 0.001223
+                shaftCapacity = soil.su! * soilHeight * 0.1884
+                bearingCapacity = soil.qult! * 0.001223
                 updatedSoil = {
                   shaftCapacity: roundToTwoDecimals(shaftCapacity),
                   bearingCapacity: roundToTwoDecimals(bearingCapacity)
                 }
               } else {
-                const Ko = 0.09 * Math.pow(e, (0.08 * soil.Angle!))
-                const T = Ko * calculatedValues.Po! * Math.tan(soil.Angle! * TAN)
+                const Ko = 0.09 * Math.pow(e, (0.08 * soil.angle!))
+                const T = Ko * calculatedValues.po! * Math.tan(soil.angle! * TAN)
                 shaftCapacity = T * soilHeight * 0.1884
-                bearingCapacity = soil.Qult! * 0.001223
+                bearingCapacity = soil.qult! * 0.001223
                 updatedSoil = {
-                  Ko: roundToTwoDecimals(Ko),
-                  T: roundToTwoDecimals(T),
+                  ko: roundToTwoDecimals(Ko),
+                  t: roundToTwoDecimals(T),
                   shaftCapacity: roundToTwoDecimals(shaftCapacity),
                   bearingCapacity: roundToTwoDecimals(bearingCapacity)
                 }
@@ -137,11 +137,11 @@ export async function calculateAll(soils: TsoilSchema[], hasCriticalChanges: boo
           //Conditon 3 > No engineered props edited
           else {
             if (pileData.pileDiameter === "100") {
-              shaftCapacity = soil.soilType === "fine" ? calculatedValues.Su! * soilHeight * 0.314 : calculatedValues.T! * soilHeight * 0.314
-              bearingCapacity = calculatedValues.Qult! * 0.002463
+              shaftCapacity = soil.soilType === "fine" ? calculatedValues.su! * soilHeight * 0.314 : calculatedValues.t! * soilHeight * 0.314
+              bearingCapacity = calculatedValues.qult! * 0.002463
             } else {
-              shaftCapacity = soil.soilType === "fine" ? calculatedValues.Su! * soilHeight * 0.1884 : calculatedValues.T! * soilHeight * 0.1884
-              bearingCapacity = calculatedValues.Qult! * 0.001223
+              shaftCapacity = soil.soilType === "fine" ? calculatedValues.su! * soilHeight * 0.1884 : calculatedValues.t! * soilHeight * 0.1884
+              bearingCapacity = calculatedValues.qult! * 0.001223
             }
             updatedSoil = {
               ...calculatedValues,

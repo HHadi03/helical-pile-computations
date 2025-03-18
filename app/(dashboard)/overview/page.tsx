@@ -64,21 +64,20 @@ export default async function OverviewPage() {
       <div className="mx-auto relative" style={{width: "min(70vw)"}}>
         {soilsData.map((soil, index) => {
           const isWaterInLayer = soil.startDepth <= pileData.waterDepth && pileData.waterDepth <= soil.endDepth
-
           const isLayerBeyondPile = soil.startDepth >= pileData.pileLength
-          const isLastLayer = soil.startDepth < pileData.pileLength && pileData.pileLength <= soil.endDepth
-          
+         
           const soilHeight = soil.h! * scaleFactor
           const layerHeight = Math.max(soilHeight, minLayerHeight)
-          console.log("Layer details:", {CalculatedLayerHeight: soilHeight,MinimumLayerHeight: minLayerHeight,actualLayerHeightUsed: layerHeight,
-          whichWasUsed: soilHeight > minLayerHeight ? "soilHeight" : "minLayerHeight"}) 
+          console.log("Layer details:", {CalculatedLayerHeight: soilHeight,MinimumLayerHeight: minLayerHeight,actualLayerHeightUsed: layerHeight, whichWasUsed: soilHeight > minLayerHeight ? "soilHeight" : "minLayerHeight"}) 
           
-          if (isLastLayer) {
+          // Calculate the height of the pile
+          if (lastLayer) {
             const portionOfLayer = (pileData.pileLength - soil.startDepth) / soil.h!
             pileHeight = totalHeight + (portionOfLayer * layerHeight)
           }
           totalHeight += layerHeight
 
+          // fallback if pile length is not defined
           if (index === soilsData.length - 1 && pileHeight === 0) {
             pileHeight = totalHeight
           }
@@ -91,6 +90,21 @@ export default async function OverviewPage() {
             <div key={soil.id || index}>
               <div className={`relative border-x-2 border-b-2 border-stone-500 ${index === 0 ? 'border-t-2' : ''}`}
               style={{backgroundColor, height: `${layerHeight}px`, width: "100%"}}>
+
+                {/* Absolute Positioned Objects in the Soil Profile */}
+                <div
+                  className={`absolute z-10 right-4 top-0 px-2 py-1 mt-4 shadow text-sm font-semibold 
+                  ${isDark ? "text-white bg-gray-700" : "text-black bg-white"}`}>
+                  {soil.h!.toFixed(1)} m
+                </div>
+
+                {isWaterInLayer && (
+                  <div className="absolute left-0 right-0 z-10" style={{top: `${((pileData.waterDepth - soil.startDepth) / soil.h!) * 100}%`,}}>
+                    <div className="w-full border-b-2 border-blue-400 border-dashed"></div>
+                    <div className="pl-2 pb-1 absolute bottom-0 flex items-center text-blue-600"> <span className="font-semibold"> ▽ Water Depth: {pileData.waterDepth.toFixed(1)} m</span></div>
+                  </div>
+                )}
+
                 <div className="flex h-full">
                   
                   {/* Left Side of the Soil Profile */}
@@ -105,7 +119,7 @@ export default async function OverviewPage() {
                             </div>
                           ) : (<div className={`${textColor} italic`}>Shaft capacity calculation missing.</div>)}
 
-                          {isLastLayer && pileData.showBearingCapacity && (
+                          {lastLayer && pileData.showBearingCapacity && (
                             soil.bearingCapacity !== undefined ? (
                               <div className={textColor}>
                                 <span className="font-semibold">Bearing Capacity:</span>{" "}
@@ -118,7 +132,7 @@ export default async function OverviewPage() {
                   </div>
                   
                   {/* Middle Section of the Soil Profile (placeholder) */}
-                  <div className="w-1/6 flex relative"></div>
+                  <div className="w-1/6 flex"></div>
 
                   {/* Right Side of the Soil Profile */}
                   <div className="w-5/12 flex pt-5 px-3">
@@ -128,7 +142,7 @@ export default async function OverviewPage() {
                         <p className={textColor}><span className="font-semibold">SPT Blow Count (N):</span> {soil.nValue}</p>
                         <p className={textColor}><span className="font-semibold">Unit Weight (Moist):</span> {soil.yMoist} kN/m³</p>
                         <p className={textColor}><span className="font-semibold">Unit Weight (Saturated):</span> {soil.ySat} kN/m³</p>
-                        <p className={textColor}><span className="font-semibold">Shear Strength ({soil.soilType === "fine" ? "Su" : "T"}):</span> {soil.soilType === "fine" ? soil.Su! : soil.T!} kPa</p>
+                        <p className={textColor}><span className="font-semibold">Shear Strength ({soil.soilType === "fine" ? "Su" : "T"}):</span> {soil.soilType === "fine" ? soil.su! : soil.t!} kPa</p>
                       </div>
                       
                       {soil.description && (
@@ -140,20 +154,6 @@ export default async function OverviewPage() {
                     </div>
                   </div>
                   
-                  {/* Absolute Positioned Objects in the Soil Profile */}
-                  <div
-                    className={`absolute z-10 right-4 top-0 px-2 py-1 mt-4 shadow text-sm font-semibold 
-                    ${isDark ? "text-white bg-gray-700" : "text-black bg-white"}`}>
-                    {soil.h!.toFixed(1)} m
-                  </div>
-
-                  {isWaterInLayer && (
-                    <div className="absolute left-0 right-0" style={{top: `${((pileData.waterDepth - soil.startDepth) / soil.h!) * 100}%`,}}>
-                      <div className="w-full border-b-2 border-blue-400 border-dashed"></div>
-                      <div className="pl-2 pb-1 absolute bottom-0 flex items-center text-blue-600"> <span className="font-semibold"> ▽ Water Depth: {pileData.waterDepth.toFixed(1)} m</span></div>
-                    </div>
-                  )}
-
                 </div>
               </div>
             </div>
@@ -161,20 +161,18 @@ export default async function OverviewPage() {
         })}
         
         {/* Continuous Pile Element Rendered outside the Soil Profile */}
-        {pileData.pileLength > 0 && (
-          <div 
-            className="absolute inset-0 z-20"
-            style={{
-              height: `${pileHeight}px`,
-              width: "16.67%", 
-              backgroundImage: `url(${pileData.pileDiameter}mm-pile.png)`,
-              backgroundSize: "auto",
-              backgroundRepeat: "repeat-y",
-              backgroundPosition: "center",
-              marginLeft: "41.67%", 
-            }}
-          />
-        )}
+        <div 
+          className="absolute inset-0 z-20"
+          style={{
+            height: `${pileHeight}px`,
+            width: "16.67%", 
+            backgroundImage: `url(${pileData.pileDiameter}mm-pile.png)`,
+            backgroundSize: "auto",
+            backgroundRepeat: "repeat-y",
+            backgroundPosition: "center",
+            marginLeft: "41.67%", 
+          }}
+        />
       </div>
       
       {hasCapacityCalculations && pileData.showBearingCapacity && (

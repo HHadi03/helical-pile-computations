@@ -33,10 +33,10 @@ export function EditForm({ soil, pile }: EditFormProps) {
 
   useEffect(() => {
     const subscription = form.watch((_, { name }) => {
-      if (name === 'T') {
+      if (name === 't') {
         setTFieldEdited(true)
 
-      } else if (name === 'Su' || name === 'Qult' || name === 'Angle') {
+      } else if (name === 'su' || name === 'qult' || name === 'angle') {
         setCriticalChanges(true)
       }
     })
@@ -134,7 +134,7 @@ export function EditForm({ soil, pile }: EditFormProps) {
             <>
               <FormField
                 control={form.control}
-                name="Su"
+                name="su"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Undrained Shear Soil Strength (Su)</FormLabel>
@@ -153,7 +153,7 @@ export function EditForm({ soil, pile }: EditFormProps) {
             <>
               <FormField
                 control={form.control}
-                name="Angle"
+                name="angle"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Angle of Internal Friction (φ)</FormLabel>
@@ -170,7 +170,7 @@ export function EditForm({ soil, pile }: EditFormProps) {
 
               <FormField
                 control={form.control}
-                name="T"
+                name="t"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Shear Soil Strength (T)</FormLabel>
@@ -190,7 +190,7 @@ export function EditForm({ soil, pile }: EditFormProps) {
           {pile.showBearingCapacity && (
             <FormField
               control={form.control}
-              name="Qult"
+              name="qult"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Ultimate Bearing Pressure (Qult)</FormLabel>
