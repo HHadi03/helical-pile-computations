@@ -1,4 +1,4 @@
-import { getPile } from './api/getPile'
+import { getPile } from '../api/getPile'
 import { TsoilSchema } from '../schemas/soilSchema'
 
 const SPT = 6.2

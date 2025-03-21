@@ -1,7 +1,8 @@
 "use server"
 import { soilSchema, TsoilSchema } from "@/app/schemas/soilSchema"
-import { API_URL } from "@/app/lib/api/getSoils"
-import { revalidateTag } from "next/cache"
+import { supabase } from "@/app/lib/supabaseClient"
+import { camelToSnake } from "@/app/lib/caseConversion"
+import { revalidatePath } from "next/cache"
 
 type ReturnType = {
   message: string
@@ -16,21 +17,21 @@ export async function updateSoil(soil: TsoilSchema): Promise<ReturnType> {
       errors: parsed.error.flatten().fieldErrors
     }
   }
-  
+ 
   try {
-    const response = await fetch(`${API_URL}/soil/${soil.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(soil)
-    })
-
-    if (!response.ok) {
-      return { message: "Failed to update soil data. Please try again.", errors: {} }
+    const snakeCaseSoil = camelToSnake(soil)
+    const { error } = await supabase
+      .from('soils')
+      .update(snakeCaseSoil)
+      .eq('id', soil.id)
+    
+    if (error) {
+      return { message: "Failed to update soil data. Please try again.", errors: {}}
     }
-    revalidateTag('soil')
+    revalidatePath('/configuration')
     return { message: "Soil data updated successfully" }
 
-  } catch {
-    return { message: "Failed to update soil data. Please try again later.", errors: {} }
+  } catch (error) {
+    return { message: "Failed to update soil data. Please try again later.", errors: {}}
   }
 }

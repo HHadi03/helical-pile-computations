@@ -1,6 +1,6 @@
 import { EditForm } from "./EditForm"
-import { getSoil } from "@/app/lib/api/getSoil"
-import { getPile } from "@/app/lib/api/getPile"
+import { getSoil } from "@/app/api/getSoil"
+import { getPile } from "@/app/api/getPile"
 import NotFound from "./not-found"
 
 type Props = {

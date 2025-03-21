@@ -19,18 +19,18 @@ const soilParametersSchema = z.object({
 })
 
 const soilEngineeringPropsSchema = z.object({
-  po: z.coerce.number().optional(),
-  angle: z.coerce.number().optional(),
-  ko: z.coerce.number().optional(),
-  t: z.coerce.number().optional(),
+  po: z.coerce.number().nullish(),
+  angle: z.coerce.number().nullish(),
+  ko: z.coerce.number().nullish(),
+  t: z.coerce.number().nullish(),
+  su: z.coerce.number().nullish(),
   qult: z.coerce.number().optional(),
-  su: z.coerce.number().optional(),
   h: z.coerce.number().optional()
 })
 
 const soilResultsSchema = z.object({
-  shaftCapacity: z.number().optional(),
-  bearingCapacity: z.number().optional(),
+  shaftCapacity: z.coerce.number().nullish(),
+  bearingCapacity: z.coerce.number().nullish(),
 })
 
 export const soilSchema = soilIdentificationSchema
@@ -52,34 +52,34 @@ export const soilSchema = soilIdentificationSchema
     }
   )
   .refine(
-    (data) => data.su === undefined || data.su >= 1,
-    {
-      path: ['Su'],
-      message: "Su is required"
-    }
-  )
-  .refine(
     (data) => data.qult === undefined || data.qult >= 1,
     {
-      path: ['Qult'],
+      path: ['qult'],
       message: "Qult is required"
     }
   )
   .refine(
-    (data) => data.angle === undefined || data.angle >= 1,
+    (data) => data.su === undefined || data.su === null || data.su >= 1,
     {
-      path: ['Angle'],
-      message: "Angle is required"
+      path: ['su'],
+      message: "Su is required"
     }
   )
   .refine(
-    (data) => data.t === undefined || data.t >= 1,
+    (data) => data.t === undefined || data.t === null || data.t >= 1,
     {
-      path: ['T'],
+      path: ['t'],
       message: "T is required"
     }
   )
-
+  .refine(
+    (data) => data.angle === undefined || data.angle === null || data.angle >= 1,
+    {
+      path: ['angle'],
+      message: "Angle is required"
+    }
+  )
+   
 export type TsoilSchema = z.infer<typeof soilSchema>
 
 

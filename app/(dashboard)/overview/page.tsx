@@ -1,6 +1,6 @@
-import { getSoils } from "@/app/lib/api/getSoils"
+import { getSoils } from "@/app/api/getSoils"
 import { ArrowUp, ArrowDown} from "lucide-react"
-import { getPile } from "@/app/lib/api/getPile"
+import { getPile } from "@/app/api/getPile"
 
 export default async function OverviewPage() {
   const soilsData = await getSoils()
@@ -35,12 +35,14 @@ export default async function OverviewPage() {
       </div>
     )
   }
-  
+
+  //add option to edit soil other soil properties
   const relevantSoils = soilsData.filter(soil => soil.startDepth < pileData.pileLength)
-  const hasCapacityCalculations = relevantSoils.some(soil => soil.shaftCapacity != null || soil.bearingCapacity != null)
-  const ultimatePulloutCapacity = relevantSoils.reduce((sum, { shaftCapacity = 0 }) => sum + shaftCapacity, 0)
+  const lastLayer = relevantSoils.find(soil => pileData.pileLength <= soil.endDepth)
+
+  const hasCapacityCalculations = relevantSoils.some(soil => soil.shaftCapacity || soil.bearingCapacity)
+  const ultimatePulloutCapacity = relevantSoils.reduce((sum, soil) => sum + (soil.shaftCapacity ?? 0), 0)
   
-  const lastLayer = soilsData.find(soil => soil.startDepth < pileData.pileLength && pileData.pileLength <= soil.endDepth)
   const bearingCapacity = lastLayer?.bearingCapacity ?? 0
   const ultimateBearingCapacity = ultimatePulloutCapacity + bearingCapacity
 
@@ -65,10 +67,10 @@ export default async function OverviewPage() {
         {soilsData.map((soil, index) => {
           const isWaterInLayer = soil.startDepth <= pileData.waterDepth && pileData.waterDepth <= soil.endDepth
           const isLayerBeyondPile = soil.startDepth >= pileData.pileLength
-         
+          const isBottomLayer = soil.startDepth < pileData.pileLength && soil.endDepth >= pileData.pileLength
+          
           const soilHeight = soil.h! * scaleFactor
           const layerHeight = Math.max(soilHeight, minLayerHeight)
-          console.log("Layer details:", {CalculatedLayerHeight: soilHeight,MinimumLayerHeight: minLayerHeight,actualLayerHeightUsed: layerHeight, whichWasUsed: soilHeight > minLayerHeight ? "soilHeight" : "minLayerHeight"}) 
           
           // Calculate the height of the pile
           if (lastLayer) {
@@ -76,11 +78,6 @@ export default async function OverviewPage() {
             pileHeight = totalHeight + (portionOfLayer * layerHeight)
           }
           totalHeight += layerHeight
-
-          // fallback if pile length is not defined
-          if (index === soilsData.length - 1 && pileHeight === 0) {
-            pileHeight = totalHeight
-          }
 
           const backgroundColor = soil.color || "#e5e5e5"
           const isDark = getLuminance(backgroundColor) < 0.5
@@ -112,15 +109,15 @@ export default async function OverviewPage() {
                     <div className="flex flex-col gap-2">
                       {!isLayerBeyondPile && (
                         <>
-                          {soil.shaftCapacity !== undefined ? (
+                          {soil.shaftCapacity !== null ? (
                             <div className={textColor}>
                               <span className="font-semibold">Shaft Capacity:</span>{" "}
                               <span className={textColor}>{soil.shaftCapacity} kN</span>
                             </div>
                           ) : (<div className={`${textColor} italic`}>Shaft capacity calculation missing.</div>)}
 
-                          {lastLayer && pileData.showBearingCapacity && (
-                            soil.bearingCapacity !== undefined ? (
+                          {isBottomLayer && pileData.showBearingCapacity && (
+                            soil.bearingCapacity !== null ? (
                               <div className={textColor}>
                                 <span className="font-semibold">Bearing Capacity:</span>{" "}
                                 <span className={textColor}>{soil.bearingCapacity} kN</span>

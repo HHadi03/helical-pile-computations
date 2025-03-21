@@ -1,6 +1,8 @@
 "use server"
-import { API_URL } from "@/app/lib/api/getSoils"
-import { revalidateTag } from "next/cache"
+import { supabase } from "@/app/lib/supabaseClient"
+import { revalidatePath } from "next/cache"
+import { getSoils } from "@/app/api/getSoils"
+import { getPile } from "@/app/api/getPile"
 
 type ReturnType = {
   message: string
@@ -10,24 +12,39 @@ type ReturnType = {
 export async function deleteSoil(id: string): Promise<ReturnType> {
   if (!id) {
     return {
-      message: "Please provide a valid soil ID.",
+      message: "Invalid Soil ID detected.",
       errors: {id: ["Soil ID is required for deletion"]}
     }
   }
 
   try {
-    const response = await fetch(`${API_URL}/soil/${id}`, {
-      method: "DELETE",
-      headers: {"Content-Type": "application/json"}
-    })
+    const soilsData = await getSoils()
+    const { error } = await supabase
+      .from('soils')
+      .delete()
+      .eq('id', id)
 
-    if (!response.ok) {
+    if (error) {
       return { message: "Failed to delete soil. Please try again.", errors: {}}
     }
-    revalidateTag('soil')
+    
+    if (soilsData.length > 1) {
+      const pileData = await getPile()
+      const previousSoil = soilsData[soilsData.length - 2]
+      const newPileLength = previousSoil.endDepth
+      
+      if (pileData) {
+        await supabase
+          .from('pile')
+          .update({ pile_length: newPileLength })
+          .eq('id', '1')
+      }
+    }
+    
+    revalidatePath('/configuration')
     return { message: "Soil deleted successfully" }
 
-  } catch {
+  } catch (error) {
     return { message: "Failed to delete soil. Please try again later.", errors: {}}
   }
 }

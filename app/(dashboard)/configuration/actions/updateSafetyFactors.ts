@@ -1,7 +1,8 @@
 "use server"
-import { API_URL } from "@/app/lib/api/getSoils"
 import { safetySchema, TsafetySchema } from "@/app/schemas/safetySchema"
 import { roundToTwoDecimals } from "@/app/lib/equations"
+import { supabase } from "@/app/lib/supabaseClient"
+import { camelToSnake } from "@/app/lib/caseConversion"
 
 type ReturnType = {
   message: string
@@ -29,18 +30,18 @@ export async function updateSafetyFactors(safetyFactors: TsafetySchema): Promise
   // End Of Server Validation
 
   try {
-    const response = await fetch(`${API_URL}/factors/${safetyFactors.id}`, {
-      method: "PATCH",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(updatedSafetyFactors)
-    })
+    const snakeCaseSafetyFactors = camelToSnake(updatedSafetyFactors)
+    const { error } = await supabase
+      .from('factors')
+      .update(snakeCaseSafetyFactors)
+      .eq('id', safetyFactors.id)
 
-    if (!response.ok) {
+    if (error) {
       return { message: "Failed to update safety factors. Please try again.", errors: {}}
     }
     return { message: "Safety factors updated successfully" }
 
-  } catch {
+  } catch (error) {
     return { message: "Failed to update safety factors. Please try again later.", errors: {}}
   }
 }

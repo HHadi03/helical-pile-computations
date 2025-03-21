@@ -1,9 +1,10 @@
 "use server"
 import { soilSchema, TsoilSchema } from "@/app/schemas/soilSchema"
-import { getSoils } from "@/app/lib/api/getSoils" 
-import { API_URL } from "@/app/lib/api/getSoils"
-import { revalidateTag } from "next/cache"
+import { getSoils } from "@/app/api/getSoils" 
 import { calculateResultsForFineSoil, calculateResultsForSoils } from "@/app/lib/equations"
+import { supabase } from "@/app/lib/supabaseClient"
+import { camelToSnake } from "@/app/lib/caseConversion"
+import { revalidatePath } from "next/cache"
 
 type ReturnType = {
   message: string
@@ -28,8 +29,7 @@ export async function insertSoil(soil: TsoilSchema): Promise<ReturnType> {
     }
   }
 
-  const sortedSoils = existingSoils.sort((a, b) => a.startDepth - b.startDepth)
-  const lastSoilLayer = sortedSoils[sortedSoils.length - 1]
+  const lastSoilLayer = existingSoils[existingSoils.length - 1]
   if (lastSoilLayer && soil.startDepth !== lastSoilLayer.endDepth) {
     return {
       message: "The start depth must match the end depth of the previous soil layer.",
@@ -42,19 +42,18 @@ export async function insertSoil(soil: TsoilSchema): Promise<ReturnType> {
   // End of Server Validation
 
   try {
-    const response = await fetch(`${API_URL}/soil`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(soil)
-    })
-
-    if (!response.ok) {
+    const snakeCaseSoil = camelToSnake(soil)
+    const { error } = await supabase
+      .from('soils')
+      .insert(snakeCaseSoil)
+     
+    if (error) {
       return { message: "Failed to submit soil data. Please try again.", errors: {}}
     }
-    revalidateTag('soils')
+    revalidatePath('/configuration')
     return { message: "Soil data submitted successfully 🎉" }
 
-  } catch {
+  } catch (error) {
     return { message: "Failed to submit soil data. Please try again later.", errors: {}}
   }
 }

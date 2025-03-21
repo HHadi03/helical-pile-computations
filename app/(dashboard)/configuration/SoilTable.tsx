@@ -130,7 +130,7 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
                 <TableHead className="font-semibold">Description</TableHead>
               </TableRow>
             </TableHeader>
-
+          
             <TableBody>
               {soilsData.map((soil: TsoilSchema, index: number) => (
                 <TableRow key={soil.id} className={`cursor-pointer hover:bg-slate-50 ${selectedRow === index ? 'bg-slate-100' : ''}`}  onClick={() => setSelectedRow(index)}>
@@ -162,7 +162,7 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
             </div>  
           </div>
         )}
-
+        
       </div>
       
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>

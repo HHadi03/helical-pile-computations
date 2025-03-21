@@ -1,4 +1,4 @@
-import { getSoils } from "@/app/lib/api/getSoils"
+import { getSoils } from "@/app/api/getSoils"
 import SoilTable from './SoilTable'  
 
 export default async function ConfigurationPage() {

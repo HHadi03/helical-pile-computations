@@ -1,11 +1,11 @@
 import { PileForm } from '@/app/(dashboard)/configuration/pile/PileForm'
 import { Modal } from '@/app/components/Modal'
-import { getPile } from '@/app/lib/api/getPile'
+import { getPile } from '@/app/api/getPile'
 
 export default async function PileModal() {
-    const existingPileData = await getPile()
+    const pileData = await getPile()
   
-    if (!existingPileData) {
+    if (!pileData) {
       return (
         <Modal title='Configure Pile'>
           <div className='text-red-500 text-sm'>
@@ -18,7 +18,7 @@ export default async function PileModal() {
     return (
       <Modal title='Configure Pile'>
         <div className='px-4'>
-          <PileForm pile={existingPileData}/>
+          <PileForm pile={pileData}/>
         </div>
       </Modal>
     )

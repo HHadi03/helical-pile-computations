@@ -1,9 +1,10 @@
 "use server"
-import { API_URL } from "@/app/lib/api/getSoils"
 import { TsoilSchema } from "@/app/schemas/soilSchema"
-import { getPile } from "@/app/lib/api/getPile"
+import { getPile } from "@/app/api/getPile"
 import { calculateResultsForSoils, calculateResultsForFineSoil, roundToTwoDecimals } from "@/app/lib/equations"
-import { revalidateTag } from "next/cache"
+import { supabase } from "@/app/lib/supabaseClient"
+import { camelToSnake } from "@/app/lib/caseConversion"
+import { revalidatePath } from "next/cache"
 
 type ReturnType = {
   message: string
@@ -13,19 +14,22 @@ type ReturnType = {
 type UpdatedSoil = {
   shaftCapacity?: number
   bearingCapacity?: number
-  po?: number
-  angle?: number
-  ko?: number
-  t?: number
-  su?: number
+  po?: number | null
+  angle?: number | null
+  ko?: number | null
+  t?: number | null
+  su?: number | null
   qult?: number
   h?: number
 }
 
 export async function calculateAll(soils: TsoilSchema[], hasCriticalChanges: boolean, isTFieldEdited: boolean): Promise<ReturnType> {
   try {
+    
     const pileData = await getPile()
-    if (!pileData) {throw new Error}
+    if (!pileData) {
+      return { message: "Failed to fetch pile data. Please try again.", errors: {}}
+    }
 
     const calculations = await Promise.all(soils.map(async (soil) => {
       try {
@@ -149,15 +153,15 @@ export async function calculateAll(soils: TsoilSchema[], hasCriticalChanges: boo
               bearingCapacity: roundToTwoDecimals(bearingCapacity)
             }  
           }
-        
-          const response = await fetch(`${API_URL}/soil/${soil.id}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(updatedSoil)
-          })
+          
+          const snakeCaseSoil = camelToSnake(updatedSoil)
+          const { error } = await supabase
+            .from('soils')
+            .update(snakeCaseSoil)
+            .eq('id', soil.id)
 
-          //if response is not ok, return false for error message else return true for success message
-          if (!response.ok) {
+          //if update failed, return false for error message else return true for success message
+          if (error) {
             return false
           }
           return true
@@ -172,7 +176,7 @@ export async function calculateAll(soils: TsoilSchema[], hasCriticalChanges: boo
 
     const allSuccessful = calculations.every(success => success)
     if (allSuccessful) {
-      revalidateTag('soils')
+      revalidatePath('/configuration')
       return { message: "All soil layers calculated successfully" }
     } 
     else {

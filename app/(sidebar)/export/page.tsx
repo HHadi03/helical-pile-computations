@@ -3,9 +3,9 @@
 import { useState, ChangeEvent} from 'react';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
-import { getSoils } from '@/app/lib/api/getSoils';
-import { getPile } from '@/app/lib/api/getPile';
-import { getFactors } from '@/app/lib/api/getFactors';
+import { getSoils } from '@/app/api/getSoils';
+import { getPile } from '@/app/api/getPile';
+import { getFactors } from '@/app/api/getFactors';
 
 
 interface FormData {

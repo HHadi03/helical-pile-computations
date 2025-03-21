@@ -1,9 +1,10 @@
 "use server"
 import { pileSchema, TpileSchema } from "@/app/schemas/pileSchema"
-import { API_URL } from "@/app/lib/api/getSoils"
-import { getSoils } from "@/app/lib/api/getSoils"
-import { getPile } from "@/app/lib/api/getPile"
-import { revalidateTag } from "next/cache"
+import { getSoils } from "@/app/api/getSoils"
+import { getPile } from "@/app/api/getPile"
+import { supabase } from "@/app/lib/supabaseClient"
+import { camelToSnake } from "@/app/lib/caseConversion"
+import { revalidatePath } from "next/cache"
 
 type ReturnType = {
   message: string
@@ -22,7 +23,7 @@ export async function updatePile(pile: TpileSchema): Promise<ReturnType> {
   // Server Validation
   const existingPile = await getPile()
   if (!existingPile) {
-    return { message: "Failed to update pile data. Please try again.", errors: {}}
+    return { message: "Failed to fetch pile data. Please try again.", errors: {}}
   }
 
   const isPileLengthModified = parsed.data.pileLength !== existingPile.pileLength
@@ -36,8 +37,7 @@ export async function updatePile(pile: TpileSchema): Promise<ReturnType> {
       }
     }
 
-    const sortedSoils = existingSoils.sort((a, b) => a.startDepth - b.startDepth)
-    const lastSoilLayer = sortedSoils[sortedSoils.length - 1]
+    const lastSoilLayer = existingSoils[existingSoils.length - 1]
     if (parsed.data.pileLength > lastSoilLayer.endDepth) {
       return {
         message: "Pile toe depth is deeper than the bottom of soil layers.",
@@ -48,19 +48,19 @@ export async function updatePile(pile: TpileSchema): Promise<ReturnType> {
   // End of Server Validation
 
   try {
-    const response = await fetch(`${API_URL}/pile/${pile.id}`, {
-      method: "PATCH",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(pile)
-    })
+    const snakeCasePile = camelToSnake(pile)
+    const { error } = await supabase
+      .from('pile')
+      .update(snakeCasePile)
+      .eq('id', pile.id)
 
-    if (!response.ok) {
+    if (error) {
       return { message: "Failed to update pile data. Please try again.", errors: {}}
     }
-    revalidateTag('pile')
+    revalidatePath('/configuration')
     return { message: "Pile data updated successfully" }
 
-  } catch {
+  } catch (error) {
     return { message: "Failed to update pile data. Please try again later.", errors: {}}
   }
 }

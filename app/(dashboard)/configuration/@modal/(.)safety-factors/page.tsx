@@ -1,4 +1,4 @@
-import { getFactors } from "@/app/lib/api/getFactors"
+import { getFactors } from "@/app/api/getFactors"
 import { SafetyFactorsForm } from "../../safety-factors/SafetyFactorsForm"
 import { Modal } from '@/app/components/Modal'
 
