@@ -4,16 +4,17 @@ import { getPile } from "@/lib/getPile"
 import NotFound from "./not-found"
 
 type Props = {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
-export default async function EditSoilPage({ params }: Props) {
+export default async function EditSoilPage(props: Props) {
+  const params = await props.params
   const { id } =  params
   const soil = await getSoil(id)
   const pile = await getPile()
-  
+
   if (!soil?.id || !pile) {
     return <NotFound/>
   }
