@@ -1,5 +1,5 @@
 "use server"
-import { supabase } from "@/lib/supabaseClient"
+import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
 import { getSoils } from "@/lib/getSoils"
 import { getPile } from "@/lib/getPile"
@@ -19,6 +19,7 @@ export async function deleteSoil(id: string): Promise<ReturnType> {
 
   try {
     const soilsData = await getSoils()
+    const supabase = await createClient()
     const { error } = await supabase
       .from('soils')
       .delete()
@@ -44,7 +45,7 @@ export async function deleteSoil(id: string): Promise<ReturnType> {
     revalidatePath('/configuration')
     return { message: "Soil deleted successfully" }
 
-  } catch (error) {
+  } catch {
     return { message: "Failed to delete soil. Please try again later.", errors: {}}
   }
 }

@@ -2,7 +2,7 @@
 import { pileSchema, TpileSchema } from "@/schemas/pileSchema"
 import { getSoils } from "@/lib/getSoils"
 import { getPile } from "@/lib/getPile"
-import { supabase } from "@/lib/supabaseClient"
+import { createClient } from "@/utils/supabase/server"
 import { camelToSnake } from "@/lib/caseConversion"
 import { revalidatePath } from "next/cache"
 
@@ -49,6 +49,7 @@ export async function updatePile(pile: TpileSchema): Promise<ReturnType> {
 
   try {
     const snakeCasePile = camelToSnake(pile)
+    const supabase = await createClient()
     const { error } = await supabase
       .from('pile')
       .update(snakeCasePile)
@@ -60,7 +61,7 @@ export async function updatePile(pile: TpileSchema): Promise<ReturnType> {
     revalidatePath('/configuration')
     return { message: "Pile data updated successfully" }
 
-  } catch (error) {
+  } catch {
     return { message: "Failed to update pile data. Please try again later.", errors: {}}
   }
 }

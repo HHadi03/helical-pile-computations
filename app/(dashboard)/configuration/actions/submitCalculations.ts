@@ -2,7 +2,7 @@
 import { TsoilSchema } from "@/schemas/soilSchema"
 import { getPile } from "@/lib/getPile"
 import { calculateResultsForSoils, calculateResultsForFineSoil, roundToTwoDecimals } from "@/lib/equations"
-import { supabase } from "@/lib/supabaseClient"
+import { createClient } from "@/utils/supabase/server"
 import { camelToSnake } from "@/lib/caseConversion"
 import { revalidatePath } from "next/cache"
 
@@ -155,6 +155,7 @@ export async function calculateAll(soils: TsoilSchema[], hasCriticalChanges: boo
           }
           
           const snakeCaseSoil = camelToSnake(updatedSoil)
+          const supabase = await createClient()
           const { error } = await supabase
             .from('soils')
             .update(snakeCaseSoil)

@@ -10,7 +10,7 @@ type Props = {
 }
 
 export default async function EditSoilPage({ params }: Props) {
-  const { id } =  await params
+  const { id } =  params
   const soil = await getSoil(id)
   const pile = await getPile()
   

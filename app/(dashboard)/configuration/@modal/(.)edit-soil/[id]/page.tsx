@@ -1,4 +1,4 @@
-import { EditForm } from "@/app/(dashboard)/configuration/edit-soil/[id]/EditForm"
+import { EditForm } from '../../../edit-soil/[id]/EditForm'
 import { Modal } from '@/components/Modal'
 import { getSoil } from "@/lib/getSoil"
 import { getPile } from "@/lib/getPile"
@@ -10,7 +10,7 @@ type Props = {
 }
 
 export default async function EditSoilModal({ params }: Props) {
-  const { id } = await params
+  const { id } = params
   const soil = await getSoil(id)
   const pile = await getPile()
 

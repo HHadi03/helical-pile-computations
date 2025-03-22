@@ -1,7 +1,7 @@
 "use server"
 import { safetySchema, TsafetySchema } from "@/schemas/safetySchema"
 import { roundToTwoDecimals } from "@/lib/equations"
-import { supabase } from "@/lib/supabaseClient"
+import { createClient } from "@/utils/supabase/server"
 import { camelToSnake } from "@/lib/caseConversion"
 
 type ReturnType = {
@@ -31,6 +31,7 @@ export async function updateSafetyFactors(safetyFactors: TsafetySchema): Promise
 
   try {
     const snakeCaseSafetyFactors = camelToSnake(updatedSafetyFactors)
+    const supabase = await createClient()
     const { error } = await supabase
       .from('factors')
       .update(snakeCaseSafetyFactors)
@@ -41,7 +42,7 @@ export async function updateSafetyFactors(safetyFactors: TsafetySchema): Promise
     }
     return { message: "Safety factors updated successfully" }
 
-  } catch (error) {
+  } catch {
     return { message: "Failed to update safety factors. Please try again later.", errors: {}}
   }
 }

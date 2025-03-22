@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
+import { logOut } from '@/app/actions'
 
 export const Sidebar = () => {
   const [expanded, setExpanded] = useState(false)
@@ -62,10 +63,12 @@ export const Sidebar = () => {
 
       <ul className='mt-auto'>
         <li className={`relative group rounded-lg hover:bg-gray-200 ${!expanded && 'justify-center'}`}>
-          <Link href="/" className="text-gray-700 font-medium py-2 px-3 flex gap-3">
+        <form action={logOut}>
+          <button type="submit" className="text-gray-700 font-medium py-2 px-3 flex gap-3">
             <img src="/signout-icon.png" alt='Sign Out Icon' className='w-6 h-auto'/>
             {expanded && <span className='whitespace-nowrap'>Sign Out</span>}
-          </Link>
+          </button>
+        </form>
 
           {!expanded && (
             <div

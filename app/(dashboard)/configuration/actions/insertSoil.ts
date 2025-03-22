@@ -2,7 +2,7 @@
 import { soilSchema, TsoilSchema } from "@/schemas/soilSchema"
 import { getSoils } from "@/lib/getSoils" 
 import { calculateResultsForFineSoil, calculateResultsForSoils } from "@/lib/equations"
-import { supabase } from "@/lib/supabaseClient"
+import { createClient } from "@/utils/supabase/server"
 import { camelToSnake } from "@/lib/caseConversion"
 import { revalidatePath } from "next/cache"
 
@@ -43,6 +43,7 @@ export async function insertSoil(soil: TsoilSchema): Promise<ReturnType> {
 
   try {
     const snakeCaseSoil = camelToSnake(soil)
+    const supabase = await createClient()
     const { error } = await supabase
       .from('soils')
       .insert(snakeCaseSoil)
@@ -53,7 +54,7 @@ export async function insertSoil(soil: TsoilSchema): Promise<ReturnType> {
     revalidatePath('/configuration')
     return { message: "Soil data submitted successfully 🎉" }
 
-  } catch (error) {
+  } catch {
     return { message: "Failed to submit soil data. Please try again later.", errors: {}}
   }
 }

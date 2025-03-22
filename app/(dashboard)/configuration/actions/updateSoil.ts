@@ -1,6 +1,6 @@
 "use server"
 import { soilSchema, TsoilSchema } from "@/schemas/soilSchema"
-import { supabase } from "@/lib/supabaseClient"
+import { createClient } from "@/utils/supabase/server"
 import { camelToSnake } from "@/lib/caseConversion"
 import { revalidatePath } from "next/cache"
 
@@ -20,6 +20,7 @@ export async function updateSoil(soil: TsoilSchema): Promise<ReturnType> {
  
   try {
     const snakeCaseSoil = camelToSnake(soil)
+    const supabase = await createClient()
     const { error } = await supabase
       .from('soils')
       .update(snakeCaseSoil)
@@ -31,7 +32,7 @@ export async function updateSoil(soil: TsoilSchema): Promise<ReturnType> {
     revalidatePath('/configuration')
     return { message: "Soil data updated successfully" }
 
-  } catch (error) {
+  } catch {
     return { message: "Failed to update soil data. Please try again later.", errors: {}}
   }
 }

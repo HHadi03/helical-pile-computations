@@ -1,9 +1,10 @@
-import { supabase } from "@/lib/supabaseClient"
+import { createClient } from "@/utils/supabase/server"
 import { TsafetySchema } from "@/schemas/safetySchema"
-import { snakeToCamel } from "../lib/caseConversion"
+import { snakeToCamel } from "./caseConversion"
 
 export async function getFactors(): Promise<TsafetySchema | null> {
   try {
+    const supabase = await createClient()
     const { data, error } = await supabase
       .from('factors')
       .select('*')

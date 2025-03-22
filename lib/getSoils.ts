@@ -1,9 +1,10 @@
-import { supabase } from "../lib/supabaseClient"
 import { TsoilSchema } from "@/schemas/soilSchema" 
-import { snakeToCamel } from "../lib/caseConversion"
+import { snakeToCamel } from "./caseConversion"
+import { createClient } from "@/utils/supabase/server"
 
 export async function getSoils(): Promise<TsoilSchema[]> {
   try {
+    const supabase = await createClient()
     const { data, error } = await supabase
       .from('soils')
       .select('*')
