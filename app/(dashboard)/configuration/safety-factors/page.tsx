@@ -1,4 +1,4 @@
-import { getFactors } from "@/app/api/getFactors"
+import { getFactors } from "@/lib/getFactors"
 import { SafetyFactorsForm } from "./SafetyFactorsForm"
 
 export default async function SafetyFactorsPage() {

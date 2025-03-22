@@ -1,16 +1,16 @@
 "use client"
-import { useToast } from "@/app/components/hooks/use-toast"
-import { ToastAction } from "@/app/components/ui/toast"
+import { useToast } from "@/components/hooks/use-toast"
+import { ToastAction } from "@/components/ui/toast"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { safetySchema, TsafetySchema } from "@/app/schemas/safetySchema"
+import { safetySchema, TsafetySchema } from "@/schemas/safetySchema"
 import { updateSafetyFactors } from "../actions/updateSafetyFactors"
-import { Button } from "@/app/components/ui/button"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/app/components/ui/form"
+import { Button } from "@/components/ui/button"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { useRouter } from "next/navigation"
-import { NumberInput } from "@/app/components/NumberInput"
+import { NumberInput } from "@/components/NumberInput"
 import { Loader2 } from "lucide-react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 type SafetyFactorsFormProps = {
   safetyFactors: TsafetySchema 

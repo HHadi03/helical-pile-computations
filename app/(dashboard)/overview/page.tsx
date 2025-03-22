@@ -1,6 +1,6 @@
-import { getSoils } from "@/app/api/getSoils"
+import { getSoils } from "@/lib/getSoils"
 import { ArrowUp, ArrowDown} from "lucide-react"
-import { getPile } from "@/app/api/getPile"
+import { getPile } from "@/lib/getPile"
 
 export default async function OverviewPage() {
   const soilsData = await getSoils()
@@ -36,7 +36,6 @@ export default async function OverviewPage() {
     )
   }
 
-  //add option to edit soil other soil properties
   const relevantSoils = soilsData.filter(soil => soil.startDepth < pileData.pileLength)
   const lastLayer = relevantSoils.find(soil => pileData.pileLength <= soil.endDepth)
 

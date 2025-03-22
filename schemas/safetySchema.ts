@@ -15,8 +15,8 @@ export const safetySchema = z.object({
 	gammaS2: z.coerce.number().min(0.1, { message: "Safety factor (yS) must be at least 0.1kN" }).default(1.5),
 	gammaB2: z.coerce.number().min(0.1, { message: "Safety factor (yB) must be at least 0.1kN" }).default(1.3),
 
-	combination1: z.coerce.number().optional(),
-	combination2: z.coerce.number().optional(),
+	combination1: z.coerce.number().nullish(),
+	combination2: z.coerce.number().nullish(),
 })
 
 export type TsafetySchema = z.infer<typeof safetySchema>

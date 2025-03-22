@@ -1,6 +1,6 @@
-import { supabase } from "@/app/lib/supabaseClient"
-import {TsoilSchema } from "@/app/schemas/soilSchema"
-import { snakeToCamel } from "@/app/lib/caseConversion"
+import { supabase } from "@/lib/supabaseClient"
+import {TsoilSchema } from "@/schemas/soilSchema"
+import { snakeToCamel } from "@/lib/caseConversion"
 
 export async function getSoil(id: string): Promise<TsoilSchema | null> {
   try {

@@ -1,5 +1,5 @@
-import { supabase } from "@/app/lib/supabaseClient"
-import { TsafetySchema } from "@/app/schemas/safetySchema"
+import { supabase } from "@/lib/supabaseClient"
+import { TsafetySchema } from "@/schemas/safetySchema"
 import { snakeToCamel } from "../lib/caseConversion"
 
 export async function getFactors(): Promise<TsafetySchema | null> {

@@ -1,5 +1,5 @@
 import { SoilForm } from '@/app/(dashboard)/configuration/insert-soil/InsertSoilForm'
-import { Modal } from '@/app/components/Modal'
+import { Modal } from '@/components/Modal'
 
 export default function InsertSoilModal() {
   return (

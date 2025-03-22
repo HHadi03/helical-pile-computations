@@ -1,5 +1,5 @@
 import { supabase } from "../lib/supabaseClient"
-import { TsoilSchema } from "@/app/schemas/soilSchema" 
+import { TsoilSchema } from "@/schemas/soilSchema" 
 import { snakeToCamel } from "../lib/caseConversion"
 
 export async function getSoils(): Promise<TsoilSchema[]> {

@@ -1,9 +1,9 @@
 "use server"
-import { TsoilSchema } from "@/app/schemas/soilSchema"
-import { getPile } from "@/app/api/getPile"
-import { calculateResultsForSoils, calculateResultsForFineSoil, roundToTwoDecimals } from "@/app/lib/equations"
-import { supabase } from "@/app/lib/supabaseClient"
-import { camelToSnake } from "@/app/lib/caseConversion"
+import { TsoilSchema } from "@/schemas/soilSchema"
+import { getPile } from "@/lib/getPile"
+import { calculateResultsForSoils, calculateResultsForFineSoil, roundToTwoDecimals } from "@/lib/equations"
+import { supabase } from "@/lib/supabaseClient"
+import { camelToSnake } from "@/lib/caseConversion"
 import { revalidatePath } from "next/cache"
 
 type ReturnType = {

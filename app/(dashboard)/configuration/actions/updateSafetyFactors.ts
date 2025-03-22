@@ -1,8 +1,8 @@
 "use server"
-import { safetySchema, TsafetySchema } from "@/app/schemas/safetySchema"
-import { roundToTwoDecimals } from "@/app/lib/equations"
-import { supabase } from "@/app/lib/supabaseClient"
-import { camelToSnake } from "@/app/lib/caseConversion"
+import { safetySchema, TsafetySchema } from "@/schemas/safetySchema"
+import { roundToTwoDecimals } from "@/lib/equations"
+import { supabase } from "@/lib/supabaseClient"
+import { camelToSnake } from "@/lib/caseConversion"
 
 type ReturnType = {
   message: string

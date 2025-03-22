@@ -1,5 +1,5 @@
-import { supabase } from "@/app/lib/supabaseClient"
-import { TpileSchema } from "@/app/schemas/pileSchema"
+import { supabase } from "@/lib/supabaseClient"
+import { TpileSchema } from "@/schemas/pileSchema"
 import { snakeToCamel } from "../lib/caseConversion"
 
 export async function getPile(): Promise<TpileSchema | null> {

@@ -1,6 +1,6 @@
 import { PileForm } from '@/app/(dashboard)/configuration/pile/PileForm'
-import { Modal } from '@/app/components/Modal'
-import { getPile } from '@/app/api/getPile'
+import { Modal } from '@/components/Modal'
+import { getPile } from '@/lib/getPile'
 
 export default async function PileModal() {
     const pileData = await getPile()

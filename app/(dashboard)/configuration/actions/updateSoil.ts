@@ -1,7 +1,7 @@
 "use server"
-import { soilSchema, TsoilSchema } from "@/app/schemas/soilSchema"
-import { supabase } from "@/app/lib/supabaseClient"
-import { camelToSnake } from "@/app/lib/caseConversion"
+import { soilSchema, TsoilSchema } from "@/schemas/soilSchema"
+import { supabase } from "@/lib/supabaseClient"
+import { camelToSnake } from "@/lib/caseConversion"
 import { revalidatePath } from "next/cache"
 
 type ReturnType = {

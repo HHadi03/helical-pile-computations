@@ -1,8 +1,8 @@
 "use server"
-import { supabase } from "@/app/lib/supabaseClient"
+import { supabase } from "@/lib/supabaseClient"
 import { revalidatePath } from "next/cache"
-import { getSoils } from "@/app/api/getSoils"
-import { getPile } from "@/app/api/getPile"
+import { getSoils } from "@/lib/getSoils"
+import { getPile } from "@/lib/getPile"
 
 type ReturnType = {
   message: string

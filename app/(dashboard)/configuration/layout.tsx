@@ -1,4 +1,4 @@
-import { Toaster } from "@/app/components/ui/toaster"
+import { Toaster } from "@/components/ui/toaster"
 import { FormContextProvider } from "./FormContext"
 
 export default function ConfigurationLayout({

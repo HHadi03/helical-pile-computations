@@ -1,9 +1,9 @@
 "use server"
-import { pileSchema, TpileSchema } from "@/app/schemas/pileSchema"
-import { getSoils } from "@/app/api/getSoils"
-import { getPile } from "@/app/api/getPile"
-import { supabase } from "@/app/lib/supabaseClient"
-import { camelToSnake } from "@/app/lib/caseConversion"
+import { pileSchema, TpileSchema } from "@/schemas/pileSchema"
+import { getSoils } from "@/lib/getSoils"
+import { getPile } from "@/lib/getPile"
+import { supabase } from "@/lib/supabaseClient"
+import { camelToSnake } from "@/lib/caseConversion"
 import { revalidatePath } from "next/cache"
 
 type ReturnType = {

@@ -3,10 +3,9 @@
 import { useState, ChangeEvent} from 'react';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
-import { getSoils } from '@/app/api/getSoils';
-import { getPile } from '@/app/api/getPile';
-import { getFactors } from '@/app/api/getFactors';
-
+import { getSoils } from '@/lib/getSoils';
+import { getPile } from '@/lib/getPile';
+import { getFactors } from '@/lib/getFactors';
 
 interface FormData {
   jobNumber: string;
@@ -126,7 +125,7 @@ export default function ExportPage() {
       const relevantSoils = soilsData.filter(soil => soil.startDepth < pileData.pileLength);
      
       const ultimatePulloutCapacity = relevantSoils.reduce(
-        (sum, { shaftCapacity = 0 }) => sum + shaftCapacity, 0
+        (sum, { shaftCapacity = 0 }) => sum + shaftCapacity!, 0
       );
       
       const lastLayer = soilsData.find(soil => 

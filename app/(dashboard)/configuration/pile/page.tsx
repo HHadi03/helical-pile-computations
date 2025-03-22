@@ -1,5 +1,5 @@
 import { PileForm } from './PileForm'
-import { getPile } from '@/app/api/getPile'
+import { getPile } from '@/lib/getPile'
 
 export default async function PilePage() {
   const pileData = await getPile()

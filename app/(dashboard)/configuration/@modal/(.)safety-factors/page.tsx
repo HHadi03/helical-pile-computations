@@ -1,6 +1,6 @@
-import { getFactors } from "@/app/api/getFactors"
+import { getFactors } from "@/lib/getFactors"
 import { SafetyFactorsForm } from "../../safety-factors/SafetyFactorsForm"
-import { Modal } from '@/app/components/Modal'
+import { Modal } from '@/components/Modal'
 
 export default async function SafetyFactorsModal() {
   const factorsData = await getFactors()

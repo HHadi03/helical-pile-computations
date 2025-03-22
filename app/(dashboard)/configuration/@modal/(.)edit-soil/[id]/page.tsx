@@ -1,7 +1,7 @@
 import { EditForm } from "@/app/(dashboard)/configuration/edit-soil/[id]/EditForm"
-import { getSoil } from "@/app/api/getSoil"
-import { Modal } from '@/app/components/Modal'
-import { getPile } from "@/app/api/getPile"
+import { Modal } from '@/components/Modal'
+import { getSoil } from "@/lib/getSoil"
+import { getPile } from "@/lib/getPile"
 
 type Props = {
   params: {
