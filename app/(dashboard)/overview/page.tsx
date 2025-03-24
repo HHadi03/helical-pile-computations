@@ -1,8 +1,17 @@
 import { getSoils } from "@/lib/getSoils"
 import { ArrowUp, ArrowDown} from "lucide-react"
 import { getPile } from "@/lib/getPile"
+import { createClient } from "@/utils/supabase/server"
+import { redirect } from "next/navigation"
 
 export default async function OverviewPage() {
+
+  const supabase = await createClient()
+  const { data, error } = await supabase.auth.getUser()
+  if (error || !data?.user) {
+    redirect('/')
+  }
+   
   const soilsData = await getSoils()
   const pileData = await getPile()
 

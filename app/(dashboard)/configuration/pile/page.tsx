@@ -1,7 +1,16 @@
 import { PileForm } from './PileForm'
 import { getPile } from '@/lib/getPile'
+import { createClient } from '@/utils/supabase/server'
+import { redirect } from 'next/navigation'
 
 export default async function PilePage() {
+
+  const supabase = await createClient()
+  const { data, error } = await supabase.auth.getUser()
+  if (error || !data?.user) {
+    redirect('/')
+  }
+
   const pileData = await getPile()
   
   if (!pileData) {

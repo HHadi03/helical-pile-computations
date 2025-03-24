@@ -1,41 +1,40 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { logIn, signUp } from './actions'
+
 export default function LandingPage() {
   return (
-    <main className="min-h-screen relative bg-cover bg-center" 
-      style={{backgroundImage: "url('/castle-background.jpg')", backgroundColor: 'rgba(0, 0, 0, 0.3)', backgroundBlendMode: 'darken'}}>
+    <main className="min-h-screen grid grid-rows-[auto_1fr] bg-cover bg-center" 
+    style={{backgroundImage: "url('/pageBackground.jpg')", backgroundColor: 'rgba(0, 0, 0, 0.3)', backgroundBlendMode: 'darken', backgroundRepeat: 'no-repeat'}}>
       
-      {/* Logo/Title Section */}
-      <div className="absolute top-4 left-4 flex items-center space-x-2">
-        <img src="/logo.png" alt="Helical Pile Calculator" className="w-60 h-10" />
-        <div className="text-gray-600 font-bold text-2xl">Helical Pile Computations</div>
-      </div>
-
-      <div className="absolute right-8 top-1/2 -translate-y-1/2">
-        <div className="bg-gray-900/90 p-6 rounded-lg shadow-xl w-80">
+      {/*Logo & Title */}
+      <header className="bg-gray-900/90 justify-center py-2 flex items-center space-x-5 shadow-xl">
+        <img src="/logo.png" alt="Company Logo" className="h-10 w-auto hover:opacity-85" />
+        <h1 className="text-neutral-400 text-2xl">Helical Pile Computations</h1>
+      </header>
+      
+       {/* Main Content */}
+       <div className="absolute right-16 top-1/3 -translate-y-1/3">
+        <div className="bg-gray-900/95 p-8 rounded-lg w-96 shadow-lg">
           <form>
-
-            <div className="mb-4">
-              <label htmlFor="email" className="block text-gray-200 mb-2">Email</label>
-              <Input id="email" name="email" type="email" required placeholder="Email" className="w-full bg-gray-800 border-gray-700 text-gray-200"/>
+            <div className="pb-5">
+              <label htmlFor="email" className="block text-gray-300 mb-2 text-lg">Email</label>
+              <Input id="email" name="email" type="email" required placeholder="Email" className="w-full bg-gray-800 border-gray-600 text-gray-200 py-3 px-4 text-base"/>
             </div>
             
-            <div className="mb-4">
-              <label htmlFor="password" className="block text-gray-200 mb-2">Password</label>
-              <Input id="password" name="password" type="password" required placeholder="Password" className="w-full bg-gray-800 border-gray-700 text-gray-200"/>
+            <div className="pb-5">
+              <label htmlFor="password" className="block text-gray-300 mb-2 text-lg">Password</label>
+              <Input id="password" name="password" type="password" required placeholder="Password" className="w-full bg-gray-800 border-gray-600 text-gray-200 py-3 px-4 text-base"/>
             </div>
             
-            <div className="space-y-4">
-              <Button formAction={logIn} className="w-full bg-blue-600 hover:bg-blue-700"> Log in </Button>
-              <Button formAction={signUp} className="w-full bg-green-600 hover:bg-green-700"> Sign up </Button>
-              <Button className="text-center text-gray-400 hover:text-gray-200 text-sm">Forgotten Password? </Button>
+            <div className="space-y-5">
+              <Button formAction={logIn} className="w-full bg-blue-500 hover:bg-blue-600 text-white text-lg py-3"> Log in </Button>
+              <Button formAction={signUp} className="w-full bg-emerald-500 hover:bg-emerald-600 text-white text-lg py-3"> Sign up </Button>
+              <button className="text-gray-400 hover:text-gray-200 text-sm">Forgotten Password? </button>
             </div>
-
           </form>
         </div>
       </div>
-
     </main>
   )
 }

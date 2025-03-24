@@ -1,7 +1,16 @@
 import { getFactors } from "@/lib/getFactors"
 import { SafetyFactorsForm } from "./SafetyFactorsForm"
+import { createClient } from "@/utils/supabase/server"
+import { redirect } from "next/navigation"
 
 export default async function SafetyFactorsPage() {
+
+  const supabase = await createClient()
+  const { data, error } = await supabase.auth.getUser()
+  if (error || !data?.user) {
+    redirect('/')
+  }
+
   const factorsData = await getFactors()
   
   if (!factorsData) {

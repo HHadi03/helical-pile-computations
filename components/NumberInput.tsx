@@ -5,7 +5,7 @@ interface NumberInputProps extends Omit<React.InputHTMLAttributes<HTMLInputEleme
   field: ControllerRenderProps<any, any>
 }
 
-export const NumberInput = ({ field, placeholder}: NumberInputProps) => {
+export const NumberInput = ({ field, placeholder, disabled}: NumberInputProps) => {
   return (
     <Input
       type="number"
@@ -13,6 +13,7 @@ export const NumberInput = ({ field, placeholder}: NumberInputProps) => {
       value={field.value === undefined ? "" : field.value}
       step={0.1}
       min={0}
+      disabled={disabled}
 
       onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
         const preventedKeys = ["e", "E", "-", "+", "="]

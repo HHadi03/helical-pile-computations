@@ -19,7 +19,12 @@ import { NumberInput } from "@/components/NumberInput"
 import { createPortal } from 'react-dom'
 import { UseFormContext } from "../FormContext"
 
-export function SoilForm() {
+interface SoilFormProps {
+  previousEndDepth?: number
+}
+
+export function SoilForm({ previousEndDepth }: SoilFormProps) {
+  console.log(previousEndDepth)
   const { toast } = useToast()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('soil')
@@ -31,7 +36,7 @@ export function SoilForm() {
       soilType: undefined,
       density: undefined,
       soil: undefined,
-      startDepth: undefined,
+      startDepth: previousEndDepth || undefined,
       endDepth: undefined,
       nValue: undefined,
       yMoist: undefined,
@@ -241,7 +246,7 @@ export function SoilForm() {
                     <FormItem className="flex-1">
                       <FormLabel>Start Depth (m)</FormLabel>
                       <FormControl>
-                        <NumberInput field={field} placeholder="0"/>
+                        <NumberInput field={field} placeholder="0" disabled={true}/>
                       </FormControl>
                       <FormMessage/>
                     </FormItem>

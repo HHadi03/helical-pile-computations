@@ -2,6 +2,8 @@ import { EditForm } from "./EditForm"
 import { getSoil } from "@/lib/getSoil"
 import { getPile } from "@/lib/getPile"
 import NotFound from "./not-found"
+import { createClient } from "@/utils/supabase/server"
+import { redirect } from "next/navigation"
 
 type Props = {
   params: Promise<{
@@ -10,6 +12,13 @@ type Props = {
 }
 
 export default async function EditSoilPage(props: Props) {
+
+  const supabase = await createClient()
+  const { data, error } = await supabase.auth.getUser()
+  if (error || !data?.user) {
+    redirect('/')
+  }
+
   const params = await props.params
   const { id } =  params
   const soil = await getSoil(id)
