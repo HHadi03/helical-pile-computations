@@ -33,9 +33,9 @@ export async function updateSafetyFactors(safetyFactors: TsafetySchema): Promise
     const snakeCaseSafetyFactors = camelToSnake(updatedSafetyFactors)
     const supabase = await createClient()
     const { error } = await supabase
-      .from('factors')
-      .update(snakeCaseSafetyFactors)
-      .eq('id', safetyFactors.id)
+    .from('factors')
+    .update(snakeCaseSafetyFactors)
+    .eq('id', safetyFactors.id)
 
     if (error) {
       return { message: "Failed to update safety factors. Please try again.", errors: {}}

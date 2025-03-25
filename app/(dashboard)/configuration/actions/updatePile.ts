@@ -51,9 +51,9 @@ export async function updatePile(pile: TpileSchema): Promise<ReturnType> {
     const snakeCasePile = camelToSnake(pile)
     const supabase = await createClient()
     const { error } = await supabase
-      .from('pile')
-      .update(snakeCasePile)
-      .eq('id', pile.id)
+    .from('pile')
+    .update(snakeCasePile)
+    .eq('id', pile.id)
 
     if (error) {
       return { message: "Failed to update pile data. Please try again.", errors: {}}

@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { logIn, signUp } from './actions'
+import { logIn} from './actions'
 
 export default function LandingPage() {
   return (
@@ -14,7 +14,7 @@ export default function LandingPage() {
       </header>
       
        {/* Main Content */}
-       <div className="absolute right-16 top-1/3 -translate-y-1/3">
+       <div className="absolute right-14 top-1/3 -translate-y-1/3">
         <div className="bg-gray-900/95 p-8 rounded-lg w-96 shadow-lg">
           <form>
             <div className="pb-5">
@@ -29,7 +29,7 @@ export default function LandingPage() {
             
             <div className="space-y-5">
               <Button formAction={logIn} className="w-full bg-blue-500 hover:bg-blue-600 text-white text-lg py-3"> Log in </Button>
-              <Button formAction={signUp} className="w-full bg-emerald-500 hover:bg-emerald-600 text-white text-lg py-3"> Sign up </Button>
+              {/* <Button formAction={signUp} className="w-full bg-green-500 hover:bg-green-600 text-white text-lg py-3"> Sign up </Button> */}
               <button className="text-gray-400 hover:text-gray-200 text-sm">Forgotten Password? </button>
             </div>
           </form>

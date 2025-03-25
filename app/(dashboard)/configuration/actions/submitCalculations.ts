@@ -157,9 +157,9 @@ export async function calculateAll(soils: TsoilSchema[], hasCriticalChanges: boo
           const snakeCaseSoil = camelToSnake(updatedSoil)
           const supabase = await createClient()
           const { error } = await supabase
-            .from('soils')
-            .update(snakeCaseSoil)
-            .eq('id', soil.id)
+          .from('soils')
+          .update(snakeCaseSoil)
+          .eq('id', soil.id)
 
           //if update failed, return false for error message else return true for success message
           if (error) {

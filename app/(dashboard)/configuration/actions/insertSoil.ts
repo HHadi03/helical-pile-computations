@@ -19,19 +19,33 @@ export async function insertSoil(soil: TsoilSchema): Promise<ReturnType> {
     }
   }
   
-  if (soil.soilType === "fine") {soil = { ...soil, ...await calculateResultsForFineSoil(soil) }}
-  else {soil = { ...soil, ...await calculateResultsForSoils(soil) }}
+  if (soil.soilType === "fine") {
+    soil = { ...soil,
+    ...await calculateResultsForFineSoil(soil)}
+  }
+
+  else {
+    soil = { ...soil,
+    ...await calculateResultsForSoils(soil)}
+  }
 
   try {
-    const snakeCaseSoil = camelToSnake(soil)
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    const snakeCaseSoil = camelToSnake({
+      ...soil,
+      user_id: user!.id
+    })
+
     const { error } = await supabase
-      .from('soils')
-      .insert(snakeCaseSoil)
+    .from('soils')
+    .insert(snakeCaseSoil)
      
     if (error) {
       return { message: "Failed to submit soil data. Please try again.", errors: {}}
     }
+    
     revalidatePath('/configuration')
     return { message: "Soil data submitted successfully 🎉" }
 

@@ -21,9 +21,9 @@ export async function deleteSoil(id: string): Promise<ReturnType> {
     const soilsData = await getSoils()
     const supabase = await createClient()
     const { error } = await supabase
-      .from('soils')
-      .delete()
-      .eq('id', id)
+    .from('soils')
+    .delete()
+    .eq('id', id)
 
     if (error) {
       return { message: "Failed to delete soil. Please try again.", errors: {}}
@@ -36,9 +36,9 @@ export async function deleteSoil(id: string): Promise<ReturnType> {
       
       if (pileData) {
         await supabase
-          .from('pile')
-          .update({ pile_length: newPileLength })
-          .eq('id', '1')
+        .from('pile')
+        .update({ pile_length: newPileLength })
+        .eq('id', '1')
       }
     }
     

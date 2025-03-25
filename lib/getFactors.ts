@@ -12,15 +12,13 @@ export async function getFactors(): Promise<TsafetySchema | null> {
       .single()
     
     if (error) {
-      console.error('Error fetching factors:', error)
       return null
     }
     
     const factors = snakeToCamel(data)
     return factors as TsafetySchema
     
-  } catch (error) {
-    console.error('Error processing factors data:', error)
+  } catch {
     return null
   }
 }

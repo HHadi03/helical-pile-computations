@@ -24,7 +24,6 @@ interface SoilFormProps {
 }
 
 export function SoilForm({ previousEndDepth }: SoilFormProps) {
-  console.log(previousEndDepth)
   const { toast } = useToast()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('soil')

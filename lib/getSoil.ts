@@ -12,15 +12,13 @@ export async function getSoil(id: string): Promise<TsoilSchema | null> {
       .single()
     
     if (error) {
-      console.error(`Error fetching soil with id ${id}:`, error)
       return null
     }
     
     const soil = snakeToCamel(data)
     return soil as TsoilSchema
     
-  } catch (error) {
-    console.error(`Error processing soil data for id ${id}:`, error)
+  } catch {
     return null
   }
 }

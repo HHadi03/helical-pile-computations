@@ -12,15 +12,13 @@ export async function getPile(): Promise<TpileSchema | null> {
       .single()
     
     if (error) {
-      console.error('Error fetching pile:', error)
       return null
     }
     
     const pile = snakeToCamel(data)
     return pile as TpileSchema
     
-  } catch (error) {
-    console.error('Error processing pile data:', error)
+  } catch {
     return null
   }
 }

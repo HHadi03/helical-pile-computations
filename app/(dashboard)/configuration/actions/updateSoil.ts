@@ -22,9 +22,9 @@ export async function updateSoil(soil: TsoilSchema): Promise<ReturnType> {
     const snakeCaseSoil = camelToSnake(soil)
     const supabase = await createClient()
     const { error } = await supabase
-      .from('soils')
-      .update(snakeCaseSoil)
-      .eq('id', soil.id)
+    .from('soils')
+    .update(snakeCaseSoil)
+    .eq('id', soil.id)
     
     if (error) {
       return { message: "Failed to update soil data. Please try again.", errors: {}}
