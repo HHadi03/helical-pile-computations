@@ -1,11 +1,11 @@
 import { getSoils } from "@/lib/getSoils"
-import { ArrowUp, ArrowDown} from "lucide-react"
 import { getPile } from "@/lib/getPile"
+import { getLuminance } from "@/lib/getLuminance"
+import { ArrowUp, ArrowDown} from "lucide-react"
 import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
 
 export default async function OverviewPage() {
-
   const supabase = await createClient()
   const { data, error } = await supabase.auth.getUser()
   if (error || !data?.user) {
@@ -15,12 +15,15 @@ export default async function OverviewPage() {
   const soilsData = await getSoils()
   const pileData = await getPile()
 
-  const getLuminance = (color: string) => {
-    const hex = color.replace("#", "");
-    const r = parseInt(hex.substring(0, 2), 16)
-    const g = parseInt(hex.substring(2, 4), 16)
-    const b = parseInt(hex.substring(4, 6), 16)
-    return (0.299 * r + 0.587 * g + 0.114 * b) / 255
+  if (soilsData.length === 0) {
+    return (
+      <div className="h-full bg-[#F4F3F2] flex items-center justify-center border-2 border-black">
+        <div className="text-center max-w-md">
+          <h3 className="text-xl font-semibold text-gray-800 pb-2">No Soil Entries Found</h3>
+          <p className="text-gray-600">Add soil data to visualise the soil profile and pile interaction.</p>
+        </div>
+      </div>
+    )
   }
 
   if (!pileData){
@@ -29,17 +32,6 @@ export default async function OverviewPage() {
         <div className="text-center max-w-md">
           <h3 className="text-xl font-semibold text-gray-800 pb-2">No Pile Data Found</h3>
           <p className="text-gray-600">Configure pile data to visualise the soil profile and pile interaction.</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (soilsData.length === 0) {
-    return (
-      <div className="h-full bg-[#F4F3F2] flex items-center justify-center border-2 border-black">
-        <div className="text-center max-w-md">
-          <h3 className="text-xl font-semibold text-gray-800 pb-2">No Soil Entries Found</h3>
-          <p className="text-gray-600">Add soil data to visualise the soil profile and pile interaction.</p>
         </div>
       </div>
     )

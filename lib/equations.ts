@@ -1,5 +1,5 @@
 import { getPile } from './getPile'
-import { TsoilSchema } from '../schemas/soilSchema'
+import { TsoilSchema } from '@/schemas/soilSchema'
 
 const SPT = 6.2
 const UNITWEIGHT = 9.8

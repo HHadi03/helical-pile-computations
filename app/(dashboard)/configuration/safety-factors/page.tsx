@@ -4,7 +4,6 @@ import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
 
 export default async function SafetyFactorsPage() {
-
   const supabase = await createClient()
   const { data, error } = await supabase.auth.getUser()
   if (error || !data?.user) {
@@ -12,9 +11,12 @@ export default async function SafetyFactorsPage() {
   }
 
   const factorsData = await getFactors()
-  
   if (!factorsData) {
-    return <div>Failed to load safety factors data.</div>
+    return (
+      <div className="flex justify-center">
+        Failed to load safety factors data.
+      </div>
+    )
   }
   
   return (

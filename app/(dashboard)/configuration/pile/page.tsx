@@ -4,7 +4,6 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 
 export default async function PilePage() {
-
   const supabase = await createClient()
   const { data, error } = await supabase.auth.getUser()
   if (error || !data?.user) {
@@ -12,9 +11,12 @@ export default async function PilePage() {
   }
 
   const pileData = await getPile()
-  
   if (!pileData) {
-    return <div>Failed to load pile data.</div>
+    return (
+      <div className="flex justify-center">
+        Failed to load pile data.
+      </div>
+    )
   }
 
   return (

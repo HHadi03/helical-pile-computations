@@ -1,4 +1,4 @@
-import { EditForm } from '../../../edit-soil/[id]/EditForm'
+import { EditForm } from '@/app/(dashboard)/configuration/edit-soil/[id]/EditForm'
 import { Modal } from '@/components/Modal'
 import { getSoil } from "@/lib/getSoil"
 import { getPile } from "@/lib/getPile"

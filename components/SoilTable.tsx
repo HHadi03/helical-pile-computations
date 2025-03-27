@@ -7,8 +7,8 @@ import { deleteSoil } from "@/app/(dashboard)/configuration/actions/deleteSoil"
 import type { TsoilSchema } from "@/schemas/soilSchema"
 import { useToast } from "@/components/hooks/use-toast"
 import { ToastAction } from "@/components/ui/toast"
-import { calculateAll } from "./actions/submitCalculations"
-import { UseFormContext } from "./FormContext"
+import { calculateAll } from "@/app/(dashboard)/configuration/actions/submitCalculations"
+import { UseFormContext } from "@/app/(dashboard)/configuration/FormContext"
 import { Calculator, PlusCircle, Edit2, Trash2, RectangleVertical, ShieldCheck } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import Link from 'next/link'
@@ -19,12 +19,18 @@ const soilTypeNames = {
   'manmade': 'Man Made'
 }
 
-export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
+export function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
   const router = useRouter()
   const { toast } = useToast()
   const [selectedRow, setSelectedRow] = useState<number | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const {isAnyFormEdited, hasCriticalChanges,  isTFieldEdited, resetFormStates} = UseFormContext()
+
+  const handleEdit = () => {
+    if (selectedRow !== null && soilsData[selectedRow].id) {
+      router.push(`/configuration/edit-soil/${soilsData[selectedRow].id}`)
+    }
+  }
 
   const handleDelete = async () => {
     if (selectedRow !== null && soilsData[selectedRow].id) {
@@ -52,12 +58,6 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
           action: <ToastAction altText="Try again">Try again</ToastAction>
         })
       }
-    }
-  }
-
-  const handleEdit = () => {
-    if (selectedRow !== null && soilsData[selectedRow].id) {
-      router.push(`/configuration/edit-soil/${soilsData[selectedRow].id}`)
     }
   }
 
@@ -90,7 +90,7 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
   return (
     <>
       <div className="flex bg-white pl-1 sticky top-0 z-10 space-x-3">
-        <Link href="/configuration/safety-factors" >
+        <Link href="/configuration/safety-factors">
           <Button variant="ghost" className="hover:bg-amber-100">
             <ShieldCheck className="h-5 w-5 text-amber-900"/> Define Parameters
           </Button>
@@ -162,7 +162,6 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
             </div>  
           </div>
         )}
-        
       </div>
       
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>

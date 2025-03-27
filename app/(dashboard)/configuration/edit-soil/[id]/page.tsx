@@ -12,7 +12,6 @@ type Props = {
 }
 
 export default async function EditSoilPage(props: Props) {
-
   const supabase = await createClient()
   const { data, error } = await supabase.auth.getUser()
   if (error || !data?.user) {
@@ -23,7 +22,6 @@ export default async function EditSoilPage(props: Props) {
   const { id } =  params
   const soil = await getSoil(id)
   const pile = await getPile()
-
   if (!soil?.id || !pile) {
     return <NotFound/>
   }

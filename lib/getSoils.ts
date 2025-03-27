@@ -14,7 +14,7 @@ export async function getSoils(): Promise<TsoilSchema[]> {
       return []
     }
 
-    const soils = data.map(soil => {return snakeToCamel(soil)})
+    const soils = data.map(soil => snakeToCamel(soil))
     return soils as TsoilSchema[]
     
   } catch {
