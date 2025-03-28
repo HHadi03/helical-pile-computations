@@ -29,6 +29,7 @@ export function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
   const handleEdit = () => {
     if (selectedRow !== null && soilsData[selectedRow].id) {
       router.push(`/configuration/edit-soil/${soilsData[selectedRow].id}`)
+      setSelectedRow(null)
     }
   }
 
@@ -63,7 +64,7 @@ export function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
 
   const handleCalculate = async () => {
     try {
-      const result = await calculateAll(soilsData, hasCriticalChanges, isTFieldEdited)
+      const result = await calculateAll( hasCriticalChanges, isTFieldEdited)
       toast({
         duration: 2500,
         variant: result.errors ? "destructive" : "default",
@@ -86,23 +87,23 @@ export function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
       })
     }
   }
-
+  
   return (
     <>
       <div className="flex bg-white pl-1 sticky top-0 z-10 space-x-3">
-        <Link href="/configuration/safety-factors">
+        <Link href="/configuration/safety-factors" prefetch={true} scroll={false}>
           <Button variant="ghost" className="hover:bg-amber-100">
             <ShieldCheck className="h-5 w-5 text-amber-900"/> Define Parameters
           </Button>
         </Link>
         
-        <Link href="/configuration/insert-soil">
+        <Link href="/configuration/insert-soil" prefetch={true} scroll={false}>
           <Button variant="ghost" className="hover:bg-blue-100">
             <PlusCircle className="h-5 w-5 text-blue-500"/> Add Soil Layer
           </Button>
         </Link>
 
-        <Link href="/configuration/pile">
+        <Link href="/configuration/pile" prefetch={true} scroll={false}>
           <Button variant="ghost" className="hover:bg-purple-100">
             <RectangleVertical className="h-5 w-5 text-purple-500"/> Configure Pile
           </Button>

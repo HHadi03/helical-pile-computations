@@ -45,7 +45,6 @@ export async function insertSoil(soil: TsoilSchema): Promise<ReturnType> {
     if (error) {
       return { message: "Failed to submit soil data. Please try again.", errors: {}}
     }
-    
     revalidatePath('/configuration')
     return { message: "Soil data submitted successfully 🎉" }
 

@@ -7,7 +7,7 @@ const soilIdentificationSchema = z.object({
   soil: z.string().min(1, { message: "Please select a soil" }),
   soilName: z.string().optional(),
   description: z.string().optional(),
-  color: z.string().optional(),
+  color: z.string(),
 })
 
 const soilParametersSchema = z.object({

@@ -10,8 +10,8 @@ export default async function InsertSoilPage() {
     redirect('/')
   }
 
-  const existingSoils = await getSoils()
-  const previousEndDepth = existingSoils.length > 0 ? existingSoils[existingSoils.length - 1].endDepth : undefined
+  const soilsData = await getSoils()
+  const previousEndDepth = soilsData.length > 0 ? soilsData[soilsData.length - 1].endDepth : undefined
 
   return (
     <main className='p-5 border border-gray-600 rounded-lg max-h-full overflow-auto scrollbar-thin scrollbar-thumb-rounded-full

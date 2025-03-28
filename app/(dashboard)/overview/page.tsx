@@ -79,7 +79,7 @@ export default async function OverviewPage() {
           }
           totalHeight += layerHeight
 
-          const backgroundColor = soil.color || "#e5e5e5"
+          const backgroundColor = soil.color
           const isDark = getLuminance(backgroundColor) < 0.5
           const textColor = isDark ? "text-white" : "text-black"
 
@@ -98,7 +98,7 @@ export default async function OverviewPage() {
                 {isWaterInLayer && (
                   <div className="absolute left-0 right-0 z-10" style={{top: `${((pileData.waterDepth - soil.startDepth) / soil.h!) * 100}%`,}}>
                     <div className="w-full border-b-2 border-blue-400 border-dashed"></div>
-                    <div className="pl-2 pb-1 absolute bottom-0 flex items-center text-blue-600"> <span className="font-semibold"> ▽ Water Depth: {pileData.waterDepth.toFixed(1)} m</span></div>
+                    <div className="pl-2 pb-1 absolute bottom-0 flex items-center text-blue-600"> <span className="font-semibold"> ▽ Water Table: {pileData.waterDepth.toFixed(1)} m</span></div>
                   </div>
                 )}
 

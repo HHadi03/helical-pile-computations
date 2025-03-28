@@ -42,7 +42,7 @@ export function SoilForm({ previousEndDepth }: SoilFormProps) {
       ySat: undefined,
       soilName: "",
       description: "",
-      color: ""
+      color: "#e5e5e5"
     }
   })
   

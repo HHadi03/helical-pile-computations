@@ -10,13 +10,7 @@ type ReturnType = {
 }
 
 export async function deleteSoil(id: string): Promise<ReturnType> {
-  if (!id) {
-    return {
-      message: "Invalid Soil ID detected.",
-      errors: {id: ["Soil ID is required for deletion"]}
-    }
-  }
-
+  
   try {
     const soilsData = await getSoils()
     const supabase = await createClient()

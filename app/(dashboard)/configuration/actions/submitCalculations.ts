@@ -1,6 +1,6 @@
 "use server"
-import { TsoilSchema } from "@/schemas/soilSchema"
 import { getPile } from "@/lib/getPile"
+import { getSoils } from "@/lib/getSoils"
 import { calculateResultsForSoils, calculateResultsForFineSoil, roundToTwoDecimals } from "@/lib/equations"
 import { createClient } from "@/utils/supabase/server"
 import { camelToSnake } from "@/lib/caseConversion"
@@ -23,15 +23,16 @@ type UpdatedSoil = {
   h?: number
 }
 
-export async function calculateAll(soils: TsoilSchema[], hasCriticalChanges: boolean, isTFieldEdited: boolean): Promise<ReturnType> {
+export async function calculateAll(hasCriticalChanges: boolean, isTFieldEdited: boolean): Promise<ReturnType> {
   try {
-    
+    const soilsData = await getSoils()
+
     const pileData = await getPile()
     if (!pileData) {
       return { message: "Failed to fetch pile data. Please try again.", errors: {}}
     }
 
-    const calculations = await Promise.all(soils.map(async (soil) => {
+    const calculations = await Promise.all(soilsData.map(async (soil) => {
       try {
 
         //If soil layer starts below pile length, no need to calculate, return true for success message

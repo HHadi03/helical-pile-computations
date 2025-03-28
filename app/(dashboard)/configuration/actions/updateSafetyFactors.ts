@@ -18,7 +18,6 @@ export async function updateSafetyFactors(safetyFactors: TsafetySchema): Promise
     }
   }
 
-  // Server Validation
   const combination1 = safetyFactors.permanentActions * safetyFactors.gammaG1 + safetyFactors.variableActions * safetyFactors.gammaQ1
   const combination2 = safetyFactors.permanentActions * safetyFactors.gammaG2 + safetyFactors.variableActions * safetyFactors.gammaQ2
   
@@ -27,8 +26,7 @@ export async function updateSafetyFactors(safetyFactors: TsafetySchema): Promise
     combination1: roundToTwoDecimals(combination1),
     combination2: roundToTwoDecimals(combination2)
   }
-  // End Of Server Validation
-
+ 
   try {
     const snakeCaseSafetyFactors = camelToSnake(updatedSafetyFactors)
     const supabase = await createClient()
