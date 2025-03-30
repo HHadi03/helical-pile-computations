@@ -4,16 +4,14 @@ import { logIn} from './actions'
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen grid grid-rows-[auto_1fr] bg-cover bg-center" 
+    <main className="h-screen bg-cover bg-center" 
     style={{backgroundImage: "url('/pageBackground.jpg')", backgroundColor: 'rgba(0, 0, 0, 0.3)', backgroundBlendMode: 'darken', backgroundRepeat: 'no-repeat'}}>
       
-      {/*Logo & Title */}
       <header className="bg-gray-900/90 justify-center py-2 flex items-center space-x-5 shadow-xl">
-        <img src="/logo.png" alt="Company Logo" className="h-10 w-auto hover:opacity-85" />
+        <img src="/logo.png" alt="Company Logo" className="h-10 w-auto" />
         <h1 className="text-neutral-400 text-2xl">Helical Pile Computations</h1>
       </header>
       
-       {/* Main Content */}
        <div className="absolute right-14 top-1/3 -translate-y-1/3">
         <div className="bg-gray-900/95 p-8 rounded-lg w-96 shadow-lg">
           <form>
@@ -35,6 +33,7 @@ export default function LandingPage() {
           </form>
         </div>
       </div>
+
     </main>
   )
 }

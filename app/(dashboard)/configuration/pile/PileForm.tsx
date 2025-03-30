@@ -136,7 +136,7 @@ export function PileForm({ pile }: PileFormProps) {
           />
         </div>
 
-        <div className="flex gap-3 pt-2">
+        <div className="flex justify-between pt-2">
         <Button type="submit" className="w-24" disabled={!isDirty || isSubmitting}>
           {isSubmitting ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin"/>Saving...</>) : ("Save" )}
         </Button>

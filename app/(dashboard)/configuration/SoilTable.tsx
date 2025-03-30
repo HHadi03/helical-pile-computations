@@ -3,12 +3,12 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from "@/components/ui/alert-dialog"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { deleteSoil } from "@/app/(dashboard)/configuration/actions/deleteSoil"
 import type { TsoilSchema } from "@/schemas/soilSchema"
 import { useToast } from "@/components/hooks/use-toast"
 import { ToastAction } from "@/components/ui/toast"
-import { calculateAll } from "@/app/(dashboard)/configuration/actions/submitCalculations"
-import { UseFormContext } from "@/app/(dashboard)/configuration/FormContext"
+import { calculateAll } from "./actions/submitCalculations"
+import { deleteSoil } from "./actions/deleteSoil"
+import { UseFormContext } from "./FormContext"
 import { Calculator, PlusCircle, Edit2, Trash2, RectangleVertical, ShieldCheck } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import Link from 'next/link'
@@ -29,7 +29,6 @@ export function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
   const handleEdit = () => {
     if (selectedRow !== null && soilsData[selectedRow].id) {
       router.push(`/configuration/edit-soil/${soilsData[selectedRow].id}`)
-      setSelectedRow(null)
     }
   }
 
@@ -64,7 +63,7 @@ export function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
 
   const handleCalculate = async () => {
     try {
-      const result = await calculateAll( hasCriticalChanges, isTFieldEdited)
+      const result = await calculateAll(hasCriticalChanges, isTFieldEdited)
       toast({
         duration: 2500,
         variant: result.errors ? "destructive" : "default",
