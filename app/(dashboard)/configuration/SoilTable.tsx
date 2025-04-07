@@ -19,7 +19,7 @@ const soilTypeNames = {
   'manmade': 'Man Made'
 }
 
-export function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
+export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
   const router = useRouter()
   const { toast } = useToast()
   const [selectedRow, setSelectedRow] = useState<number | null>(null)
@@ -90,19 +90,19 @@ export function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
   return (
     <>
       <div className="flex bg-white pl-1 sticky top-0 z-10 space-x-3">
-        <Link href="/configuration/safety-factors" prefetch={true} scroll={false}>
+        <Link href="/configuration/safety-factors" prefetch={false} scroll={false}>
           <Button variant="ghost" className="hover:bg-amber-100">
             <ShieldCheck className="h-5 w-5 text-amber-900"/> Define Parameters
           </Button>
         </Link>
         
-        <Link href="/configuration/insert-soil" prefetch={true} scroll={false}>
+        <Link href="/configuration/insert-soil" prefetch={false} scroll={false}>
           <Button variant="ghost" className="hover:bg-blue-100">
             <PlusCircle className="h-5 w-5 text-blue-500"/> Add Soil Layer
           </Button>
         </Link>
 
-        <Link href="/configuration/pile" prefetch={true} scroll={false}>
+        <Link href="/configuration/pile" prefetch={false} scroll={false}>
           <Button variant="ghost" className="hover:bg-purple-100">
             <RectangleVertical className="h-5 w-5 text-purple-500"/> Configure Pile
           </Button>
