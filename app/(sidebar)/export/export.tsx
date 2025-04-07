@@ -6,6 +6,8 @@ import html2canvas from 'html2canvas';
 import { TsoilSchema } from '@/schemas/soilSchema'
 import { TsafetySchema } from '@/schemas/safetySchema';
 import { TpileSchema } from '@/schemas/pileSchema';
+import { useRouter } from "next/navigation"
+import { Button } from '@/components/ui/button';
 
 interface FormData {
   jobNumber: string;
@@ -32,6 +34,7 @@ export default function Export({
     additionalInfo: '',
   });
   const [isCapturing, setIsCapturing] = useState<boolean>(false);
+  const router = useRouter()
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -280,7 +283,7 @@ export default function Export({
   };
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto pt-10">
       <h1 className="text-2xl font-bold mb-6">Export to PDF</h1>
       
       <div className="bg-white p-6 rounded-lg shadow-md mb-6">
@@ -345,6 +348,7 @@ export default function Export({
         </div>
       </div>
       
+      <div className='flex gap-4'>
       <button
         onClick={generatePDF}
         disabled={isCapturing}
@@ -352,6 +356,8 @@ export default function Export({
       >
         {isCapturing ? 'Generating PDF...' : 'Generate PDF Report'}
       </button>
+      <Button onClick={() => router.back()}>Go Back</Button>
+      </div>
     </div>
   );
 }
