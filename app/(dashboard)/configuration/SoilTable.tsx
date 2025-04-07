@@ -24,6 +24,7 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
   const { toast } = useToast()
   const [selectedRow, setSelectedRow] = useState<number | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isCalculating, setIsCalculating] = useState(false);
   const {isAnyFormEdited, hasCriticalChanges,  isTFieldEdited, resetFormStates} = UseFormContext()
 
   const handleEdit = () => {
@@ -62,6 +63,7 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
   }
 
   const handleCalculate = async () => {
+    setIsCalculating(true)
     try {
       const result = await calculateAll(hasCriticalChanges, isTFieldEdited)
       toast({
@@ -73,7 +75,8 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
       })
       
       if (!result.errors) {
-        resetFormStates() 
+        resetFormStates()
+        setIsCalculating(false) 
       }
   
     } catch {
@@ -109,8 +112,12 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
         </Link>
 
         {isAnyFormEdited && soilsData.length > 0 && (
-          <Button variant="ghost" className="hover:bg-green-100" onClick={handleCalculate}>
-            <Calculator className="h-5 w-5 text-green-700" /> Calculate Changes
+          <Button variant="ghost" className="hover:bg-green-100" onClick={handleCalculate} disabled={isCalculating}>
+            {isCalculating ? (
+              <> <span className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-solid border-green-700 border-t-transparent"></span>Calculating...</>
+            ) : (
+              <> <Calculator className="h-5 w-5 text-green-700 mr-2"/> Calculate Changes</>
+            )}
           </Button>
         )}
       </div>
