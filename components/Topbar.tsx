@@ -17,7 +17,7 @@ export const Topbar = () => {
         {navItems.map((item) => (
           <li key={item.href}>
             <Link
-              prefetch={true}
+              prefetch={false}
               href={item.href}
               className={`
                 text-gray-600 px-4 py-3 block font-semibold
