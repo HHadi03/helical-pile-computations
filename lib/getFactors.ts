@@ -8,7 +8,6 @@ export async function getFactors(): Promise<TsafetySchema | null> {
     const { data, error } = await supabase
       .from('factors')
       .select('*')
-      .eq('id', '1')
       .single()
     
     if (error) {

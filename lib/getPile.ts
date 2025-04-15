@@ -8,7 +8,6 @@ export async function getPile(): Promise<TpileSchema | null> {
     const { data, error } = await supabase
       .from('pile')
       .select('*')
-      .eq('id', '1')
       .single()
     
     if (error) {
