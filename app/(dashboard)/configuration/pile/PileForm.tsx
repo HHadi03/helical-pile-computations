@@ -19,6 +19,7 @@ type PileFormProps = {
 }
 
 export function PileForm({ pile }: PileFormProps) {
+  console.log(pile)
   const { toast } = useToast()
   const router = useRouter()
   const { setHasUnsavedChanges } = UseFormContext()

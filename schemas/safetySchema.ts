@@ -1,7 +1,7 @@
 import { z } from "zod"
 
 export const safetySchema = z.object({
-	id: z.coerce.number().int().positive(),
+	id: z.string().optional(),
 	permanentActions: z.coerce.number().gt(0, { message: "Permanent actions must be greater than 0" }),
 	variableActions: z.coerce.number().gt(0, { message: "Variable actions must be greater than 0" }),
 
