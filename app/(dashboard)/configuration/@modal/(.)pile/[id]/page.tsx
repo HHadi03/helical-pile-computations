@@ -1,9 +1,10 @@
-import { PileForm } from '@/app/(dashboard)/configuration/pile/PileForm'
+import { PileForm } from '@/app/(dashboard)/configuration/pile/[id]/PileForm'
 import { Modal } from '@/components/Modal'
 import { getPile } from '@/lib/getPile'
 
-export default async function PileModal() {
-  const pileData = await getPile()
+export default async function PileModal({params}:{params: Promise<{id: string}>}) {
+  const { id } = await params
+  const pileData = await getPile(id)
 
   if (!pileData) {
     return (

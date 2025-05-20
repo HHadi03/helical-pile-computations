@@ -12,11 +12,7 @@ import { NumberInput } from "@/components/NumberInput"
 import { Loader2 } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-type SafetyFactorsFormProps = {
-  safetyFactors: TsafetySchema 
-}
-
-export function SafetyFactorsForm({ safetyFactors }: SafetyFactorsFormProps) {
+export function SafetyFactorsForm({ safetyFactors }: {safetyFactors: TsafetySchema }) {
   const { toast } = useToast()
   const router = useRouter()
   

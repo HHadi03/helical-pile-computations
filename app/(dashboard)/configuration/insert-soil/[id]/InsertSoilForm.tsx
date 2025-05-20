@@ -1,5 +1,5 @@
 "use client"
-import { Loader2 } from "lucide-react"
+import { Loader2, CheckCircle, TriangleAlert } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useToast } from "@/components/hooks/use-toast"
 import { ToastAction } from "@/components/ui/toast"
@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { soilOptions, soilProperties } from "./soilData"
 import { soilSchema, TsoilSchema } from "@/schemas/soilSchema"
-import { insertSoil } from "../actions/insertSoil"
+import { insertSoil } from "../../actions/insertSoil"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -17,13 +17,9 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 import { useRouter } from "next/navigation"
 import { NumberInput } from "@/components/NumberInput"
 import { createPortal } from 'react-dom'
-import { UseFormContext } from "../FormContext"
+import { UseFormContext } from "../../FormContext"
 
-interface SoilFormProps {
-  previousEndDepth?: number
-}
-
-export function SoilForm({ previousEndDepth }: SoilFormProps) {
+export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: number, profileId: string}) {
   const { toast } = useToast()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('soil')
@@ -75,18 +71,21 @@ export function SoilForm({ previousEndDepth }: SoilFormProps) {
 
   async function onSubmit(values: TsoilSchema) {
     try {
-      const result = await insertSoil(values)
+      const result = await insertSoil(values, profileId)
       if (result.errors) {
         Object.entries(result.errors).forEach(([key, value]) => {
         form.setError(key as keyof TsoilSchema, { message: Array.isArray(value) ? value[0] : (value as string)})})
       }
   
       toast({
-        duration: 2500,
+        duration: 2000,
         variant: result.errors ? "destructive" : "default",
-        title: result.errors ? "Soil Submission Failed" : "Soil Submission Successful",
-        description: result.message,
-        action: result.errors && <ToastAction altText="Try again">Try again</ToastAction>
+        description: (
+          <div className="flex items-center gap-2">
+            {result.errors ? (<TriangleAlert className="text-yellow-500 w-5 h-5" />) : (<CheckCircle className="text-green-500 w-5 h-5" />)}
+            <span>{result.message}</span>
+          </div>
+        ),  
       })
       
       if (!result.errors){
@@ -96,7 +95,7 @@ export function SoilForm({ previousEndDepth }: SoilFormProps) {
 
     } catch {
       toast({
-        duration: 2500,
+        duration: 2000,
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
         description: "An unexpected error occurred. Please try again later.",
@@ -114,7 +113,7 @@ export function SoilForm({ previousEndDepth }: SoilFormProps) {
             {showParametersTab && <TabsTrigger value="parameters">Parameters</TabsTrigger>}
           </TabsList>
       
-          <TabsContent value="soil">
+          <TabsContent value="soil" className="focus-visible:ring-transparent">
             <div className="space-y-8 border-y-2 py-3">
               <FormField
                 control={form.control}
@@ -230,12 +229,12 @@ export function SoilForm({ previousEndDepth }: SoilFormProps) {
             </div>
 
             <div className="pt-2 flex justify-between">
-              <Button type="button" className="w-24" onClick={handleNext} disabled={!showParametersTab}>Next</Button>
-              <Button type="button" variant="outline" onClick={() => router.back()}>Close</Button>
+              <Button type="button" className="w-32" onClick={handleNext} disabled={!showParametersTab}>Next</Button>
+              <Button type="button" variant="outline" onClick={router.back}>Close</Button>
             </div>
           </TabsContent>
 
-          {showParametersTab && (<TabsContent value="parameters">
+          {showParametersTab && (<TabsContent value="parameters" className="focus-visible:ring-transparent">
             <div className="space-y-8 border-y-2 py-3">
               <div className="flex gap-4">
                 <FormField
@@ -329,10 +328,10 @@ export function SoilForm({ previousEndDepth }: SoilFormProps) {
             </div>
 
             <div className="pt-2 flex justify-between">
-              <Button type="submit" className="w-24" disabled={isSubmitting}>
+              <Button type="submit" className="w-32" disabled={isSubmitting}>
                 {isSubmitting ? (<> <Loader2 className="mr-2 h-4 w-4 animate-spin"/> Submitting... </>) : ("Submit")}
               </Button>
-              <Button type="button" variant="outline" disabled={isSubmitting} onClick={() => router.back()}>Close</Button>
+              <Button type="button" variant="outline" disabled={isSubmitting} onClick={router.back}>Close</Button>
             </div>
           </TabsContent>)}
 

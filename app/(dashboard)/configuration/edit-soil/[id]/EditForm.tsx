@@ -4,7 +4,6 @@ import { ToastAction } from "@/components/ui/toast"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { TsoilSchema, soilSchema} from "@/schemas/soilSchema"
-import { TpileSchema } from "@/schemas/pileSchema"
 import { updateSoil } from "@/app/(dashboard)/configuration/actions/updateSoil"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -12,14 +11,9 @@ import { useRouter } from "next/navigation"
 import { NumberInput } from "@/components/NumberInput"
 import { useEffect } from "react"
 import { UseFormContext } from "../../FormContext"
-import { Loader2 } from "lucide-react"
+import { Loader2, CheckCircle, TriangleAlert } from "lucide-react"
 
-type EditFormProps = {
-  soil: TsoilSchema
-  pile: TpileSchema
-}
-
-export function EditForm({ soil, pile }: EditFormProps) {
+export function EditForm({ soil}: {soil: TsoilSchema}) {
   const { toast } = useToast()
   const router = useRouter()
   const { setHasUnsavedChanges, setCriticalChanges, setTFieldEdited } = UseFormContext()
@@ -52,11 +46,14 @@ export function EditForm({ soil, pile }: EditFormProps) {
       }
       
       toast({
-        duration: 2500,
+        duration: 2000,
         variant: result.errors ? "destructive" : "default",
-        title: result.errors ? "Soil Update Failed" : "Soil Update Successful",
-        description: result.message,
-        action: result.errors && <ToastAction altText="Try again">Try again</ToastAction>
+        description: (
+          <div className="flex items-center gap-2">
+            {result.errors ? (<TriangleAlert className="text-yellow-500 w-5 h-5" />) : (<CheckCircle className="text-green-500 w-5 h-5" />)}
+            <span>{result.message}</span>
+          </div>
+        ),  
       })
       
       if (!result.errors) {
@@ -66,7 +63,7 @@ export function EditForm({ soil, pile }: EditFormProps) {
 
     } catch {
       toast({
-        duration: 2500,
+        duration: 2000,
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
         description: "An unexpected error occurred. Please try again later.",
@@ -186,33 +183,13 @@ export function EditForm({ soil, pile }: EditFormProps) {
               />
             </>
           )}
-
-          {pile.showBearingCapacity && (
-            <FormField
-              control={form.control}
-              name="qult"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Ultimate Bearing Pressure (Qult)</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <NumberInput field={field} placeholder="Enter Qult"/>
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm">kPa</span>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
-
         </div>
   
         <div className="pt-2 flex justify-between">
-        <Button type="submit" className="w-24" disabled={!isDirty || isSubmitting}>
-          {isSubmitting ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin"/>Saving...</>) : ("Save" )}
+        <Button type="submit" className="w-28" disabled={!isDirty || isSubmitting}>
+          {isSubmitting ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin"/>Saving...</>) : ("Save")}
         </Button>
-          <Button type="button" variant="outline" disabled={isSubmitting} onClick={() => router.back()}>Close</Button>
+          <Button type="button" variant="outline" disabled={isSubmitting} onClick={router.back}>Close</Button>
         </div>
 
       </form>

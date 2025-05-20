@@ -7,19 +7,13 @@ import { pileSchema, TpileSchema } from "@/schemas/pileSchema"
 import { updatePile } from "@/app/(dashboard)/configuration/actions/updatePile"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useRouter } from "next/navigation"
 import { NumberInput } from "@/components/NumberInput"
 import { Checkbox } from "@/components/ui/checkbox"
-import { UseFormContext } from "../FormContext"
+import { UseFormContext } from "../../FormContext"
 import { Loader2 } from "lucide-react"
 
-type PileFormProps = {
-  pile: TpileSchema 
-}
-
-export function PileForm({ pile }: PileFormProps) {
-  console.log(pile)
+export function PileForm({ pile }:{pile: TpileSchema}) {
   const { toast } = useToast()
   const router = useRouter()
   const { setHasUnsavedChanges } = UseFormContext()
@@ -86,28 +80,7 @@ export function PileForm({ pile }: PileFormProps) {
         </div>
           
         <div className="space-y-8 border-b-2 pb-3">
-          <FormField
-            control={form.control}
-            name="pileDiameter"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Pile Diameter (mm)</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select pile diameter"/>
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="60">60 mm</SelectItem>
-                    <SelectItem value="100">100 mm</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
+          
           <FormField
             control={form.control}
             name="pileLength"
@@ -124,12 +97,12 @@ export function PileForm({ pile }: PileFormProps) {
 
           <FormField
             control={form.control}
-            name="waterDepth"
+            name="pileStickout"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Water Depth (m)</FormLabel>
+                <FormLabel>Pile Stickout (m)</FormLabel>
                 <FormControl>
-                  <NumberInput field={field} placeholder="Enter water depth"/>
+                  <NumberInput field={field} placeholder="Enter stick out"/>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -141,7 +114,7 @@ export function PileForm({ pile }: PileFormProps) {
         <Button type="submit" className="w-24" disabled={!isDirty || isSubmitting}>
           {isSubmitting ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin"/>Saving...</>) : ("Save" )}
         </Button>
-        <Button type="button" variant="outline" disabled={isSubmitting} onClick={() => router.back()}>Close</Button>
+        <Button type="button" variant="outline" disabled={isSubmitting} onClick={router.back}>Close</Button>
         </div>
       </form>
     </Form>

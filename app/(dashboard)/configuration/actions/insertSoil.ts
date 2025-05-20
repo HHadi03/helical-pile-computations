@@ -10,7 +10,8 @@ type ReturnType = {
   errors?: Record<string, string[]>
 }
 
-export async function insertSoil(soil: TsoilSchema): Promise<ReturnType> {
+export async function insertSoil(soil: TsoilSchema, profileId: string): Promise<ReturnType> {
+  
   const parsed = soilSchema.safeParse(soil)
   if (!parsed.success) {
     return {
@@ -32,10 +33,11 @@ export async function insertSoil(soil: TsoilSchema): Promise<ReturnType> {
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
-    
+
     const snakeCaseSoil = camelToSnake({
       ...soil,
-      user_id: user!.id
+      user_id: user!.id,
+      soil_profile_id: profileId
     })
 
     const { error } = await supabase
@@ -43,12 +45,14 @@ export async function insertSoil(soil: TsoilSchema): Promise<ReturnType> {
     .insert(snakeCaseSoil)
      
     if (error) {
-      return { message: "Failed to submit soil data. Please try again.", errors: {}}
+      return { message: "Failed to insert soil layer, please try again later.", errors: {}}
     }
+    
     revalidatePath('/configuration')
-    return { message: "Soil data submitted successfully 🎉" }
-
-  } catch {
-    return { message: "Failed to submit soil data. Please try again later.", errors: {}}
+    return { message: "Soil layer has been successfully inserted" }
+  }
+  
+  catch {
+    return { message: "Failed to insert soil layer, please try again later.", errors: {}}
   }
 }

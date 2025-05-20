@@ -1,17 +1,20 @@
 'use client'
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from "@/components/ui/alert-dialog"
+import {DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem} from "@/components/ui/dropdown-menu"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import type { TsoilSchema } from "@/schemas/soilSchema"
+import { TsoilProfileSchema } from "@/schemas/soilProfileSchema"
 import { useToast } from "@/components/hooks/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { calculateAll } from "./actions/submitCalculations"
 import { deleteSoil } from "./actions/deleteSoil"
 import { UseFormContext } from "./FormContext"
-import { Calculator, PlusCircle, Edit2, Trash2, RectangleVertical, ShieldCheck } from 'lucide-react'
+import { Calculator, PlusCircle, Trash2, EllipsisVertical, Copy, Pencil, ChevronDown, ChevronRight, TriangleAlert, CheckCircle} from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import Link from 'next/link'
+import { deleteProfile } from "./actions/deleteProfile"
 
 const soilTypeNames = {
   'fine': 'Fine Grain',
@@ -19,40 +22,84 @@ const soilTypeNames = {
   'manmade': 'Man Made'
 }
 
-export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
+export default function SoilTable({ soilsData, profileData}: { soilsData: TsoilSchema[], profileData: TsoilProfileSchema[] }) {
   const router = useRouter()
   const { toast } = useToast()
-  const [selectedRow, setSelectedRow] = useState<number | null>(null)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [isCalculating, setIsCalculating] = useState(false);
+  const [selectedSoil, setSelectedSoil] = useState<string | null>(null)
+  const [selectedProfile, setSelectedProfile] = useState<string | null>(null)
+  const [isSoilDeleteDialogOpen, setisSoilDeleteDialogOpen] = useState(false)
+  const [isProfileDeleteDialogOpen, setIsProfileDeleteDialogOpen] = useState(false)
+  const [isCalculating, setIsCalculating] = useState(false)
+  const [collapsedProfiles, setCollapsedProfiles] = useState<Set<string>>(new Set())
   const {isAnyFormEdited, hasCriticalChanges,  isTFieldEdited, resetFormStates} = UseFormContext()
-
-  const handleEdit = () => {
-    if (selectedRow !== null && soilsData[selectedRow].id) {
-      router.push(`/configuration/edit-soil/${soilsData[selectedRow].id}`)
-    }
+  
+  const toggleProfileCollapse = (profileId: string) => {
+    setCollapsedProfiles(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(profileId)) {
+        newSet.delete(profileId)
+      } else {
+        newSet.add(profileId)
+      }
+      return newSet
+    })
   }
 
-  const handleDelete = async () => {
-    if (selectedRow !== null && soilsData[selectedRow].id) {
+  const handleSoilDelete = async () => {
+    if (selectedSoil !== null) {
       try {
-        const result = await deleteSoil(soilsData[selectedRow].id)
+        const result = await deleteSoil(selectedSoil)
         toast({
-          duration: 2500,
+          duration: 2000,
           variant: result.errors ? "destructive" : "default",
-          title: result.errors ? "Soil Deletion Failed" : "Soil Deletion Successful",
-          description: result.message,
-          action: result.errors && <ToastAction altText="Try again">Try again</ToastAction>
+          description: (
+            <div className="flex items-center gap-2">
+              {result.errors ? (<TriangleAlert className="text-yellow-500 w-5 h-5" />) : (<CheckCircle className="text-green-500 w-5 h-5" />)}
+              <span>{result.message}</span>
+            </div>
+          ),  
         })
         
         if (!result.errors) {
-          setSelectedRow(null)
-          setIsDeleteDialogOpen(false)
+          setSelectedSoil(null)
+          setisSoilDeleteDialogOpen(false)
         }
   
       } catch {
         toast({
-          duration: 2500,
+          duration: 2000,
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description: "An unexpected error occurred. Please try again later.",
+          action: <ToastAction altText="Try again">Try again</ToastAction>
+        })
+      }
+    }
+  }
+
+  const handleProfileDelete = async () => {
+    if (selectedProfile !== null) {
+      try {
+        const result = await deleteProfile(selectedProfile)
+        toast({
+          duration: 2000,
+          variant: result.errors ? "destructive" : "default",
+          description: (
+            <div className="flex items-center gap-2">
+              {result.errors ? (<TriangleAlert className="text-yellow-500 w-5 h-5" />) : (<CheckCircle className="text-green-500 w-5 h-5" />)}
+              <span>{result.message}</span>
+            </div>
+          ),  
+        })
+        
+        if (!result.errors) {
+          setSelectedProfile(null)
+          setIsProfileDeleteDialogOpen(false)
+        }
+
+      } catch {
+        toast({
+          duration: 2000,
           variant: "destructive",
           title: "Uh oh! Something went wrong.",
           description: "An unexpected error occurred. Please try again later.",
@@ -67,11 +114,14 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
     try {
       const result = await calculateAll(hasCriticalChanges, isTFieldEdited)
       toast({
-        duration: 2500,
+        duration: 2000,
         variant: result.errors ? "destructive" : "default",
-        title: result.errors ? "Calculation Failed" : "Calculation Successful",
-        description: result.message,
-        action: result.errors && <ToastAction altText="Try again">Try again</ToastAction>
+        description: (
+          <div className="flex items-center gap-2">
+            {result.errors ? (<TriangleAlert className="text-yellow-500 w-5 h-5" />) : (<CheckCircle className="text-green-500 w-5 h-5" />)}
+            <span>{result.message}</span>
+          </div>
+        ),  
       })
       
       if (!result.errors) {
@@ -81,7 +131,7 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
   
     } catch {
       toast({
-        duration: 2500,
+        duration: 2000,
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
         description: "An unexpected error occurred. Please try again later.",
@@ -89,104 +139,129 @@ export default function SoilTable({ soilsData }: { soilsData: TsoilSchema[] }) {
       })
     }
   }
-  
+
   return (
-    <>
-      <div className="flex bg-white pl-1 sticky top-0 z-10 space-x-3">
-        <Link href="/configuration/safety-factors" prefetch={false} scroll={false}>
-          <Button variant="ghost" className="hover:bg-amber-100">
-            <ShieldCheck className="h-5 w-5 text-amber-900"/> Define Parameters
-          </Button>
-        </Link>
-        
-        <Link href="/configuration/insert-soil" prefetch={false} scroll={false}>
-          <Button variant="ghost" className="hover:bg-blue-100">
-            <PlusCircle className="h-5 w-5 text-blue-500"/> Add Soil Layer
-          </Button>
-        </Link>
+    <div className="space-y-6 px-3 pt-3">
+       
+      {profileData.map((profile, index) => {
+        const profileSoils = soilsData.filter((soil) => soil.soilProfileId === profile.id)
+        const isCollapsed = collapsedProfiles.has(profile.id)
+        return (
+          <div key={profile.id}>
+            
+            <div className="flex items-center pb-2 pl-1">
+              <Button variant="ghost" size="icon" className="h-6 w-6 mr-2" onClick={() => toggleProfileCollapse(profile.id)}>{isCollapsed ? (<ChevronRight/>) : (<ChevronDown/>)}</Button>
+              <h2 className="text-xl font-semibold">Soil Profile {index + 1}</h2>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-6 w-6 ml-1 focus-visible:ring-transparent"><EllipsisVertical/></Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-40">
+                  <DropdownMenuItem onClick={() => router.push(`/configuration/edit-profile/${profile.id}`)}><Pencil/>Edit</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => {/* handleDuplicateProfile(profile.id) */}}><Copy/>Duplicate</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => {setSelectedProfile(profile.id), setIsProfileDeleteDialogOpen(true)}}><Trash2/>Remove</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              {/* <button onClick={(e) => {e.stopPropagation(), setSelectedProfile(profile.id), setIsProfileDeleteDialogOpen(true)}}>Remove Profile</button> */}
+            </div>
 
-        <Link href="/configuration/pile" prefetch={false} scroll={false}>
-          <Button variant="ghost" className="hover:bg-purple-100">
-            <RectangleVertical className="h-5 w-5 text-purple-500"/> Configure Pile
-          </Button>
-        </Link>
+            {!isCollapsed && (
+              <>
+                {profileSoils.length === 0 ? (<p className="pl-1 pt-2 text-gray-500">No soil data available. Please add some entries.</p>)
+                : (
+                <div className="overflow-hidden rounded-xl border border-gray-200 shadow-gray-200 shadow-md">
+                  <Table>
+                    <TableHeader className="bg-gray-300">
+                      <TableRow>
+                        <TableHead className="font-semibold">Layer</TableHead>
+                        <TableHead className="whitespace-nowrap font-semibold">Start Depth</TableHead>
+                        <TableHead className="whitespace-nowrap font-semibold">End Depth</TableHead>
+                        <TableHead className="font-semibold">Type</TableHead>
+                        <TableHead className="font-semibold">Name</TableHead>
+                        <TableHead className="font-semibold">Description</TableHead>
+                        <TableHead className=""></TableHead>
+                      </TableRow>
+                    </TableHeader>
+                  
+                    <TableBody>
+                      {profileSoils.map((soil, index) => (
+                        <TableRow key={soil.id} onDoubleClick={() => router.push(`/configuration/edit-soil/${soil.id}`, { scroll: false })} className={`cursor-pointer hover:bg-slate-50`}>
+                          <TableCell>{index + 1}</TableCell>
+                          <TableCell>{`${soil.startDepth} m`}</TableCell>
+                          <TableCell>{`${soil.endDepth} m`}</TableCell>
+                          <TableCell>{soilTypeNames[soil.soilType]}</TableCell>
+                          <TableCell>{soil.soilName ? soil.soilName : soil.soil}</TableCell>
+                          <TableCell>{soil.description}</TableCell>
+                          <TableCell className="text-right"><Button variant="outline" size="icon" className="h-6 w-6" onClick={(e) => {e.stopPropagation(), setSelectedSoil(soil.id!), setisSoilDeleteDialogOpen(true)}}><Trash2 className="text-red-500"/></Button></TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+                )}
 
-        {isAnyFormEdited && soilsData.length > 0 && (
-          <Button variant="ghost" className="hover:bg-green-100" onClick={handleCalculate} disabled={isCalculating}>
-            {isCalculating ? (
-              <> <span className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-solid border-green-700 border-t-transparent"></span>Calculating...</>
-            ) : (
-              <> <Calculator className="h-5 w-5 text-green-700 mr-2"/> Calculate Changes</>
+                <div className="pt-2">
+                  <Link href={`/configuration/insert-soil/${profile.id}`} prefetch={false} scroll={false}>
+                    <Button variant="ghost" className="hover:bg-blue-100">
+                      <PlusCircle className="text-blue-500"/> Add Soil Layer
+                    </Button>
+                  </Link>
+                </div>
+              </>
             )}
-          </Button>
-        )}
-      </div>
 
-      <div className="px-3 pt-3">
-        <h1 className="pl-1 text-2xl">Soil Layer Entries ({soilsData.length})</h1>
-        {soilsData.length > 0 ? (
-          <div className="overflow-hidden rounded-xl border border-gray-200 shadow-gray-200 shadow-md mt-2">
-          <Table className="w-full">
-            <TableHeader className="bg-gray-300">
-              <TableRow>
-                <TableHead className="font-semibold">Layer</TableHead>
-                <TableHead className="whitespace-nowrap font-semibold">Start Depth</TableHead>
-                <TableHead className="whitespace-nowrap font-semibold">End Depth</TableHead>
-                <TableHead className="font-semibold">Type</TableHead>
-                <TableHead className="font-semibold">Name</TableHead>
-                <TableHead className="font-semibold">Description</TableHead>
-              </TableRow>
-            </TableHeader>
-          
-            <TableBody>
-              {soilsData.map((soil: TsoilSchema, index: number) => (
-                <TableRow key={soil.id} className={`cursor-pointer hover:bg-slate-50 ${selectedRow === index ? 'bg-slate-100' : ''}`}  onClick={() => setSelectedRow(index)}>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>{`${soil.startDepth} m`}</TableCell>
-                  <TableCell>{`${soil.endDepth} m`}</TableCell>
-                  <TableCell>{soilTypeNames[soil.soilType]}</TableCell>
-                  <TableCell>{soil.soilName ? soil.soilName : soil.soil}</TableCell>
-                  <TableCell>{soil.description}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
           </div>
-        ) : (<p className="pl-1 pt-2 text-gray-500">No soil data available. Please add some entries.</p>)}
+        )
+      })}
 
-        {soilsData.length > 0 && (
-          <div className="sticky bottom-0 z-10 pt-3 pb-2 pr-2 pointer-events-none flex justify-end">
-            <div className="border border-gray-300 rounded-sm shadow-sm bg-white pointer-events-auto">
-              <Button variant="ghost" className={`hover:bg-zinc-200 border-r border-gray-300 ${selectedRow === null ? 'cursor-not-allowed' : ''}`}
-                onClick={handleEdit} disabled={selectedRow === null}>
-                <Edit2 className="h-5 w-5 text-zinc-600"/> Edit
-              </Button>
-
-              <Button variant="ghost" className={`hover:bg-red-100 ${selectedRow === null || selectedRow !== soilsData.length - 1 ? 'cursor-not-allowed' : ''}`} 
-                onClick={() => setIsDeleteDialogOpen(true)} disabled={selectedRow === null || selectedRow !== soilsData.length - 1}>
-                <Trash2 className="h-5 w-5 text-red-500"/> Delete
-              </Button>
-            </div>  
-          </div>
-        )}
-      </div>
-      
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <AlertDialog open={isProfileDeleteDialogOpen} onOpenChange={setIsProfileDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete{" "}
-              {selectedRow !== null ? soilsData[selectedRow].soilName || soilsData[selectedRow].soil : "selected soil"}{" "}
-              and remove it from the table.
-            </AlertDialogDescription>
+            <AlertDialogDescription>This action cannot be undone. This will permanently delete the selected soil profile and remove it from the table.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+            <AlertDialogCancel onClick={() => setIsProfileDeleteDialogOpen(false)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleProfileDelete}>Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+
+      <AlertDialog open={isSoilDeleteDialogOpen} onOpenChange={setisSoilDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>This action cannot be undone. This will permanently delete the selected soil layer and remove it from the table.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setisSoilDeleteDialogOpen(false)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleSoilDelete}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+    </div>
   )
 }
+
+// {isAnyFormEdited && soilsData.length > 0 && (
+//   <Button variant="ghost" className="hover:bg-green-100" onClick={() => handleCalculate()} disabled={isCalculating}>
+//     {isCalculating ? (
+//       <> <span className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-solid border-green-700 border-t-transparent"></span>Calculating...</>
+//     ) : (
+//       <> <Calculator className="text-green-700"/> Calculate Changes </>
+//     )}
+//   </Button>
+// )} 
+
+//todo set up soil profile modal with the water depth, stick out, name and pile length paramaters. with insert/edit route
+//set up tooltip menu with duplicate, edit, and delete
+//remove bearing capacity calculations.
+//add options to soiltable, fix edit soil with more 
+//fix calculateall logic
+//add extra fields to table
+//improve config table ui
+//improve server actions
+//work on overview page
+//fix issues in supabse table
+//improve caching issues

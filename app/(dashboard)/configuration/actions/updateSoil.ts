@@ -2,6 +2,7 @@
 import { soilSchema, TsoilSchema } from "@/schemas/soilSchema"
 import { createClient } from "@/utils/supabase/server"
 import { camelToSnake } from "@/lib/caseConversion"
+import { revalidatePath } from "next/cache"
 
 type ReturnType = {
   message: string
@@ -26,11 +27,14 @@ export async function updateSoil(soil: TsoilSchema): Promise<ReturnType> {
     .eq('id', soil.id)
     
     if (error) {
-      return { message: "Failed to update soil data. Please try again.", errors: {}}
+      return { message: "Failed to update soil layer, please try again later.", errors: {}}
     }
-    return { message: "Soil data updated successfully" }
 
-  } catch {
-    return { message: "Failed to update soil data. Please try again later.", errors: {}}
+    revalidatePath('/configuration')
+    return { message: "Soil layer has been successfully updated" }
+  } 
+  
+  catch {
+    return { message: "Failed to update soil layer, please try again later.", errors: {}}
   }
 }

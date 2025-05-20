@@ -1,8 +1,6 @@
 "use server"
 import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
-import { getSoils } from "@/lib/getSoils"
-import { getPile } from "@/lib/getPile"
 
 type ReturnType = {
   message: string
@@ -12,7 +10,6 @@ type ReturnType = {
 export async function deleteSoil(id: string): Promise<ReturnType> {
   
   try {
-    const soilsData = await getSoils()
     const supabase = await createClient()
     const { error } = await supabase
     .from('soils')
@@ -20,26 +17,14 @@ export async function deleteSoil(id: string): Promise<ReturnType> {
     .eq('id', id)
 
     if (error) {
-      return { message: "Failed to delete soil. Please try again.", errors: {}}
+      return { message: "Failed to delete soil layer, please try again later.", errors: {}}
     }
-    
-    if (soilsData.length > 1) {
-      const pileData = await getPile()
-      const previousSoil = soilsData[soilsData.length - 2]
-      const newPileLength = previousSoil.endDepth
-      
-      if (pileData) {
-        await supabase
-        .from('pile')
-        .update({ pile_length: newPileLength })
-        .eq('id', '1')
-      }
-    }
-    
+  
     revalidatePath('/configuration')
-    return { message: "Soil deleted successfully" }
-
-  } catch {
-    return { message: "Failed to delete soil. Please try again later.", errors: {}}
+    return { message: "Soil layer has been successfully deleted" }
+  } 
+  
+  catch {
+    return { message: "Failed to delete soil layer, please try again later.", errors: {}}
   }
 }

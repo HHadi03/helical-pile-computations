@@ -2,21 +2,20 @@ import { PileForm } from './PileForm'
 import { getPile } from '@/lib/getPile'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
+import { NotFound } from '@/components/NotFound'
 
-export default async function PilePage() {
+export default async function PilePage({params}:{params: Promise<{id: string}>}) {
   const supabase = await createClient()
   const { data, error } = await supabase.auth.getUser()
   if (error || !data?.user) {
     redirect('/')
   }
 
-  const pileData = await getPile()
+  const { id } =  await params
+  const pileData = await getPile(id)
+  
   if (!pileData) {
-    return (
-      <div className="flex justify-center">
-        Failed to load pile data.
-      </div>
-    )
+    return <NotFound/>
   }
 
   return (
