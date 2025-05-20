@@ -8,7 +8,7 @@ type ReturnType = {
 }
 
 export async function deleteProfile(id: string): Promise<ReturnType> {
-	console.log("SERVER ACTION TRIGGERED")
+
 	try {
 		const supabase = await createClient()
 		const { error } = await supabase

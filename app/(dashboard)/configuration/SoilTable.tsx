@@ -162,7 +162,6 @@ export default function SoilTable({ soilsData, profileData}: { soilsData: TsoilS
                   <DropdownMenuItem onClick={() => {setSelectedProfile(profile.id), setIsProfileDeleteDialogOpen(true)}}><Trash2/>Remove</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              {/* <button onClick={(e) => {e.stopPropagation(), setSelectedProfile(profile.id), setIsProfileDeleteDialogOpen(true)}}>Remove Profile</button> */}
             </div>
 
             {!isCollapsed && (
