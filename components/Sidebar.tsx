@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { logOut } from '@/app/actions'
+import {ArrowLeftToLine, ArrowRightToLine, LogOut } from 'lucide-react'
 import Link from 'next/link'
 
 export const Sidebar = () => {
@@ -35,7 +36,7 @@ export const Sidebar = () => {
   )
 
   return (
-    <aside className={`flex flex-col border-r border-gray-300 p-2 bg-gradient-to-tr from-slate-50 via-white to-blue-50 shadow-inner
+    <aside className={`flex flex-col border-r border-gray-300 p-2 bg-linear-to-tr from-slate-50 via-white to-blue-50 shadow-inner
     ${expanded ? 'w-[260px]' : 'w-[70px]'} transition-all duration-300`}>
       
       <div className='pt-2 flex gap-2'>
@@ -46,12 +47,12 @@ export const Sidebar = () => {
             </div>
 
             <button onClick={toggleSidebar} aria-label="Collapse Sidebar" aria-expanded={expanded} className="px-3 rounded hover:bg-gray-200 shrink-0">
-              <img src="/collapse-icon.png" alt="Collapse" className='w-6 h-auto'/>
+               <ArrowLeftToLine className="w-6 h-6" />
             </button>
           </>
         ) : (
           <button onClick={toggleSidebar} aria-label="Expand Sidebar" aria-expanded={expanded} className="p-2 rounded hover:bg-gray-200 grow">
-            <img src="/expand-icon.png" alt="Expand" className='w-6 h-auto'/>
+           <ArrowRightToLine className="w-6 h-6" />
           </button>
         )}
       </div>
@@ -66,8 +67,7 @@ export const Sidebar = () => {
         <li className={`relative group rounded-lg hover:bg-gray-200 ${!expanded && 'justify-center'}`}>
           <form action={logOut}>
             <button type="submit" className="text-gray-700 font-medium py-2 px-3 flex gap-3">
-              <img src="/signout-icon.png" alt='Sign Out Icon' className='w-6 h-auto'/>
-              {expanded && <span className='whitespace-nowrap'>Sign Out</span>}
+              <LogOut className="w-6 h-6"/> {expanded && <span className='whitespace-nowrap'>Sign Out</span>}
             </button>
           </form>
 

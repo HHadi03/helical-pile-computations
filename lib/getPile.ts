@@ -2,12 +2,13 @@ import { createClient } from "@/utils/supabase/server"
 import { TpileSchema } from "@/schemas/pileSchema"
 import { snakeToCamel } from "./caseConversion"
 
-export async function getPile(): Promise<TpileSchema | null> {
+export async function getPile(id: string): Promise<TpileSchema | null> {
   try {
     const supabase = await createClient()
     const { data, error } = await supabase
-      .from('pile')
+      .from('piles')
       .select('*')
+      .eq('id', id)
       .single()
     
     if (error) {
