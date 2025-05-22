@@ -1,11 +1,10 @@
 "use server"
-import { getPile } from "@/lib/getPile"
 import { getSoils } from "@/lib/getSoils"
-import { getProfile } from "@/lib/getProfile"
 import { calculateResultsForSoils, calculateResultsForFineSoil, roundToTwoDecimals } from "@/lib/equations"
 import { createClient } from "@/utils/supabase/server"
 import { camelToSnake } from "@/lib/caseConversion"
 import { revalidatePath } from "next/cache"
+import { getProfiles } from "@/lib/getProfiles"
 
 type ReturnType = {
   message: string
@@ -15,65 +14,62 @@ type ReturnType = {
 type UpdatedSoil = {
   shaftCapacity60?: number
   shaftCapacity100?: number
-  bearingCapacity?: number
   po?: number | null
   angle?: number | null
   ko?: number | null
   t?: number | null
   su?: number | null
-  qult?: number
   h?: number
 }
 
 export async function calculateAll(hasCriticalChanges: boolean, isTFieldEdited: boolean): Promise<ReturnType> {
+  
   try {
-    // Get all profiles and soils
-    const profilesData = await getProfile()
-    const allSoils = await getSoils()
-    
-    // For tracking success across all profiles
-    const profileResults = await Promise.all(profilesData.map(async (profile) => {
+    const profileData = await getProfiles()
+    const soilsData = await getSoils()
+
+    const profileCalculations = await Promise.all(profileData.map(async (profile) => {
       try {
-        // Filter soils for this profile
-        const profileSoils = allSoils.filter((soil) => soil.soilProfileId === profile.id)
-        
-        // Get pile data for this profile
-        const pileData = await getPile(profile.id)
-        if (!pileData) {
-          console.error(`Failed to fetch pile data for profile ${profile.id}`)
-          return false
+        // Calculate new pile length
+        let newPileLength: number
+        if (profile.pileStickOut > profile.pileLength) {
+          newPileLength = 0
+        } else {
+          newPileLength = profile.pileLength - profile.pileStickOut
         }
 
-        // Process each soil in this profile
+        // Get soils for this profile
+        const profileSoils = soilsData.filter((soil) => soil.soilProfileId === profile.id)
+
+        // Process each soil layer in this profile
         const soilCalculations = await Promise.all(profileSoils.map(async (soil) => {
           try {
-            // If soil layer starts below pile length, no need to calculate
-            if (soil.startDepth >= pileData.pileLength) {
+            // If soil layer starts below pile length, no need to calculate, return true for success message
+            if (soil.startDepth >= newPileLength) {
               return true
             }
             
             // Create a new soil object with calculated values
             const calculatedValues = soil.soilType === "fine" 
               ? await calculateResultsForFineSoil(soil) 
-              : await calculateResultsForSoils(soil)
+              : await calculateResultsForSoils(soil, profile.waterDepth)
         
             // Determine soil height based on pile length
             let soilHeight: number
-            if (soil.endDepth <= pileData.pileLength) {
+            if (soil.endDepth <= newPileLength) {
               soilHeight = soil.h!
             }
-            else if (soil.startDepth < pileData.pileLength) {
-              soilHeight = pileData.pileLength - soil.startDepth
+            else if (soil.startDepth < newPileLength) {
+              soilHeight = newPileLength - soil.startDepth
             }
             else {
               soilHeight = 0
             }
             
-            // If soil height is greater than 0, continue with calculations
+            // If soil height is greater than 0, continue with code execution
             if (soilHeight > 0) {
               let shaftCapacity60: number
               let shaftCapacity100: number
-              let bearingCapacity: number
               let updatedSoil: UpdatedSoil = {}
               const e = 2.71828183
               const TAN = 0.01745
@@ -82,14 +78,10 @@ export async function calculateAll(hasCriticalChanges: boolean, isTFieldEdited: 
               if (isTFieldEdited && hasCriticalChanges && soil.soilType === 'coarse') {
                 shaftCapacity60 = soil.t! * soilHeight * 0.1884
                 shaftCapacity100 = soil.t! * soilHeight * 0.314
-                bearingCapacity = pileData.pileDiameter === "100" 
-                  ? soil.qult! * 0.002463
-                  : soil.qult! * 0.001223
-                  
+                
                 updatedSoil = {
                   shaftCapacity60: roundToTwoDecimals(shaftCapacity60),
                   shaftCapacity100: roundToTwoDecimals(shaftCapacity100),
-                  bearingCapacity: roundToTwoDecimals(bearingCapacity)
                 }
               }
 
@@ -97,14 +89,10 @@ export async function calculateAll(hasCriticalChanges: boolean, isTFieldEdited: 
               else if (isTFieldEdited && soil.soilType === 'coarse') {
                 shaftCapacity60 = soil.t! * soilHeight * 0.1884
                 shaftCapacity100 = soil.t! * soilHeight * 0.314
-                bearingCapacity = pileData.pileDiameter === "100" 
-                  ? calculatedValues.qult! * 0.002463
-                  : calculatedValues.qult! * 0.001223
-                  
+                
                 updatedSoil = {
                   shaftCapacity60: roundToTwoDecimals(shaftCapacity60),
                   shaftCapacity100: roundToTwoDecimals(shaftCapacity100),
-                  bearingCapacity: roundToTwoDecimals(bearingCapacity)
                 }
               } 
               
@@ -113,35 +101,27 @@ export async function calculateAll(hasCriticalChanges: boolean, isTFieldEdited: 
                 if (soil.soilType === "fine") {
                   shaftCapacity60 = soil.su! * soilHeight * 0.1884
                   shaftCapacity100 = soil.su! * soilHeight * 0.314
-                  bearingCapacity = pileData.pileDiameter === "100" 
-                    ? soil.qult! * 0.002463
-                    : soil.qult! * 0.001223
-                    
+                
                   updatedSoil = {
                     shaftCapacity60: roundToTwoDecimals(shaftCapacity60),
                     shaftCapacity100: roundToTwoDecimals(shaftCapacity100),
-                    bearingCapacity: roundToTwoDecimals(bearingCapacity)
                   }
                 } else {
                   const Ko = 0.09 * Math.pow(e, (0.08 * soil.angle!))
                   const T = Ko * calculatedValues.po! * Math.tan(soil.angle! * TAN)
                   shaftCapacity60 = T * soilHeight * 0.1884
                   shaftCapacity100 = T * soilHeight * 0.314
-                  bearingCapacity = pileData.pileDiameter === "100" 
-                    ? soil.qult! * 0.002463
-                    : soil.qult! * 0.001223
-                    
+                 
                   updatedSoil = {
                     ko: roundToTwoDecimals(Ko),
                     t: roundToTwoDecimals(T),
                     shaftCapacity60: roundToTwoDecimals(shaftCapacity60),
                     shaftCapacity100: roundToTwoDecimals(shaftCapacity100),
-                    bearingCapacity: roundToTwoDecimals(bearingCapacity)
                   }
                 }
               }
 
-              // Conditon 3 > No engineered props edited
+              // Condition 3 > No engineered props edited
               else {
                 if (soil.soilType === "fine") {
                   shaftCapacity60 = calculatedValues.su! * soilHeight * 0.1884
@@ -151,19 +131,13 @@ export async function calculateAll(hasCriticalChanges: boolean, isTFieldEdited: 
                   shaftCapacity100 = calculatedValues.t! * soilHeight * 0.314
                 }
                 
-                bearingCapacity = pileData.pileDiameter === "100" 
-                  ? calculatedValues.qult! * 0.002463
-                  : calculatedValues.qult! * 0.001223
-                  
                 updatedSoil = {
                   ...calculatedValues,
                   shaftCapacity60: roundToTwoDecimals(shaftCapacity60),
                   shaftCapacity100: roundToTwoDecimals(shaftCapacity100),
-                  bearingCapacity: roundToTwoDecimals(bearingCapacity)
                 }  
               }
               
-              // Update the soil in the database
               const snakeCaseSoil = camelToSnake(updatedSoil)
               const supabase = await createClient()
               const { error } = await supabase
@@ -171,9 +145,8 @@ export async function calculateAll(hasCriticalChanges: boolean, isTFieldEdited: 
                 .update(snakeCaseSoil)
                 .eq('id', soil.id)
 
-              // If update failed, return false for error message
+              // If update failed, return false for error message else return true for success message
               if (error) {
-                console.error(`Failed to update soil ${soil.id}: ${error.message}`)
                 return false
               }
               return true
@@ -181,32 +154,29 @@ export async function calculateAll(hasCriticalChanges: boolean, isTFieldEdited: 
             // If soil height is 0, return true for success message
             return true
             
-          } catch (error) {
-            console.error(`Error processing soil ${soil.id}: ${error}`)
+          } catch {
             return false
           }
         }))
 
         // Check if all soil calculations for this profile were successful
-        return soilCalculations.every(success => success)
+        return soilCalculations.every((success: boolean) => success)
         
-      } catch (error) {
-        console.error(`Error processing profile ${profile.id}: ${error}`)
+      } catch {
         return false
       }
     }))
 
-    // Check if all profile calculations were successful
-    const allSuccessful = profileResults.every(success => success)
+    const allSuccessful = profileCalculations.every((success: boolean) => success)
     if (allSuccessful) {
       revalidatePath('/configuration')
-      return { message: "All soil profiles calculated successfully" }
-    } else {
-      return { message: "Some soil profiles failed to calculate. Please try again.", errors: {}}
+      return { message: "All soil layers calculated successfully" }
+    } 
+    else {
+      return { message: "Some soil layers failed to calculate. Please try again.", errors: {}}
     }
 
-  } catch (error) {
-    console.error(`Global error in calculateAll: ${error}`)
-    return { message: "Failed to calculate soil profiles, please try again later.", errors: {}}
+  } catch {
+    return { message: "Failed to calculate all soil layers, please try again later.", errors: {}}
   }
 }

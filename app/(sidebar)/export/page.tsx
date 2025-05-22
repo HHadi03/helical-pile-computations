@@ -1,6 +1,6 @@
 // ServerExportPage.tsx (server component)
 import { getSoils } from '@/lib/getSoils';
-import { getPile } from '@/lib/getPile';
+import { getPile } from '@/lib/getProfile';
 import { getFactors } from '@/lib/getFactors';
 import Export from './export';
 

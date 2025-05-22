@@ -9,7 +9,7 @@ export const soilSchema = z.object({
   soilName: z.string().optional(),
   description: z.string().optional(),
   color: z.string(),
-  startDepth: z.coerce.number().gte(0, { message: "Start depth must be greater than or equal to 0" }).default(0),
+  startDepth: z.coerce.number().gte(0, { message: "Start depth must be greater than or equal to 0m" }).default(0),
   endDepth: z.coerce.number({ message: "End depth is required"}).default(0),
   nValue: z.coerce.number().gte(1, { message: "SPT N-Value is required" }).default(0),
   yMoist: z.coerce.number().gte(1, { message: "YMoist is required" }),
@@ -19,14 +19,10 @@ export const soilSchema = z.object({
   ko: z.coerce.number().nullish(),
   t: z.coerce.number().nullish(),
   su: z.coerce.number().nullish(),
-  qult: z.coerce.number().optional(),
   h: z.coerce.number().optional(),
   shaftCapacity60: z.coerce.number().nullish(),
   shaftCapacity100: z.coerce.number().nullish(),
-  bearingCapacity: z.coerce.number().nullish(),
-})
-
-  .refine(
+}).refine(
     (data) => data.endDepth > data.startDepth,
     {
       path: ['endDepth'], 
@@ -38,13 +34,6 @@ export const soilSchema = z.object({
     {
       path: ['description'],
       message: "Description must be less than 125 characters long"
-    }
-  )
-  .refine(
-    (data) => data.qult === undefined || data.qult >= 1,
-    {
-      path: ['qult'],
-      message: "Qult is required"
     }
   )
   .refine(

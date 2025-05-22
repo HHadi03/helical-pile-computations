@@ -1,5 +1,5 @@
 import { PileForm } from './PileForm'
-import { getPile } from '@/lib/getPile'
+import { getPile } from '@/lib/getProfile'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { NotFound } from '@/components/NotFound'

@@ -4,6 +4,7 @@ import { calculateResultsForFineSoil, calculateResultsForSoils } from "@/lib/equ
 import { createClient } from "@/utils/supabase/server"
 import { camelToSnake } from "@/lib/caseConversion"
 import { revalidatePath } from "next/cache"
+import { getProfile } from "@/lib/getProfile"
 
 type ReturnType = {
   message: string
@@ -11,7 +12,7 @@ type ReturnType = {
 }
 
 export async function insertSoil(soil: TsoilSchema, profileId: string): Promise<ReturnType> {
-  
+
   const parsed = soilSchema.safeParse(soil)
   if (!parsed.success) {
     return {
@@ -26,8 +27,10 @@ export async function insertSoil(soil: TsoilSchema, profileId: string): Promise<
   }
 
   else {
+    const profileData = await getProfile(profileId)
+    const waterDepth = profileData!.waterDepth
     soil = { ...soil,
-    ...await calculateResultsForSoils(soil)}
+    ...await calculateResultsForSoils(soil, waterDepth)}
   }
 
   try {

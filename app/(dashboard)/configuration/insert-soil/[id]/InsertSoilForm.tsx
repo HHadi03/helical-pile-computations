@@ -73,8 +73,7 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
     try {
       const result = await insertSoil(values, profileId)
       if (result.errors) {
-        Object.entries(result.errors).forEach(([key, value]) => {
-        form.setError(key as keyof TsoilSchema, { message: Array.isArray(value) ? value[0] : (value as string)})})
+        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TsoilSchema, { message: Array.isArray(value) ? value[0] : (value as string)})})
       }
   
       toast({
@@ -144,7 +143,7 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Density</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select density" />
@@ -166,7 +165,7 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Soil</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select soil" />

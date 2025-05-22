@@ -9,14 +9,11 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { useRouter } from "next/navigation"
 import { NumberInput } from "@/components/NumberInput"
-import { Checkbox } from "@/components/ui/checkbox"
-import { UseFormContext } from "../../FormContext"
 import { Loader2 } from "lucide-react"
 
 export function PileForm({ pile }:{pile: TpileSchema}) {
   const { toast } = useToast()
   const router = useRouter()
-  const { setHasUnsavedChanges } = UseFormContext()
   
   const form = useForm<TpileSchema>({
     resolver: zodResolver(pileSchema),
@@ -43,7 +40,6 @@ export function PileForm({ pile }:{pile: TpileSchema}) {
       })
       
       if (!result.errors) {
-        setHasUnsavedChanges(true)
         router.back()
       }
   
@@ -61,23 +57,7 @@ export function PileForm({ pile }:{pile: TpileSchema}) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
-        <div className="border-t-2 py-3">
-          <FormField
-            control={form.control}
-            name="showBearingCapacity"
-            render={({ field }) => (
-              <FormItem className="flex flex-row space-x-3 space-y-0 rounded-md border p-4">
-              <FormControl>
-                <Checkbox checked={field.value} onCheckedChange={field.onChange} className="h-5 w-5"/>
-              </FormControl>
-              <div className="space-y-1 leading-none">
-                <FormLabel>Ulimate Bearing Capacity Calculations</FormLabel>
-                <FormDescription>Enable or disable soil bearing pressure paramaters.</FormDescription>
-              </div>
-            </FormItem>
-            )}
-          />
-        </div>
+        
           
         <div className="space-y-8 border-b-2 pb-3">
           

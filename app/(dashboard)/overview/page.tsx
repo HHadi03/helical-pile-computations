@@ -1,5 +1,4 @@
 import { getSoils } from "@/lib/getSoils"
-import { getPile } from "@/lib/getPile"
 import { getLuminance } from "@/lib/getLuminance"
 import { ArrowUp, ArrowDown} from "lucide-react"
 import { createClient } from "@/utils/supabase/server"
@@ -13,7 +12,6 @@ export default async function OverviewPage() {
   }
    
   const soilsData = await getSoils()
-  const pileData = await getPile()
 
   if (soilsData.length === 0) {
     return (

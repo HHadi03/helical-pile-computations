@@ -1,25 +1,24 @@
 import { createClient } from "@/utils/supabase/server"
-import { snakeToCamel } from "./caseConversion"
 import { TsoilProfileSchema } from "@/schemas/soilProfileSchema"
+import { snakeToCamel } from "./caseConversion"
 
-export async function getProfile(): Promise<TsoilProfileSchema[]>{
+export async function getProfile(id: string): Promise<TsoilProfileSchema | null> {
   try {
     const supabase = await createClient()
-    const {data, error} = await supabase
-    .from("soil_profiles")
-    .select("*")
-    .order("created_at", {ascending: true})
-
+    const { data, error } = await supabase
+      .from('soil_profiles')
+      .select('*')
+      .eq('id', id)
+      .single()
+    
     if (error) {
-      return []
+      return null
     }
-
-    const profiles = data.map(profile => snakeToCamel(profile))
-    return profiles as TsoilProfileSchema[]
-
-  }
-  catch {
-    return []
+    
+    const profile = snakeToCamel(data)
+    return profile as TsoilProfileSchema
+    
+  } catch {
+    return null
   }
 }
-

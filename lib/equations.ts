@@ -10,12 +10,10 @@ export const roundToTwoDecimals = (value: number): number => {
 }
 
 //Coarse OR Manmade Soil Algorithm
-export const calculateResultsForSoils = async (soil: TsoilSchema): Promise<Partial<TsoilSchema>> => {
-
+export const calculateResultsForSoils = async (soil: TsoilSchema, waterDepth: number): Promise<Partial<TsoilSchema>> => {
   const h = roundToTwoDecimals(soil.endDepth - soil.startDepth)
-   
-  const hMoist = Math.max(0, Math.min(3.5, soil.endDepth) - soil.startDepth)
-  const hSat = Math.max(0, soil.endDepth - Math.max(3.5, soil.startDepth))
+  const hMoist = Math.max(0, Math.min(waterDepth, soil.endDepth) - soil.startDepth)
+  const hSat = Math.max(0, soil.endDepth - Math.max(waterDepth, soil.startDepth))
   const po = roundToTwoDecimals((soil.yMoist * hMoist) + (soil.ySat * hSat) - (UNITWEIGHT * hSat))
 
   let angle = 25 + 28 * (soil.nValue / po)
@@ -26,15 +24,13 @@ export const calculateResultsForSoils = async (soil: TsoilSchema): Promise<Parti
 
   const ko = roundToTwoDecimals(0.09 * Math.pow(e, (0.08 * angle)))
   const t = roundToTwoDecimals(ko * po * Math.tan(angle * TAN))
-  const qult = roundToTwoDecimals(12 * SPT * soil.nValue)
-
+ 
   return {
     h,
     po,
     angle,
     ko,
     t,
-    qult,
   }
 }
 
@@ -42,11 +38,9 @@ export const calculateResultsForSoils = async (soil: TsoilSchema): Promise<Parti
 export const calculateResultsForFineSoil = async (soil: TsoilSchema): Promise<Partial<TsoilSchema>> => {
   const h = roundToTwoDecimals(soil.endDepth - soil.startDepth)
   const su = roundToTwoDecimals(soil.nValue * SPT)
-  const qult = roundToTwoDecimals(11 * SPT * soil.nValue)
 
   return {
     h,
     su,
-    qult,
   }
 }

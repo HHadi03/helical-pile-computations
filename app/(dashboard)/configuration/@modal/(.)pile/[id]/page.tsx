@@ -1,6 +1,6 @@
 import { PileForm } from '@/app/(dashboard)/configuration/pile/[id]/PileForm'
 import { Modal } from '@/components/Modal'
-import { getPile } from '@/lib/getPile'
+import { getPile } from '@/lib/getProfile'
 
 export default async function PileModal({params}:{params: Promise<{id: string}>}) {
   const { id } = await params
