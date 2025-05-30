@@ -11,7 +11,7 @@ export async function getProfile(id: string): Promise<TsoilProfileSchema | null>
       .eq('id', id)
       .single()
     
-    if (error) {
+    if (error || !data) {
       return null
     }
     

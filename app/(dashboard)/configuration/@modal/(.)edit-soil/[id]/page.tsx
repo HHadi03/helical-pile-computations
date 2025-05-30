@@ -10,7 +10,7 @@ export default async function EditSoilModal({params}:{params: Promise<{id: strin
     return (
       <Modal title="Edit Soil Parameters">
         <div className="text-red-500 text-sm">
-          <p>Could not find soil data, or pile data is missing.</p>
+          <p>Could not find soil data</p>
         </div>
       </Modal>
     )

@@ -10,7 +10,7 @@ export async function getSoils(): Promise<TsoilSchema[]> {
       .select('*')
       .order('start_depth', { ascending: true })
   
-    if (error) {
+    if (error || !data) {
       return []
     }
 

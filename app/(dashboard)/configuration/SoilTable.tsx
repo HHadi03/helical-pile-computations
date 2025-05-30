@@ -11,7 +11,7 @@ import { ToastAction } from "@/components/ui/toast"
 import { calculateAll } from "./actions/submitCalculations"
 import { deleteSoil } from "./actions/deleteSoil"
 import { UseFormContext } from "./FormContext"
-import { Calculator, PlusCircle, Trash2, EllipsisVertical, Copy, Pencil, ChevronDown, ChevronRight, TriangleAlert, CheckCircle, Layers, ShieldCheck, Plus} from 'lucide-react'
+import { Calculator, PlusCircle, Trash2, EllipsisVertical, Copy, Pencil, ChevronDown, ChevronRight, TriangleAlert, CheckCircle, Layers, Plus, FolderOpen} from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import Link from 'next/link'
 import { deleteProfile } from "./actions/deleteProfile"
@@ -22,7 +22,7 @@ const soilTypeNames = {
   'manmade': 'Man Made'
 }
 
-export default function SoilTable({ soilsData, profileData}: { soilsData: TsoilSchema[], profileData: TsoilProfileSchema[] }) {
+export default function SoilTable({ soilsData, profilesData}: { soilsData: TsoilSchema[], profilesData: TsoilProfileSchema[] }) {
   const router = useRouter()
   const { toast } = useToast()
   const [selectedSoil, setSelectedSoil] = useState<string | null>(null)
@@ -34,8 +34,7 @@ export default function SoilTable({ soilsData, profileData}: { soilsData: TsoilS
   const {isAnyFormEdited, hasCriticalChanges,  isTFieldEdited, resetFormStates} = UseFormContext()
   
   const toggleProfileCollapse = (profileId: string) => {
-    setCollapsedProfiles(prev => {
-      const newSet = new Set(prev)
+    setCollapsedProfiles(prev => {const newSet = new Set(prev)
       if (newSet.has(profileId)) {
         newSet.delete(profileId)
       } else {
@@ -140,43 +139,42 @@ export default function SoilTable({ soilsData, profileData}: { soilsData: TsoilS
     }
   }
 
-  return (
-    <div className="space-y-6 px-3">
-      
-      {profileData.length === 0 && (
-        <div className="mx-auto max-w-lg rounded-xl border border-gray-300 p-6 text-center shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-800">No Soil Profiles Found</h2>
-          <p className="pt-1 text-sm text-gray-500">Start by creating a new soil profile to configure soil layers for analysis.</p>
-            <div className="pt-3">
-              <Link href="/configuration/insert-profile" prefetch={true} scroll={false}>
-                <Button>Add Soil Profile</Button>
-              </Link>
-            </div>
-        </div>
-      )}
-
-      {profileData.length > 0 && (
-        <div className="absolute top-0 right-0 pr-4">
+  if (profilesData.length === 0) {
+    return (
+      <div className="h-full bg-[#F4F3F2] flex items-center justify-center border-2 border-black px-5">
+        <div className="text-center">
+          <span className="flex justify-center mb-2"><FolderOpen className="size-10"/></span>
+          <h3 className="text-2xl font-semibold text-gray-800 mb-2">No Soil Profiles Found</h3>
+          <p className="text-gray-600 mb-4">Start by adding a new soil profile to configure soil layers for analysis</p>
           <Link href="/configuration/insert-profile" prefetch={true} scroll={false}>
-            <Button className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white shadow-md hover:bg-blue-700 w-44">
-              <Plus className="h-10 w-10 shrink-0" /> {/* Slightly larger icon */}
-              Add Soil Profile
-            </Button>
+            <Button className="w-80 rounded-lg text-white shadow-md hover:shadow-xl"><Plus className="!size-6"/>Add Soil Profile</Button>
           </Link>
         </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6 px-3">
+    
+      {profilesData.length > 0 && (
+        <div className="absolute top-0 right-0 pr-4">
+          <div className="flex border border-gray-300 shadow-sm rounded-md ">
+
+            <Button variant="ghost" className="w-52 border-r border-gray-300 rounded-none hover:bg-green-100" onClick={() => handleCalculate()} disabled={!isAnyFormEdited || isCalculating}>
+              {isCalculating ? (<> <span className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-solid border-green-700 border-t-transparent"></span>Calculating...</>)
+              : (<> <Calculator className="text-green-700"/> Perform Calculations </> )}
+            </Button>
+
+            <Link href="/configuration/insert-profile" prefetch={true} scroll={false}>
+              <Button variant="ghost" className="w-48 hover:bg-zinc-200 rounded-none"><Plus className="text-zinc-600 !size-5"/>Add Soil Profile</Button>
+            </Link>
+
+          </div>
+        </div>
       )}
       
-      
-    {isAnyFormEdited && soilsData.length > 0 && (
-      <Button variant="ghost" className="hover:bg-green-100" onClick={() => handleCalculate()} disabled={isCalculating}>
-        {isCalculating ? (
-          <> <span className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-solid border-green-700 border-t-transparent"></span>Calculating...</>
-        ) : (
-          <> <Calculator className="text-green-700"/> Calculate Changes </>
-        )}
-      </Button>
-    )} 
-      {profileData.map((profile, index) => {
+      {profilesData.map((profile, index) => {
         const profileSoils = soilsData.filter((soil) => soil.soilProfileId === profile.id)
         const isCollapsed = collapsedProfiles.has(profile.id!)
         return (
@@ -220,6 +218,9 @@ export default function SoilTable({ soilsData, profileData}: { soilsData: TsoilS
                             <TableHead className="whitespace-nowrap font-semibold">End Depth</TableHead>
                             <TableHead className="font-semibold">Type</TableHead>
                             <TableHead className="font-semibold">Name</TableHead>
+                            <TableHead className="font-semibold">SPT Blow Count</TableHead>
+                            <TableHead className="font-semibold">Saturated Weight</TableHead>
+                            <TableHead className="font-semibold">Moist Weight</TableHead>
                             <TableHead className="font-semibold">Description</TableHead>
                             <TableHead className=""></TableHead>
                           </TableRow>
@@ -232,6 +233,9 @@ export default function SoilTable({ soilsData, profileData}: { soilsData: TsoilS
                               <TableCell>{`${soil.endDepth} m`}</TableCell>
                               <TableCell>{soilTypeNames[soil.soilType]}</TableCell>
                               <TableCell>{soil.soilName || soil.soil}</TableCell>
+                              <TableCell>{soil.nValue}</TableCell>
+                              <TableCell>{`${soil.ySat} kN/m³`}</TableCell>
+                              <TableCell>{`${soil.yMoist} kN/m³`}</TableCell>
                               <TableCell>{soil.description}</TableCell>
                               <TableCell className="text-right"><Button variant="outline" size="icon" className="h-6 w-6" onClick={(e) => {e.stopPropagation(), setSelectedSoil(soil.id!), setisSoilDeleteDialogOpen(true)}}><Trash2 className="text-red-500"/></Button></TableCell>
                             </TableRow>
@@ -300,7 +304,7 @@ export default function SoilTable({ soilsData, profileData}: { soilsData: TsoilS
 //improve caching issues
 
 
-// {profileData.length > 0 && (
+// {profilesData.length > 0 && (
 //   <div className="flex bg-white pl-1 sticky top-0 z-10 space-x-3">
 //     <Link href="/configuration/safety-factors" prefetch={false} scroll={false}>
 //       <Button variant="ghost" className="hover:bg-amber-100"> <ShieldCheck className="h-5 w-5 text-amber-900"/> Define Parameters</Button>

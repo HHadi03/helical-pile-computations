@@ -16,7 +16,7 @@ export default async function VisualisationPage() {
   return (
     <main className="p-8">
       <h1 className="text-2xl font-bold mb-6">Soil Data Visualization</h1>
-      <SoilDepthChart soilsData={soilsData} />
+      
     </main>
   );
 }

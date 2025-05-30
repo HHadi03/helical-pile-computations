@@ -11,7 +11,7 @@ export async function getSoil(id: string): Promise<TsoilSchema | null> {
       .eq('id', id)
       .single()
     
-    if (error) {
+    if (error || !data) {
       return null
     }
     

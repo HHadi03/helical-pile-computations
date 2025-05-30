@@ -15,13 +15,16 @@ export const soilSchema = z.object({
   yMoist: z.coerce.number().gte(1, { message: "YMoist is required" }),
   ySat: z.coerce.number().gte(1, { message: "YSat is required" }),
   po: z.coerce.number().nullish(),
-  angle: z.coerce.number().nullish(),
   ko: z.coerce.number().nullish(),
+  angle: z.coerce.number().nullish(),
   t: z.coerce.number().nullish(),
   su: z.coerce.number().nullish(),
   h: z.coerce.number().optional(),
+  qult: z.coerce.number().optional(),
   shaftCapacity60: z.coerce.number().nullish(),
   shaftCapacity100: z.coerce.number().nullish(),
+  bearingCapacity60: z.coerce.number().nullish(),
+  bearingCapacity100: z.coerce.number().nullish(),
 }).refine(
     (data) => data.endDepth > data.startDepth,
     {

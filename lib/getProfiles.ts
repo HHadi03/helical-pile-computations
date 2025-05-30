@@ -10,7 +10,7 @@ export async function getProfiles(): Promise<TsoilProfileSchema[]>{
     .select("*")
     .order("created_at", {ascending: true})
 
-    if (error) {
+    if (error || !data) {
       return []
     }
 

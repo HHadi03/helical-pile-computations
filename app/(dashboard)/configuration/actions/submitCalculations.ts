@@ -14,12 +14,13 @@ type ReturnType = {
 type UpdatedSoil = {
   shaftCapacity60?: number
   shaftCapacity100?: number
+  bearingCapacity60?: number
+  bearingCapacity100?: number
   po?: number | null
   angle?: number | null
   ko?: number | null
   t?: number | null
   su?: number | null
-  h?: number
 }
 
 export async function calculateAll(hasCriticalChanges: boolean, isTFieldEdited: boolean): Promise<ReturnType> {
@@ -30,12 +31,12 @@ export async function calculateAll(hasCriticalChanges: boolean, isTFieldEdited: 
 
     const profileCalculations = await Promise.all(profileData.map(async (profile) => {
       try {
-        // Calculate new pile length
-        let newPileLength: number
+        //Calculate Pile Length
+        let pileLength: number
         if (profile.pileStickOut > profile.pileLength) {
-          newPileLength = 0
+          pileLength = 0
         } else {
-          newPileLength = profile.pileLength - profile.pileStickOut
+          pileLength = profile.pileLength - profile.pileStickOut
         }
 
         // Get soils for this profile
@@ -45,22 +46,20 @@ export async function calculateAll(hasCriticalChanges: boolean, isTFieldEdited: 
         const soilCalculations = await Promise.all(profileSoils.map(async (soil) => {
           try {
             // If soil layer starts below pile length, no need to calculate, return true for success message
-            if (soil.startDepth >= newPileLength) {
+            if (soil.startDepth >= pileLength) {
               return true
             }
             
             // Create a new soil object with calculated values
-            const calculatedValues = soil.soilType === "fine" 
-              ? await calculateResultsForFineSoil(soil) 
-              : await calculateResultsForSoils(soil, profile.waterDepth)
+            const calculatedValues = soil.soilType === "fine" ? await calculateResultsForFineSoil(soil) : await calculateResultsForSoils(soil, profile.waterDepth)
         
             // Determine soil height based on pile length
             let soilHeight: number
-            if (soil.endDepth <= newPileLength) {
+            if (soil.endDepth <= pileLength) {
               soilHeight = soil.h!
             }
-            else if (soil.startDepth < newPileLength) {
-              soilHeight = newPileLength - soil.startDepth
+            else if (soil.startDepth < pileLength) {
+              soilHeight = pileLength - soil.startDepth
             }
             else {
               soilHeight = 0
@@ -70,6 +69,8 @@ export async function calculateAll(hasCriticalChanges: boolean, isTFieldEdited: 
             if (soilHeight > 0) {
               let shaftCapacity60: number
               let shaftCapacity100: number
+              let bearingCapacity60: number
+              let bearingCapacity100: number
               let updatedSoil: UpdatedSoil = {}
               const e = 2.71828183
               const TAN = 0.01745
@@ -78,10 +79,14 @@ export async function calculateAll(hasCriticalChanges: boolean, isTFieldEdited: 
               if (isTFieldEdited && hasCriticalChanges && soil.soilType === 'coarse') {
                 shaftCapacity60 = soil.t! * soilHeight * 0.1884
                 shaftCapacity100 = soil.t! * soilHeight * 0.314
+                bearingCapacity60 = soil.qult! * 0.001223
+                bearingCapacity100 = soil.qult! * 0.002463
                 
                 updatedSoil = {
                   shaftCapacity60: roundToTwoDecimals(shaftCapacity60),
                   shaftCapacity100: roundToTwoDecimals(shaftCapacity100),
+                  bearingCapacity60: roundToTwoDecimals(bearingCapacity60),
+                  bearingCapacity100: roundToTwoDecimals(bearingCapacity100),
                 }
               }
 
@@ -89,10 +94,14 @@ export async function calculateAll(hasCriticalChanges: boolean, isTFieldEdited: 
               else if (isTFieldEdited && soil.soilType === 'coarse') {
                 shaftCapacity60 = soil.t! * soilHeight * 0.1884
                 shaftCapacity100 = soil.t! * soilHeight * 0.314
+                bearingCapacity60 = calculatedValues.qult! * 0.001223
+                bearingCapacity100 = calculatedValues.qult! * 0.002463
                 
                 updatedSoil = {
                   shaftCapacity60: roundToTwoDecimals(shaftCapacity60),
                   shaftCapacity100: roundToTwoDecimals(shaftCapacity100),
+                  bearingCapacity60: roundToTwoDecimals(bearingCapacity60),
+                  bearingCapacity100: roundToTwoDecimals(bearingCapacity100),
                 }
               } 
               
@@ -101,22 +110,30 @@ export async function calculateAll(hasCriticalChanges: boolean, isTFieldEdited: 
                 if (soil.soilType === "fine") {
                   shaftCapacity60 = soil.su! * soilHeight * 0.1884
                   shaftCapacity100 = soil.su! * soilHeight * 0.314
+                  bearingCapacity60 = soil.qult! * 0.001223
+                  bearingCapacity100 = soil.qult! * 0.002463
                 
                   updatedSoil = {
                     shaftCapacity60: roundToTwoDecimals(shaftCapacity60),
                     shaftCapacity100: roundToTwoDecimals(shaftCapacity100),
+                    bearingCapacity60: roundToTwoDecimals(bearingCapacity60),
+                    bearingCapacity100: roundToTwoDecimals(bearingCapacity100),
                   }
                 } else {
                   const Ko = 0.09 * Math.pow(e, (0.08 * soil.angle!))
                   const T = Ko * calculatedValues.po! * Math.tan(soil.angle! * TAN)
                   shaftCapacity60 = T * soilHeight * 0.1884
                   shaftCapacity100 = T * soilHeight * 0.314
+                  bearingCapacity60 = calculatedValues.qult! * 0.001223
+                  bearingCapacity100 = calculatedValues.qult! * 0.002463
                  
                   updatedSoil = {
                     ko: roundToTwoDecimals(Ko),
                     t: roundToTwoDecimals(T),
                     shaftCapacity60: roundToTwoDecimals(shaftCapacity60),
                     shaftCapacity100: roundToTwoDecimals(shaftCapacity100),
+                    bearingCapacity60: roundToTwoDecimals(bearingCapacity60),
+                    bearingCapacity100: roundToTwoDecimals(bearingCapacity100),
                   }
                 }
               }
@@ -126,15 +143,21 @@ export async function calculateAll(hasCriticalChanges: boolean, isTFieldEdited: 
                 if (soil.soilType === "fine") {
                   shaftCapacity60 = calculatedValues.su! * soilHeight * 0.1884
                   shaftCapacity100 = calculatedValues.su! * soilHeight * 0.314
+                  bearingCapacity60 = calculatedValues.qult! * 0.001223
+                  bearingCapacity100 = calculatedValues.qult! * 0.002463
                 } else {
                   shaftCapacity60 = calculatedValues.t! * soilHeight * 0.1884
                   shaftCapacity100 = calculatedValues.t! * soilHeight * 0.314
+                  bearingCapacity60 = calculatedValues.qult! * 0.001223
+                  bearingCapacity100 = calculatedValues.qult! * 0.002463
                 }
                 
                 updatedSoil = {
                   ...calculatedValues,
                   shaftCapacity60: roundToTwoDecimals(shaftCapacity60),
                   shaftCapacity100: roundToTwoDecimals(shaftCapacity100),
+                  bearingCapacity60: roundToTwoDecimals(bearingCapacity60),
+                  bearingCapacity100: roundToTwoDecimals(bearingCapacity100),
                 }  
               }
               
