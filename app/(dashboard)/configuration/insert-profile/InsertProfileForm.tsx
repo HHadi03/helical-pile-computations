@@ -31,6 +31,7 @@ export function ProfileForm() {
   async function onSubmit(values: TsoilProfileSchema) {
     try {
       const result = await insertProfile(values)
+      
       if (result.errors) {
         Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TsoilProfileSchema, { message: Array.isArray(value) ? value[0] : (value as string)})})
       }

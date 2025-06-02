@@ -13,7 +13,7 @@ import { useEffect } from "react"
 import { UseFormContext } from "../../FormContext"
 import { Loader2, CheckCircle, TriangleAlert } from "lucide-react"
 
-export function EditForm({ soil}: {soil: TsoilSchema}) {
+export function EditSoilForm({soil}: {soil: TsoilSchema}) {
   const { toast } = useToast()
   const router = useRouter()
   const { setHasUnsavedChanges, setCriticalChanges, setTFieldEdited } = UseFormContext()
@@ -29,8 +29,9 @@ export function EditForm({ soil}: {soil: TsoilSchema}) {
     const subscription = form.watch((_, { name }) => {
       if (name === 't') {
         setTFieldEdited(true)
-
-      } else if (name === 'su' || name === 'qult' || name === 'angle') {
+      } 
+      
+      else if (name === 'su' || name === 'qult' || name === 'angle') {
         setCriticalChanges(true)
       }
     })
@@ -53,7 +54,7 @@ export function EditForm({ soil}: {soil: TsoilSchema}) {
             {result.errors ? (<TriangleAlert className="text-yellow-500 w-5 h-5" />) : (<CheckCircle className="text-green-500 w-5 h-5" />)}
             <span>{result.message}</span>
           </div>
-        ),  
+        ) 
       })
       
       if (!result.errors) {
@@ -183,6 +184,23 @@ export function EditForm({ soil}: {soil: TsoilSchema}) {
               />
             </>
           )}
+
+           <FormField
+              control={form.control}
+              name="qult"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Ultimate Bearing Pressure (Qult)</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <NumberInput field={field} placeholder="Enter Qult"/>
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm">kPa</span>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
         </div>
   
         <div className="pt-2 flex justify-between">
@@ -196,3 +214,10 @@ export function EditForm({ soil}: {soil: TsoilSchema}) {
     </Form>
   )
 }
+
+// if  n value and t is edited, then t takes precident
+// if n value is edited and angle is edited, angle takes precident
+// if angle and t is edited, t takes precident again 
+// if n vlue and su is edited, su takes precident
+// if only n value edited, it uses them numbers.
+

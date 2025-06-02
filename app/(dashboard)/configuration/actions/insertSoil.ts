@@ -22,15 +22,13 @@ export async function insertSoil(soil: TsoilSchema, profileId: string): Promise<
   }
   
   if (soil.soilType === "fine") {
-    soil = { ...soil,
-    ...await calculateResultsForFineSoil(soil)}
+    soil = { ...soil,...await calculateResultsForFineSoil(soil)}
   }
 
   else {
     const profileData = await getProfile(profileId)
     const waterDepth = profileData!.waterDepth
-    soil = { ...soil,
-    ...await calculateResultsForSoils(soil, waterDepth)}
+    soil = { ...soil,...await calculateResultsForSoils(soil, waterDepth)}
   }
 
   try {

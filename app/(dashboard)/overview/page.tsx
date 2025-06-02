@@ -8,6 +8,11 @@ import SoilDepthChart from "../visulisation/graph"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
+export const metadata = {
+  title: "Overview | Helical Pile Computations",
+  description: "Summary of your soil profiles and pile settings",
+}
+
 export default async function OverviewPage() {
   const supabase = await createClient()
   const { data, error } = await supabase.auth.getUser()

@@ -43,5 +43,4 @@ export async function insertProfile(profile: TsoilProfileSchema): Promise<Return
   catch {
     return { message: "Failed to insert soil profile, please try again later.", errors: {}}
   }
-
 }

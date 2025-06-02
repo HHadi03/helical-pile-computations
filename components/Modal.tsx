@@ -23,7 +23,7 @@ export const Modal = ({ children, title}: ModalProps) => {
             <DialogTitle className="flex justify-center">{title}</DialogTitle>
             <VisuallyHidden.Root><DialogDescription> A Modal that provides user interactivity </DialogDescription></VisuallyHidden.Root>
           </DialogHeader>
-          <div className="p-5 border border-gray-700 rounded-lg shadow-lg">
+          <div className="p-5 border border-gray-400 rounded-lg shadow-lg">
             {children}
           </div>
         </DialogContent>

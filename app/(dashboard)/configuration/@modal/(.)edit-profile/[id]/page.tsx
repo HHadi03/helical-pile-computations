@@ -4,9 +4,9 @@ import { getProfile } from '@/lib/getProfile'
 
 export default async function EditSProfileModal({params}:{params: Promise<{id: string}>}) {
   const { id } = await params
-  const profilesData = await getProfile(id)
+  const profileData = await getProfile(id)
 
-  if (!profilesData) {
+  if (!profileData) {
     return (
       <Modal title="Edit Soil Profile">
         <div className="text-red-500 text-sm">
@@ -19,7 +19,7 @@ export default async function EditSProfileModal({params}:{params: Promise<{id: s
   return (
     <Modal title="Edit Soil Profile">
       <div className="px-4">
-       <EditProfileForm profile={profilesData}/>
+       <EditProfileForm profile={profileData}/>
       </div>
     </Modal>
   )

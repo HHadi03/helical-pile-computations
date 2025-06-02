@@ -10,7 +10,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useRouter } from "next/navigation"
 import { NumberInput } from "@/components/NumberInput"
 import { Input } from "@/components/ui/input"
-import { useEffect } from "react"
 import { UseFormContext } from "../../FormContext"
 import { Loader2, CheckCircle, TriangleAlert } from "lucide-react"
 
@@ -26,21 +25,12 @@ export function EditProfileForm({ profile }: { profile: TsoilProfileSchema }) {
 
   const { formState: { isDirty, isSubmitting } } = form
 
-  useEffect(() => {
-    const subscription = form.watch(() => {
-      setHasUnsavedChanges(true)
-    })
-    return () => subscription.unsubscribe()
-  }, [form, setHasUnsavedChanges])
-
   async function onSubmit(values: TsoilProfileSchema) {
     try {
       const result = await updateProfile(values)
 
       if (result.errors) {
-        Object.entries(result.errors).forEach(([key, value]) => {
-          form.setError(key as keyof TsoilProfileSchema, { message: Array.isArray(value) ? value[0] : String(value) })
-        })
+        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TsoilProfileSchema, { message: Array.isArray(value) ? value[0] : String(value) })})
       }
 
       toast({
@@ -48,17 +38,14 @@ export function EditProfileForm({ profile }: { profile: TsoilProfileSchema }) {
         variant: result.errors ? "destructive" : "default",
         description: (
           <div className="flex items-center gap-2">
-            {result.errors ? (
-              <TriangleAlert className="text-yellow-500 w-5 h-5" />
-            ) : (
-              <CheckCircle className="text-green-500 w-5 h-5" />
-            )}
+            {result.errors ? (<TriangleAlert className="text-yellow-500 w-5 h-5" />) : (<CheckCircle className="text-green-500 w-5 h-5" />)}
             <span>{result.message}</span>
           </div>
         )
       })
 
       if (!result.errors) {
+        setHasUnsavedChanges(true)
         router.back()
       }
 

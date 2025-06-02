@@ -72,6 +72,7 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
   async function onSubmit(values: TsoilSchema) {
     try {
       const result = await insertSoil(values, profileId)
+      
       if (result.errors) {
         Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TsoilSchema, { message: Array.isArray(value) ? value[0] : (value as string)})})
       }
@@ -113,7 +114,7 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
           </TabsList>
       
           <TabsContent value="soil" className="focus-visible:ring-transparent">
-            <div className="space-y-8 border-y-2 py-3">
+            <div className="space-y-6 border-y-2 py-3">
               <FormField
                 control={form.control}
                 name="soilType"
@@ -234,7 +235,7 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
           </TabsContent>
 
           {showParametersTab && (<TabsContent value="parameters" className="focus-visible:ring-transparent">
-            <div className="space-y-8 border-y-2 py-3">
+            <div className="space-y-6 border-y-2 py-3">
               <div className="flex gap-4">
                 <FormField
                   control={form.control}

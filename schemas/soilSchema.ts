@@ -40,24 +40,31 @@ export const soilSchema = z.object({
     }
   )
   .refine(
-    (data) => data.su === undefined || data.su === null || data.su >= 1,
+    (data) => data.su === undefined || data.su === null || data.su > 0,
     {
       path: ['su'],
       message: "Su is required"
     }
   )
   .refine(
-    (data) => data.t === undefined || data.t === null || data.t >= 1,
+    (data) => data.t === undefined || data.t === null || data.t > 0,
     {
       path: ['t'],
       message: "T is required"
     }
   )
   .refine(
-    (data) => data.angle === undefined || data.angle === null || data.angle >= 1,
+    (data) => data.angle === undefined || data.angle === null || data.angle > 0,
     {
       path: ['angle'],
       message: "Angle is required"
+    }
+  )
+   .refine(
+    (data) => data.qult === undefined || data.qult === null || data.qult > 0,
+    {
+      path: ['qult'],
+      message: "Qult is required"
     }
   )
    

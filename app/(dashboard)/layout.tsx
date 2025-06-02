@@ -3,8 +3,8 @@ import { Topbar } from "@/components/Topbar"
 import { Sidebar } from "@/components/Sidebar"
 
 export const metadata: Metadata = {
-  title: "Dashboard",
-  description: "Dashboard Page",
+  title: "Dashboard | Helical Pile Computations",
+  description: "Dashboard providing configuration, overview, and visualisation features",
 }
 
 export default function DashboardLayout({
