@@ -182,6 +182,7 @@ export default function SoilTable({ soilsData, profilesData}: { soilsData: Tsoil
                   </div>
                 ) : (
                   <>
+                  {/* Soil Layer Entries Here? */}
                     <Table className="border-b border-x border-gray-300 overflow-auto">
                       <TableHeader>
                         <TableRow>
