@@ -352,7 +352,7 @@ export default function Export({
       <button
         onClick={generatePDF}
         disabled={isCapturing}
-        className={`bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${isCapturing ? 'opacity-70 cursor-not-allowed' : ''}`}
+        className={`bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-sm focus:outline-hidden focus:shadow-outline ${isCapturing ? 'opacity-70 cursor-not-allowed' : ''}`}
       >
         {isCapturing ? 'Generating PDF...' : 'Generate PDF Report'}
       </button>

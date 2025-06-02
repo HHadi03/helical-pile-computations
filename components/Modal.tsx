@@ -17,7 +17,7 @@ export const Modal = ({ children, title}: ModalProps) => {
 
   return (
     <Dialog defaultOpen={true} open={true} onOpenChange={handleOpenChange}>
-      <DialogOverlay className="backdrop-blur-sm bg-white/30">
+      <DialogOverlay className="backdrop-blur-xs bg-white/30">
         <DialogContent onInteractOutside={(e) => {e.preventDefault()}} onOpenAutoFocus={(e) => e.preventDefault()} onCloseAutoFocus={(e) => e.preventDefault()}>
           <DialogHeader>
             <DialogTitle className="flex justify-center">{title}</DialogTitle>

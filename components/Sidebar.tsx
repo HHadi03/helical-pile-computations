@@ -36,7 +36,7 @@ export const Sidebar = () => {
   )
 
   return (
-    <aside className={`flex flex-col border-r border-gray-300 p-2 bg-gradient-to-tr from-slate-50 via-white to-blue-50 shadow-inner
+    <aside className={`flex flex-col border-r border-gray-300 p-2 bg-linear-to-tr from-slate-50 via-white to-blue-50 shadow-inner
     ${expanded ? 'w-[260px]' : 'w-[70px]'} transition-all duration-300`}>
       
       <div className='pt-2 flex gap-2'>
@@ -46,12 +46,12 @@ export const Sidebar = () => {
               <img src='/logo.png' alt='Company Logo' className="transition-opacity duration-200 hover:opacity-85 w-auto h-auto"/>
             </div>
 
-            <button onClick={toggleSidebar} aria-label="Collapse Sidebar" aria-expanded={expanded} className="px-3 rounded hover:bg-gray-200 shrink-0">
+            <button onClick={toggleSidebar} aria-label="Collapse Sidebar" aria-expanded={expanded} className="px-3 rounded-sm hover:bg-gray-200 shrink-0">
                <ArrowLeftToLine className="w-6 h-6" />
             </button>
           </>
         ) : (
-          <button onClick={toggleSidebar} aria-label="Expand Sidebar" aria-expanded={expanded} className="p-2 rounded hover:bg-gray-200 grow">
+          <button onClick={toggleSidebar} aria-label="Expand Sidebar" aria-expanded={expanded} className="p-2 rounded-sm hover:bg-gray-200 grow">
            <ArrowRightToLine className="w-6 h-6" />
           </button>
         )}

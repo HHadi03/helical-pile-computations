@@ -31,7 +31,7 @@ export default async function OverviewPage() {
           <h3 className="text-2xl font-semibold text-gray-800 mb-2">No Soil Profiles Found</h3>
           <p className="text-gray-600 mb-4">Head to the configuration page to add your first soil profile</p>
           <Link href="/configuration" prefetch={true} scroll={false}>
-            <Button className="w-80 rounded-lg text-white shadow-md hover:shadow-xl"><ArrowBigRight className="!size-6"/>Go to Configuration</Button>
+            <Button className="w-80 rounded-lg text-white shadow-md hover:shadow-xl"><ArrowBigRight className="size-6!"/>Go to Configuration</Button>
           </Link>
         </div>
       </div>

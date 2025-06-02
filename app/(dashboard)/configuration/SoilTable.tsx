@@ -136,7 +136,7 @@ export default function SoilTable({ soilsData, profilesData}: { soilsData: Tsoil
           <h3 className="text-2xl font-semibold text-gray-800 mb-2">No Soil Profiles Found</h3>
           <p className="text-gray-600 mb-4">Start by adding a new soil profile to configure soil layers for analysis</p>
           <Link href="/configuration/insert-profile" prefetch={true} scroll={false}>
-            <Button className="w-80 rounded-lg text-white shadow-md hover:shadow-xl"><Plus className="!size-6"/>Add Soil Profile</Button>
+            <Button className="w-80 rounded-lg text-white shadow-md hover:shadow-xl"><Plus className="size-6!"/>Add Soil Profile</Button>
           </Link>
         </div>
       </div>
@@ -147,13 +147,13 @@ export default function SoilTable({ soilsData, profilesData}: { soilsData: Tsoil
     <>
       {profilesData.length > 0 && (
         <div className="flex justify-end mb-3">
-          <div className="flex flex-row border border-gray-300 shadow-sm rounded-md">
+          <div className="flex flex-row border border-gray-300 shadow-xs rounded-md">
             <Button variant="ghost" className="w-52 border-r border-gray-300 rounded-none hover:bg-green-100" onClick={() => handleCalculate()} disabled={!isAnyFormEdited || soilsData.length === 0 || isCalculating}>
               {isCalculating ? (<> <span className="pr-2 h-5 w-5 animate-spin rounded-full border-2 border-solid border-green-700 border-t-transparent"></span>Calculating...</>)
               : (<> <Calculator className="text-green-700"/> Perform Calculations </> )}
             </Button>
             <Link href="/configuration/insert-profile" prefetch={true} scroll={false}>
-              <Button variant="ghost" className="w-48 hover:bg-zinc-200 rounded-none"><Plus className="text-zinc-600 !size-5"/>Add Soil Profile</Button>
+              <Button variant="ghost" className="w-48 hover:bg-zinc-200 rounded-none"><Plus className="text-zinc-600 size-5!"/>Add Soil Profile</Button>
             </Link>
           </div>
         </div>
