@@ -210,7 +210,7 @@ export default function SoilTable({ soilsData, profilesData}: { soilsData: Tsoil
                             <TableCell>{`${soil.yMoist} kN/m³`}</TableCell>
                             <TableCell>{soil.nValue}</TableCell>
                             <TableCell>{soil.description}</TableCell>
-                            <TableCell className="text-right"><Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-red-200" onClick={(e) => {e.stopPropagation(), setSelectedSoil(soil.id!), setisSoilDeleteDialogOpen(true)}}><Trash2 className="text-red-500"/></Button></TableCell>
+                            <TableCell className="text-right"><Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-red-200" onClick={(e) => {e.stopPropagation(); setSelectedSoil(soil.id!); setisSoilDeleteDialogOpen(true)}}><Trash2 className="text-red-500"/></Button></TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -227,7 +227,7 @@ export default function SoilTable({ soilsData, profilesData}: { soilsData: Tsoil
                         <DropdownMenuContent align="start" className="w-40">
                           <DropdownMenuItem onClick={() => router.push(`/configuration/edit-profile/${profile.id}`, { scroll: false })}><Pencil/>Edit</DropdownMenuItem>
                           <DropdownMenuItem onClick={() => {/* handleDuplicateProfile(profile.id) */}}><Copy/>Duplicate</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => {setSelectedProfile(profile.id!), setIsProfileDeleteDialogOpen(true)}}><Trash2/>Remove</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => {setSelectedProfile(profile.id!); setIsProfileDeleteDialogOpen(true)}}><Trash2/>Remove</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
