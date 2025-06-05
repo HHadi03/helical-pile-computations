@@ -7,13 +7,6 @@
   preferredstrategy: 'pseudoelements';
 }
 
-@layer base {
-  button:not([disabled]),
-  [role="button"]:not([disabled]) {
-    cursor: pointer;
-  }
-}
-
 @custom-variant dark (&:is(.dark *));
 
 @theme {
@@ -154,9 +147,15 @@
   }
 }
 
+@layer base {
+  button:not([disabled]),
+  [role="button"]:not([disabled]) {
+    cursor: pointer;
+  }
+}
+
 body {
   font-family: Arial, Helvetica, sans-serif;
-  background-color: #ffffff;
 }
 
 input[type='number'] {

@@ -136,7 +136,7 @@ export default function SoilTable({ soilsData, profilesData}: { soilsData: Tsoil
           <h3 className="text-2xl font-semibold text-gray-800 mb-2">No Soil Profiles Found</h3>
           <p className="text-gray-600 mb-4">Start by adding a new soil profile to configure soil layers for analysis</p>
           <Link href="/configuration/insert-profile" prefetch={true} scroll={false}>
-            <Button className="w-80 rounded-lg text-white shadow-md hover:shadow-xl"><Plus className="size-6!"/>Add Soil Profile</Button>
+            <Button className="w-80 rounded-lg text-white shadow-md hover:shadow-xl"><Plus className="size-6"/>Add Soil Profile</Button>
           </Link>
         </div>
       </div>
@@ -144,7 +144,7 @@ export default function SoilTable({ soilsData, profilesData}: { soilsData: Tsoil
   }
 
   return (
-    <>
+    <div className="mx-3">
       {profilesData.length > 0 && (
         <div className="flex justify-end mb-3">
           <div className="flex flex-row border border-gray-300 shadow-xs rounded-md">
@@ -152,9 +152,9 @@ export default function SoilTable({ soilsData, profilesData}: { soilsData: Tsoil
               {isCalculating ? (<> <span className="pr-2 h-5 w-5 animate-spin rounded-full border-2 border-solid border-green-700 border-t-transparent"></span>Calculating...</>)
               : (<> <Calculator className="text-green-700"/> Perform Calculations </> )}
             </Button>
-            <Link href="/configuration/insert-profile" prefetch={true} scroll={false}>
-              <Button variant="ghost" className="w-48 hover:bg-zinc-200 rounded-none"><Plus className="text-zinc-600 size-5!"/>Add Soil Profile</Button>
-            </Link>
+            <Button asChild variant="ghost" className="w-48 hover:bg-zinc-200 rounded-none">
+              <Link href="/configuration/insert-profile" prefetch={true} scroll={false}><Plus className="text-zinc-600 size-5"/>Add Soil Profile</Link>
+            </Button>
           </div>
         </div>
       )}
@@ -174,16 +174,15 @@ export default function SoilTable({ soilsData, profilesData}: { soilsData: Tsoil
                   <div className="flex flex-col items-center border-x border-b border-gray-300 bg-[#f7f7f7] py-5">
                     <Layers className="mb-2 h-8 w-8 text-gray-600"/>
                     <h3 className="font-medium text-gray-700">No soil layers detected</h3>
-                    <p className="pt-1 text-sm text-gray-500">Add soil layers to begin analysis</p>
-                    <Link href={`/configuration/insert-soil/${profile.id}`} prefetch={false} scroll={false}>
-                      <Button variant="outline" className="mt-2 border border-gray-300 hover:bg-blue-100">
-                        <PlusCircle className="text-blue-500"/>Add Soil Layer</Button>
-                    </Link>
+                    <p className="mt-1 text-sm text-gray-500">Add soil layers to begin analysis</p>
+                    <Button asChild variant="outline" className="mt-2 border border-gray-300 hover:bg-blue-100">
+                      <Link href={`/configuration/insert-soil/${profile.id}`} prefetch={false} scroll={false}> <PlusCircle className="text-blue-500"/>Add Soil Layer </Link>
+                    </Button>
                   </div>
                 ) : (
                   <>
                   {/* Soil Layer Entries Here? */}
-                    <Table className="border-b border-x border-gray-300 overflow-auto">
+                    <Table className="border-b border-x border-gray-300">
                       <TableHeader>
                         <TableRow>
                           <TableHead className="font-semibold">Layer</TableHead>
@@ -216,20 +215,10 @@ export default function SoilTable({ soilsData, profilesData}: { soilsData: Tsoil
                       </TableBody>
                     </Table>
                   
-                    <div className="mt-2">
-                      <Link href={`/configuration/insert-soil/${profile.id}`} prefetch={false} scroll={false}>
-                        <Button variant="ghost" className="hover:bg-blue-100"><PlusCircle className="text-blue-500"/>Add Soil Layer</Button>
-                      </Link>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-6 w-6 focus-visible:ring-transparent ml-2"><EllipsisVertical/></Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="w-40">
-                          <DropdownMenuItem onClick={() => router.push(`/configuration/edit-profile/${profile.id}`, { scroll: false })}><Pencil/>Edit</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => {/* handleDuplicateProfile(profile.id) */}}><Copy/>Duplicate</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => {setSelectedProfile(profile.id!); setIsProfileDeleteDialogOpen(true)}}><Trash2/>Remove</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                    <div className="mt-2 ml-1">
+                      <Button asChild variant="ghost" className="hover:bg-blue-100">
+                        <Link href={`/configuration/insert-soil/${profile.id}`} prefetch={false} scroll={false}> <PlusCircle className="text-blue-500"/> Add Soil Layer </Link>
+                      </Button>
                     </div>
                   </>
                 )}
@@ -266,6 +255,6 @@ export default function SoilTable({ soilsData, profilesData}: { soilsData: Tsoil
         </AlertDialogContent>
       </AlertDialog>
 
-    </>
+    </div>
   ) 
 }

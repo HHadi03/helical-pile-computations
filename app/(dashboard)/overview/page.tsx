@@ -4,7 +4,7 @@ import { getLuminance } from "@/lib/getLuminance"
 import { ArrowUp, ArrowDown, FolderOpen, ArrowBigRight} from "lucide-react"
 import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
-import SoilDepthChart from "../visulisation/graph"
+import SoilDepthChart from "../visualisation/graph"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
@@ -31,7 +31,7 @@ export default async function OverviewPage() {
           <h3 className="text-2xl font-semibold text-gray-800 mb-2">No Soil Profiles Found</h3>
           <p className="text-gray-600 mb-4">Head to the configuration page to add your first soil profile</p>
           <Link href="/configuration" prefetch={true} scroll={false}>
-            <Button className="w-80 rounded-lg text-white shadow-md hover:shadow-xl"><ArrowBigRight className="size-6!"/>Go to Configuration</Button>
+            <Button className="w-80 rounded-lg text-white shadow-md hover:shadow-xl"><ArrowBigRight className="size-6"/>Go to Configuration</Button>
           </Link>
         </div>
       </div>
@@ -39,7 +39,7 @@ export default async function OverviewPage() {
   }
 
   return (
-    <main className="h-full overflow-y-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-slate-400
+    <section className="h-full scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-slate-400
      scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-600">
 
       <div className="space-y-12 p-6">
@@ -215,6 +215,6 @@ export default async function OverviewPage() {
         })}
       </div>
 
-    </main>
+    </section>
   )
 }

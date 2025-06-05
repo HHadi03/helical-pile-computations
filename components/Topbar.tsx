@@ -8,7 +8,7 @@ export const Topbar = () => {
   const navItems = [
     { href: '/configuration', label: 'Configuration' },
     { href: '/overview', label: 'Overview' },
-    { href: '/visulisation', label: 'Visulisation' }
+    { href: '/visualisation', label: 'Visualisation' }
   ] 
 
   return (

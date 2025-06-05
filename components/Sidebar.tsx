@@ -36,10 +36,10 @@ export const Sidebar = () => {
   )
 
   return (
-    <aside className={`flex flex-col border-r border-gray-300 p-2 bg-linear-to-tr from-slate-50 via-white to-blue-50 shadow-inner
+    <div className={`flex flex-col border-r border-gray-300 p-2 bg-linear-to-tr from-slate-50 via-white to-blue-50 shadow-inner
     ${expanded ? 'w-[260px]' : 'w-[70px]'} transition-all duration-300`}>
       
-      <div className='pt-2 flex gap-2'>
+      <div className='mt-2 flex gap-2'>
         {expanded ? (
           <>
             <div> 
@@ -58,7 +58,7 @@ export const Sidebar = () => {
       </div>
 
       <nav>
-        <ul className='space-y-4 pt-10'>
+        <ul className='space-y-4 mt-10'>
           {navigationItems.map(renderNavBar)}
         </ul>
       </nav>
@@ -81,6 +81,6 @@ export const Sidebar = () => {
         </li>
       </ul>
 
-    </aside>
+    </div>
   )
 }
