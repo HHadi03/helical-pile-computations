@@ -9,11 +9,11 @@ export const soilSchema = z.object({
   soilName: z.string().optional(),
   description: z.string().optional(),
   color: z.string(),
-  startDepth: z.coerce.number().gte(0, { message: "Start depth must be greater than or equal to 0m" }),
-  endDepth: z.coerce.number({ message: "End depth is required"}),
-  nValue: z.coerce.number().gte(1, { message: "SPT N-Value is required" }),
-  yMoist: z.coerce.number().gte(1, { message: "YMoist is required" }),
-  ySat: z.coerce.number().gte(1, { message: "YSat is required" }),
+  startDepth: z.coerce.number().gte(0, { message: "Start Depth is required" }),
+  endDepth: z.coerce.number().gt(0,{ message: "End Depth is required"}),
+  nValue: z.coerce.number().gt(0, { message: "SPT N-Value is required" }),
+  yMoist: z.coerce.number().gt(0, { message: "γMoist is required" }),
+  ySat: z.coerce.number().gt(0, { message: "γSat is required" }),
   po: z.coerce.number().nullish(),
   ko: z.coerce.number().nullish(),
   angle: z.coerce.number().nullish(),
@@ -21,22 +21,22 @@ export const soilSchema = z.object({
   su: z.coerce.number().nullish(),
   h: z.coerce.number().optional(),
   qult: z.coerce.number().optional(),
-  shaftCapacity60: z.coerce.number().nullish(),
-  shaftCapacity100: z.coerce.number().nullish(),
-  bearingCapacity60: z.coerce.number().nullish(),
-  bearingCapacity100: z.coerce.number().nullish(),
+  shaftCapacity60: z.coerce.number().optional(),
+  shaftCapacity100: z.coerce.number().optional(),
+  bearingCapacity60: z.coerce.number().optional(),
+  bearingCapacity100: z.coerce.number().optional(),
 }).refine(
     (data) => data.endDepth > data.startDepth,
     {
       path: ['endDepth'], 
-      message: "End depth must be greater than start depth",
+      message: "End Depth must be greater than Start Depth",
     }
   )
   .refine(
-    (data) => data.description === undefined || data.description.length <= 125,
+    (data) => data.description === undefined || data.description.length <= 75,
     {
       path: ['description'],
-      message: "Description must be less than 125 characters long"
+      message: "Description must be less than 75 characters long"
     }
   )
   .refine(

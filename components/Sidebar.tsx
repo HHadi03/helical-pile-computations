@@ -1,85 +1,94 @@
 'use client'
-import { useState } from 'react'
+import { useState,useEffect } from 'react'
 import { logOut } from '@/app/actions'
-import {ArrowLeftToLine, ArrowRightToLine, LogOut } from 'lucide-react'
+import { ArrowLeftToLine, ArrowRightToLine, LogOut,Save, FolderOpen, Download, RotateCcw, MessageSquareText, CircleHelp } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export const Sidebar = () => {
   const [expanded, setExpanded] = useState(false)
   
+  useEffect(() => {
+    const updateExpanded = () => {
+      if (window.innerWidth < 768) {
+        setExpanded(false)
+      }
+    }
+
+    updateExpanded()
+    window.addEventListener('resize', updateExpanded)
+    return () => window.removeEventListener('resize', updateExpanded)
+  }, [])
+  
   const navigationItems = [
-    { icon: "/save-icon.png", text: "Save", alt: "Save Icon", href: "/save"},
-    { icon: "/load-icon.png", text: "Load", alt: "Load Icon", href: "/load"},
-    { icon: "/export-icon.png", text: "Export", alt: "Export Icon", href: "/export"},
-    { icon: "/restart-icon.png", text: "Restart", alt: "Restart Icon", href: "/restart"},
-    { icon: "/feedback-icon.png", text: "Feedback", alt: "Feedback Icon", href: "/feedback"},
-    { icon: "/help-icon.png", text: "Help", alt: "Help Icon", href: "/help"},
+    { icon: Save, text: "Save", href: "/save"},
+    { icon: FolderOpen, text: "Load", href: "/load"},
+    { icon: Download, text: "Export", href: "/export"},
+    { icon: RotateCcw, text: "Restart", href: "/restart"},
+    { icon: MessageSquareText, text: "Feedback", href: "/feedback"},
+    { icon: CircleHelp, text: "Help", href: "/help"},
   ]
 
-  const toggleSidebar = () => setExpanded(!expanded)
-
-  const renderNavBar = (item: typeof navigationItems[number]) => (
-    <li key={item.href} className={`relative group rounded-lg hover:bg-indigo-200 transition-all duration-200 ${!expanded && 'justify-center'}`}>
-      <Link href={item.href} prefetch={false} className="text-gray-700 font-medium py-2 px-3 flex gap-3">
-        <img src={item.icon} alt={item.alt} className='w-6 h-auto'/>
-        {expanded && <span className='whitespace-nowrap'>{item.text}</span>}
-      </Link>
-
-      {!expanded && (
-        <div
-          className="absolute left-full top-1/2 -translate-y-1/2 px-2 py-1 bg-indigo-400 text-white text-sm rounded shadow-lg
-          invisible opacity-0 translate-x-0 transition-all group-hover:visible group-hover:opacity-100 group-hover:translate-x-5 z-20 whitespace-nowrap">
-          {item.text}
+  return (
+    <div className={`flex flex-col border-r border-gray-300 p-2 bg-linear-to-tr from-slate-50 via-white to-blue-50 shadow-inner transition-[width] duration-300 ${expanded ? 'w-[260px]' : 'w-[70px]'}`}>
+      
+      {expanded ? (
+        <div className="hidden md:flex mt-2 flex-row items-center gap-2">
+          <Image height={39} width={187} src='/logo.png' alt='Company Logo' className="transition-opacity duration-200 hover:opacity-85"/>
+          <button onClick={() => setExpanded(false)} aria-label="Collapse Sidebar" aria-expanded={expanded} className="py-2 px-3 rounded-sm hover:bg-gray-200">
+            <ArrowLeftToLine className="size-6"/>
+          </button>
+        </div>
+      ) : (
+        <div className="hidden md:block">
+          <button onClick={() => setExpanded(true)} aria-label="Expand Sidebar" aria-expanded={expanded} className="py-2 px-3 rounded-sm hover:bg-gray-200">
+            <ArrowRightToLine className="size-6"/>
+          </button>
         </div>
       )}
-    </li>
-  )
-
-  return (
-    <div className={`flex flex-col border-r border-gray-300 p-2 bg-linear-to-tr from-slate-50 via-white to-blue-50 shadow-inner
-    ${expanded ? 'w-[260px]' : 'w-[70px]'} transition-all duration-300`}>
       
-      <div className='mt-2 flex gap-2'>
-        {expanded ? (
-          <>
-            <div> 
-              <img src='/logo.png' alt='Company Logo' className="transition-opacity duration-200 hover:opacity-85 w-auto h-auto"/>
-            </div>
+      <div className='flex flex-col justify-between h-full'>
+        <nav>
+          <ul className={`space-y-4 ${expanded ? 'mt-10 md:mt-10' : 'mt-0 md:mt-10'}`}>
+            {navigationItems.map((item) => {
+              const IconComponent = item.icon
+              return (
+                <li key={item.href} className={`relative group rounded-lg hover:bg-indigo-200 ${!expanded && 'justify-center'}`}>
+                  <Link href={item.href} prefetch={false} className="text-gray-700 font-medium py-2 px-3 flex gap-3">
+                    <IconComponent className='size-6 text-blue-800 shrink-0'/>
+                    <span className={`transition-opacity duration-300 delay-100 ${ expanded ? 'opacity-100' : 'opacity-0 overflow-hidden'}`}> {item.text}</span>
+                  </Link>
 
-            <button onClick={toggleSidebar} aria-label="Collapse Sidebar" aria-expanded={expanded} className="px-3 rounded-sm hover:bg-gray-200 shrink-0">
-               <ArrowLeftToLine className="w-6 h-6" />
-            </button>
-          </>
-        ) : (
-          <button onClick={toggleSidebar} aria-label="Expand Sidebar" aria-expanded={expanded} className="p-2 rounded-sm hover:bg-gray-200 grow">
-           <ArrowRightToLine className="w-6 h-6" />
-          </button>
-        )}
-      </div>
+                  {!expanded && (
+                    <div
+                      className="absolute left-full top-1/2 -translate-y-1/2 px-2 py-1 bg-indigo-400 text-white text-sm rounded shadow-lg invisible opacity-0 translate-x-0 transition-all duration-200 group-hover:visible group-hover:opacity-100 group-hover:translate-x-5 z-20">
+                      {item.text}
+                    </div>
+                  )}
+                </li>
+              )
+            })}
+          </ul>
+        </nav>
 
-      <nav>
-        <ul className='space-y-4 mt-10'>
-          {navigationItems.map(renderNavBar)}
+        <ul>
+          <li className={`relative group rounded-lg hover:bg-gray-200 ${!expanded && 'justify-center'}`}>
+            <form action={logOut}>
+              <button type="submit" className="text-gray-700 font-medium py-2 px-3 flex gap-3">
+                <LogOut className="size-6 rotate-180 shrink-0"/>
+                <span className={`transition-opacity duration-300 delay-100 whitespace-nowrap ${ expanded ? 'opacity-100 ': 'opacity-0'}`}>Log Out</span>
+              </button>
+            </form>
+
+            {!expanded && (
+              <div
+                className="absolute left-full top-1/2 -translate-y-1/2 px-2 py-1 bg-gray-300 text-gray-700 text-sm rounded shadow-lg invisible opacity-0 translate-x-0 transition-all duration-200 group-hover:visible group-hover:opacity-100 group-hover:translate-x-5 z-20 whitespace-nowrap">
+                Log Out
+              </div>
+            )}
+          </li>
         </ul>
-      </nav>
-
-      <ul className='mt-auto'>
-        <li className={`relative group rounded-lg hover:bg-gray-200 ${!expanded && 'justify-center'}`}>
-          <form action={logOut}>
-            <button type="submit" className="text-gray-700 font-medium py-2 px-3 flex gap-3">
-              <LogOut className="w-6 h-6"/> {expanded && <span className='whitespace-nowrap'>Sign Out</span>}
-            </button>
-          </form>
-
-          {!expanded && (
-            <div
-              className="absolute left-full top-1/2 -translate-y-1/2 px-2 py-1 bg-gray-300 text-gray-700 text-sm rounded shadow-lg
-              invisible opacity-0 translate-x-0 transition-all group-hover:visible group-hover:opacity-100 group-hover:translate-x-5 z-20 whitespace-nowrap">
-              Sign Out
-            </div>
-          )}
-        </li>
-      </ul>
+      </div>
 
     </div>
   )

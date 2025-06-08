@@ -1,11 +1,12 @@
 import { Input } from "./ui/input"
-import { ControllerRenderProps } from "react-hook-form"
+import { ControllerRenderProps, FieldValues, Path } from "react-hook-form"
 
-interface NumberInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
-  field: ControllerRenderProps<any, any>
-}
+type NumberInputProps<T extends FieldValues = FieldValues, K extends Path<T> = Path<T>> =
+  Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> & {
+    field: ControllerRenderProps<T, K>
+  }
 
-export const NumberInput = ({ field, placeholder, disabled}: NumberInputProps) => {
+export const NumberInput = <T extends FieldValues, K extends Path<T>>({field, placeholder, disabled,}: NumberInputProps<T, K>) => {
   return (
     <Input
       type="number"
@@ -14,25 +15,9 @@ export const NumberInput = ({ field, placeholder, disabled}: NumberInputProps) =
       step={0.1}
       min={0}
       disabled={disabled}
-
-      onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-        const preventedKeys = ["e", "E", "-", "+", "="]
-        if (preventedKeys.includes(e.key)) {
-          e.preventDefault()
-        }
-      }}
-
-      onPaste={(e: React.ClipboardEvent<HTMLInputElement>) => {
-        e.preventDefault()
-      }}
-
-      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value
-        if (/^\d{0,4}(\.\d{0,2})?$/.test(value)) {
-          field.onChange(value)
-        }
-      }}
-
+      onKeyDown={(e) => {if (["e", "E", "-", "+", "="].includes(e.key)) e.preventDefault()}}
+      onPaste={(e) => e.preventDefault()}
+      onChange={(e) => {const value = e.target.value; if (/^\d{0,4}(\.\d{0,2})?$/.test(value)) {field.onChange(value)}}}
       placeholder={placeholder}
     />
   )

@@ -1,6 +1,4 @@
 "use client"
-import { useToast } from "@/components/hooks/use-toast"
-import { ToastAction } from "@/components/ui/toast"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { TsoilSchema, soilSchema} from "@/schemas/soilSchema"
@@ -11,10 +9,10 @@ import { useRouter } from "next/navigation"
 import { NumberInput } from "@/components/NumberInput"
 import { useEffect } from "react"
 import { UseFormContext } from "../../FormContext"
-import { Loader2, CheckCircle, TriangleAlert } from "lucide-react"
+import { Loader2 } from "lucide-react"
+import { toast } from "sonner"
 
 export function EditSoilForm({soil}: {soil: TsoilSchema}) {
-  const { toast } = useToast()
   const router = useRouter()
   const { setHasUnsavedChanges, setCriticalChanges, setTFieldEdited } = UseFormContext()
 
@@ -41,37 +39,22 @@ export function EditSoilForm({soil}: {soil: TsoilSchema}) {
   async function onSubmit(values: TsoilSchema) {
     try {
       const result = await updateSoil(values)
+
       if (result.errors) {
-        Object.entries(result.errors).forEach(([key, value]) => {
-        form.setError(key as keyof TsoilSchema, { message: Array.isArray(value) ? value[0] : String(value) })})
+        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TsoilSchema, { message: Array.isArray(value) ? value[0] : String(value) })})
+        toast.error(result.message)
       }
-      
-      toast({
-        duration: 2000,
-        variant: result.errors ? "destructive" : "default",
-        description: (
-          <div className="flex items-center gap-2">
-            {result.errors ? (<TriangleAlert className="text-yellow-500 w-5 h-5" />) : (<CheckCircle className="text-green-500 w-5 h-5" />)}
-            <span>{result.message}</span>
-          </div>
-        ) 
-      })
-      
-      if (!result.errors) {
-        setHasUnsavedChanges(true) 
+
+      else {
+        setHasUnsavedChanges(true)
         router.back()
+        toast.success(result.message)
       }
 
     } catch {
-      toast({
-        duration: 2000,
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "An unexpected error occurred. Please try again later.",
-        action: <ToastAction altText="Try again">Try again</ToastAction>
-      })
+      toast.error("An unexpected error has occurred.", { description: "Please try again later." })
     }
-  }
+  } 
 
   return (
     <Form {...form}>

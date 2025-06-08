@@ -1,4 +1,5 @@
 'use client'
+import Link from 'next/link'
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from "@/components/ui/alert-dialog"
 import {DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem} from "@/components/ui/dropdown-menu"
@@ -7,25 +8,27 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import type { TsoilSchema } from "@/schemas/soilSchema"
 import { TsoilProfileSchema } from "@/schemas/soilProfileSchema"
-import { useToast } from "@/components/hooks/use-toast"
-import { ToastAction } from "@/components/ui/toast"
+import { toast } from "sonner"
 import { calculateAll } from "./actions/submitCalculations"
 import { deleteSoil } from "./actions/deleteSoil"
 import { UseFormContext } from "./FormContext"
-import { Calculator, PlusCircle, Trash2, EllipsisVertical, Copy, Pencil, TriangleAlert, CheckCircle, Layers, Plus, FolderOpen} from 'lucide-react'
+import { Calculator, PlusCircle, Trash2, EllipsisVertical, Copy, Pencil, Layers, Plus, FolderOpen} from 'lucide-react'
 import { Button } from "@/components/ui/button"
-import Link from 'next/link'
 import { deleteProfile } from "./actions/deleteProfile"
 
-const soilTypeNames = {
+const soilTypeCapitalisation = {
   'fine': 'Fine Grain',
   'coarse': 'Coarse Grain',
   'manmade': 'Man Made'
 }
 
-export default function SoilTable({ soilsData, profilesData}: { soilsData: TsoilSchema[], profilesData: TsoilProfileSchema[] }) {
+const soilDensityCapitalisation = {
+  'loose' : 'Loose',
+  'dense' : 'Dense'
+}
+
+export function SoilTable({ soilsData, profilesData}: { soilsData: TsoilSchema[], profilesData: TsoilProfileSchema[] }) {
   const router = useRouter()
-  const { toast } = useToast()
   const [selectedSoil, setSelectedSoil] = useState<string | null>(null)
   const [selectedProfile, setSelectedProfile] = useState<string | null>(null)
   const [isSoilDeleteDialogOpen, setisSoilDeleteDialogOpen] = useState(false)
@@ -37,30 +40,17 @@ export default function SoilTable({ soilsData, profilesData}: { soilsData: Tsoil
     if (selectedSoil !== null) {
       try {
         const result = await deleteSoil(selectedSoil)
-        toast({
-          duration: 2000,
-          variant: result.errors ? "destructive" : "default",
-          description: (
-            <div className="flex items-center gap-2">
-              {result.errors ? (<TriangleAlert className="text-yellow-500 w-5 h-5" />) : (<CheckCircle className="text-green-500 w-5 h-5" />)}
-              <span>{result.message}</span>
-            </div>
-          ),  
-        })
-        
-        if (!result.errors) {
-          setSelectedSoil(null)
-          setisSoilDeleteDialogOpen(false)
+        if (result.errors) {
+          toast.error(result.message)
         }
-  
+        
+        else {
+          setSelectedSoil(null)
+          toast.success(result.message)
+        }
+       
       } catch {
-        toast({
-          duration: 2000,
-          variant: "destructive",
-          title: "Uh oh! Something went wrong.",
-          description: "An unexpected error occurred. Please try again later.",
-          action: <ToastAction altText="Try again">Try again</ToastAction>
-        })
+       toast.error("An unexpected error has occurred.", {description: "Please try again later."})
       }
     }
   }
@@ -69,30 +59,17 @@ export default function SoilTable({ soilsData, profilesData}: { soilsData: Tsoil
     if (selectedProfile !== null) {
       try {
         const result = await deleteProfile(selectedProfile)
-        toast({
-          duration: 2000,
-          variant: result.errors ? "destructive" : "default",
-          description: (
-            <div className="flex items-center gap-2">
-              {result.errors ? (<TriangleAlert className="text-yellow-500 w-5 h-5" />) : (<CheckCircle className="text-green-500 w-5 h-5" />)}
-              <span>{result.message}</span>
-            </div>
-          ),  
-        })
-        
-        if (!result.errors) {
+        if (result.errors) {
+          toast.error(result.message)
+        }
+
+        else {
           setSelectedProfile(null)
-          setIsProfileDeleteDialogOpen(false)
+          toast.success(result.message)
         }
 
       } catch {
-        toast({
-          duration: 2000,
-          variant: "destructive",
-          title: "Uh oh! Something went wrong.",
-          description: "An unexpected error occurred. Please try again later.",
-          action: <ToastAction altText="Try again">Try again</ToastAction>
-        })
+        toast.error("An unexpected error has occurred.", { description: "Please try again later." })
       }
     }
   }
@@ -101,30 +78,18 @@ export default function SoilTable({ soilsData, profilesData}: { soilsData: Tsoil
     setIsCalculating(true)
     try {
       const result = await calculateAll(hasCriticalChanges, isTFieldEdited)
-      toast({
-        duration: 2000,
-        variant: result.errors ? "destructive" : "default",
-        description: (
-          <div className="flex items-center gap-2">
-            {result.errors ? (<TriangleAlert className="text-yellow-500 w-5 h-5" />) : (<CheckCircle className="text-green-500 w-5 h-5" />)}
-            <span>{result.message}</span>
-          </div>
-        ),  
-      })
-      
-      if (!result.errors) {
-        resetFormStates()
-        setIsCalculating(false) 
+      if (result.errors) {
+        toast.error(result.message)
       }
-  
+
+      else {
+        resetFormStates()
+        setIsCalculating(false)
+        toast.success(result.message)
+      }
+
     } catch {
-      toast({
-        duration: 2000,
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "An unexpected error occurred. Please try again later.",
-        action: <ToastAction altText="Try again">Try again</ToastAction>
-      })
+      toast.error("An unexpected error has occurred.", { description: "Please try again later." })
     }
   }
 
@@ -186,8 +151,9 @@ export default function SoilTable({ soilsData, profilesData}: { soilsData: Tsoil
                       <TableHeader>
                         <TableRow>
                           <TableHead className="font-semibold">Layer</TableHead>
-                          <TableHead className="font-semibold whitespace-nowrap">Soil Type</TableHead>
-                          <TableHead className="font-semibold whitespace-nowrap">Soil Name</TableHead>
+                          <TableHead className="font-semibold whitespace-nowrap">Type</TableHead>
+                          <TableHead className="font-semibold whitespace-nowrap">Density</TableHead>
+                          <TableHead className="font-semibold whitespace-nowrap">Name</TableHead>
                           <TableHead className="font-semibold whitespace-nowrap">Start Depth</TableHead>
                           <TableHead className="font-semibold whitespace-nowrap">End Depth</TableHead>
                           <TableHead className="font-semibold whitespace-nowrap ">Sat Unit Weight</TableHead>
@@ -201,9 +167,10 @@ export default function SoilTable({ soilsData, profilesData}: { soilsData: Tsoil
                         {profileSoils.map((soil, index) => (
                           <TableRow key={soil.id} onDoubleClick={() => router.push(`/configuration/edit-soil/${soil.id}`, { scroll: false })} className="cursor-pointer hover:bg-slate-100">
                             <TableCell>{index + 1}</TableCell>
-                            <TableCell>{soilTypeNames[soil.soilType]}</TableCell>
-                            <TableCell className="">{soil.soilName || soil.soil}</TableCell>
-                            <TableCell className="">{`${soil.startDepth} m`}</TableCell>
+                            <TableCell>{soilTypeCapitalisation[soil.soilType]}</TableCell>
+                            <TableCell>{soilDensityCapitalisation[soil.density]}</TableCell>
+                            <TableCell>{soil.soilName || soil.soil}</TableCell>
+                            <TableCell>{`${soil.startDepth} m`}</TableCell>
                             <TableCell>{`${soil.endDepth} m`}</TableCell>
                             <TableCell>{`${soil.ySat} kN/m³`}</TableCell>
                             <TableCell>{`${soil.yMoist} kN/m³`}</TableCell>
@@ -219,6 +186,16 @@ export default function SoilTable({ soilsData, profilesData}: { soilsData: Tsoil
                       <Button asChild variant="ghost" className="hover:bg-blue-100">
                         <Link href={`/configuration/insert-soil/${profile.id}`} prefetch={false} scroll={false}> <PlusCircle className="text-blue-500"/> Add Soil Layer </Link>
                       </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-6 w-6 focus-visible:ring-transparent ml-2"><EllipsisVertical/></Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="w-40">
+                          <DropdownMenuItem onClick={() => router.push(`/configuration/edit-profile/${profile.id}`, { scroll: false })}><Pencil/>Edit</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => {/* handleDuplicateProfile(profile.id) */}}><Copy/>Duplicate</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => {setSelectedProfile(profile.id!); setIsProfileDeleteDialogOpen(true)}}><Trash2/>Remove</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </>
                 )}
@@ -233,10 +210,10 @@ export default function SoilTable({ soilsData, profilesData}: { soilsData: Tsoil
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>This action cannot be undone. This will permanently delete the selected soil profile and remove it from the table.</AlertDialogDescription>
+            <AlertDialogDescription>This action cannot be undone. This will permanently delete the selected soil profile and remove it from the configuration.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setIsProfileDeleteDialogOpen(false)}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleProfileDelete}>Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -246,10 +223,10 @@ export default function SoilTable({ soilsData, profilesData}: { soilsData: Tsoil
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>This action cannot be undone. This will permanently delete the selected soil layer and remove it from the table.</AlertDialogDescription>
+            <AlertDialogDescription>This action cannot be undone. This will permanently delete the selected soil layer and remove it from the configuration.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setisSoilDeleteDialogOpen(false)}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleSoilDelete}>Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

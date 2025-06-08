@@ -1,16 +1,23 @@
 import { getSoils } from "@/lib/getSoils"
 import { getProfiles } from "@/lib/getProfiles"
-import { getLuminance } from "@/lib/getLuminance"
 import { ArrowUp, ArrowDown, FolderOpen, ArrowBigRight} from "lucide-react"
 import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
-import SoilDepthChart from "../visualisation/graph"
+import { SoilDepthChart } from "../visualisation/graph"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
 export const metadata = {
   title: "Overview | Helical Pile Computations",
   description: "Summary of your soil profiles and pile settings",
+}
+
+const getLuminance = (color: string) => {
+  const hex = color.replace("#", "");
+  const r = parseInt(hex.substring(0, 2), 16)
+  const g = parseInt(hex.substring(2, 4), 16)
+  const b = parseInt(hex.substring(4, 6), 16)
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255
 }
 
 export default async function OverviewPage() {
@@ -39,7 +46,7 @@ export default async function OverviewPage() {
   }
 
   return (
-    <section className="h-full scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-slate-400
+    <section className="h-full overflow-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-slate-400
      scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-600">
 
       <div className="space-y-12 p-6">

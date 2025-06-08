@@ -2,7 +2,7 @@ import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
 import { getSoils } from "@/lib/getSoils"
 import { getProfiles } from "@/lib/getProfiles"
-import SoilTable from "./SoilTable"
+import { SoilTable } from "./SoilTable"
 
 export const metadata = {
   title: "Configuration | Helical Pile Computations",

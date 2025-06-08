@@ -8,7 +8,7 @@ type ReturnType = {
 }
 
 export async function deleteSoil(id: string): Promise<ReturnType> {
-  
+
   try {
     const supabase = await createClient()
     const { error } = await supabase

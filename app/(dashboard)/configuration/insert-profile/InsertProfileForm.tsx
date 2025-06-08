@@ -1,7 +1,5 @@
 "use client"
-import { Loader2, CheckCircle, TriangleAlert } from "lucide-react"
-import { useToast } from "@/components/hooks/use-toast"
-import { ToastAction } from "@/components/ui/toast"
+import { Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { soilProfileSchema, TsoilProfileSchema } from "@/schemas/soilProfileSchema"
@@ -11,18 +9,18 @@ import { Input } from "@/components/ui/input"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { useRouter } from "next/navigation"
 import { NumberInput } from "@/components/NumberInput"
+import { toast } from "sonner"
 
 export function ProfileForm() {
-  const { toast } = useToast()
   const router = useRouter()
 
   const form = useForm<TsoilProfileSchema>({
     resolver: zodResolver(soilProfileSchema),
     defaultValues: {
       profileName: "",
-      pileLength: undefined,
-      pileStickOut: undefined,
-      waterDepth: undefined,
+      pileLength:"" as unknown as number,
+      pileStickOut: "" as unknown as number,
+      waterDepth:"" as unknown as number,
     }
   })
   
@@ -31,41 +29,26 @@ export function ProfileForm() {
   async function onSubmit(values: TsoilProfileSchema) {
     try {
       const result = await insertProfile(values)
-      
+
       if (result.errors) {
-        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TsoilProfileSchema, { message: Array.isArray(value) ? value[0] : (value as string)})})
+        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TsoilProfileSchema, { message: Array.isArray(value) ? value[0] : (value as string) })})
+        toast.error(result.message)
       }
-  
-      toast({
-        duration: 2000,
-        variant: result.errors ? "destructive" : "default",
-        description: (
-          <div className="flex items-center gap-2">
-            {result.errors ? (<TriangleAlert className="text-yellow-500 w-5 h-5" />) : (<CheckCircle className="text-green-500 w-5 h-5" />)}
-            <span>{result.message}</span>
-          </div>
-        ),  
-      })
-      
-      if (!result.errors) {
+
+      else {
         router.back()
+        toast.success(result.message)
       }
 
     } catch {
-      toast({
-        duration: 2000,
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "An unexpected error occurred. Please try again later.",
-        action: <ToastAction altText="Try again">Try again</ToastAction>
-      })
-    } 
+      toast.error("An unexpected error has occurred.", { description: "Please try again later." })
+    }
   }
-  
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
-        <div className="space-y-8 border-y-2 py-3">
+        <div className="space-y-6 border-y-2 py-3">
           <FormField
             control={form.control}
             name="profileName"
@@ -82,15 +65,26 @@ export function ProfileForm() {
 
           <FormField
             control={form.control}
+            name="waterDepth"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Water Depth (m)</FormLabel>
+                <FormControl>
+                  <NumberInput field={field} placeholder="0"/>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
             name="pileLength"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Pile Length (m)</FormLabel>
                 <FormControl>
-                  <div className="relative">
-                    <NumberInput field={field} placeholder="Enter pile length" />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm">m</span>
-                  </div>
+                  <NumberInput field={field} placeholder="0" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -104,27 +98,7 @@ export function ProfileForm() {
               <FormItem>
                 <FormLabel>Pile Stick Out (m)</FormLabel>
                 <FormControl>
-                  <div className="relative">
-                    <NumberInput field={field} placeholder="Enter pile stick out" />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm">m</span>
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="waterDepth"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Water Depth (m)</FormLabel>
-                <FormControl>
-                  <div className="relative">
-                    <NumberInput field={field} placeholder="Enter water depth" />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm">m</span>  
-                  </div>
+                  <NumberInput field={field} placeholder="0"/>
                 </FormControl>
                 <FormMessage />
               </FormItem>

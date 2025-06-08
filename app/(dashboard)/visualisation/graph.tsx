@@ -3,7 +3,7 @@ import { TsoilSchema } from "@/schemas/soilSchema";
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 
-export default function SoilDepthChart({ profileSoils }: { profileSoils: TsoilSchema[] }) {
+export function SoilDepthChart({ profileSoils }: { profileSoils: TsoilSchema[] }) {
   const maxDepth = profileSoils.length > 0 ? Math.max(...profileSoils.map(soil => soil.endDepth)) : 10
 
   return (
