@@ -21,7 +21,7 @@ import Image from 'next/image'
 
 export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: number, profileId: string}) {
   const router = useRouter()
-  const [activeTab, setActiveTab] = useState('soil')
+  const [activeTab, setActiveTab] = useState("soil")
   const { setHasUnsavedChanges } = UseFormContext()
   
   const form = useForm<TsoilSchema>({
@@ -46,23 +46,34 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
   const soilType = form.watch("soilType")
   const soil = form.watch("soil")
   const density = form.watch("density")
-  const selectedSoil = form.watch("soil")
-  const selectedDensity = form.watch("density")
   const showParametersTab = Boolean(soilType && soil && density)
 
-  const handleNext = () => {
-    if (soilType && soil && density) {
-      setActiveTab('parameters')
-    }
-  }
-  
   useEffect(() => {
-    if (selectedSoil && selectedDensity && soilProperties[selectedSoil]) {
-      const values = soilProperties[selectedSoil][selectedDensity]
+    const errorFields = Object.keys(form.formState.errors)
+
+    if (errorFields.length === 0) return
+    
+    const soilTabFields = ["soilType", "soil", "density", "soilName", "description", "color"]
+    const parametersTabFields = ["startDepth", "endDepth", "yMoist", "ySat", "nValue"]
+
+    const hasSoilErrors = errorFields.some(field => soilTabFields.includes(field))
+    const hasParameterErrors = errorFields.some(field => parametersTabFields.includes(field))
+
+    if (hasSoilErrors) {
+      setActiveTab("soil")
+    }
+    else if (hasParameterErrors) {
+      setActiveTab("parameters")
+    }
+  }, [form.formState.errors])
+
+  useEffect(() => {
+    if (soil && density && soilProperties[soil]) {
+      const values = soilProperties[soil][density]
       form.setValue("yMoist", values.yMoist)
       form.setValue("ySat", values.ySat)
     }
-  }, [selectedSoil, selectedDensity, form])
+  }, [soil, density, form])
 
   useEffect(() => {
     form.setValue("soil", "")
@@ -88,6 +99,12 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
     }
   }
 
+  const handleNext = () => {
+    if (soilType && soil && density) {
+      setActiveTab("parameters")
+    }
+  }
+  
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
@@ -108,7 +125,7 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select soil type"/>
+                          <SelectValue placeholder="Select type"/>
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -117,7 +134,7 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                         <SelectItem value="manmade">Man Made</SelectItem>
                       </SelectContent>
                     </Select>
-                    <FormMessage />
+                    <FormMessage/>
                   </FormItem>
                 )}
               />
@@ -127,7 +144,7 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                 name="density"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Density</FormLabel>
+                    <FormLabel>Soil Density</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger className="w-full">
@@ -157,9 +174,8 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {soilType && soilOptions[soilType].map((soil) => (
-                          <SelectItem key={soil} value={soil}>{soil}</SelectItem>
-                        ))}
+                        {soilType ? (soilOptions[soilType].map((soil) => (<SelectItem key={soil} value={soil}>{soil}</SelectItem>))
+                        ) : (<SelectItem value="placeholder" disabled>Please select soil type first</SelectItem>)}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -258,7 +274,7 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                     <FormLabel>Moist Unit Weight (γMoist)</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <NumberInput field={field} placeholder="Enter moist unit weight"/>
+                        <NumberInput field={field} placeholder="0"/>
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm">kN/m³</span>
                       </div>
                     </FormControl>
@@ -275,7 +291,7 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                     <FormLabel>Saturated Unit Weight (γSat)</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <NumberInput field={field} placeholder="Enter sat unit weight"/>
+                        <NumberInput field={field} placeholder="0"/>
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm">kN/m³</span>
                       </div>
                     </FormControl>

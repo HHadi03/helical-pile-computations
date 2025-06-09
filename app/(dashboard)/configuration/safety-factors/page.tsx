@@ -2,6 +2,7 @@ import { getFactors } from "@/lib/getFactors"
 import { SafetyFactorsForm } from "./SafetyFactorsForm"
 import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
+import { NotFound } from "@/components/NotFound"
 
 export default async function SafetyFactorsPage() {
   const supabase = await createClient()
@@ -12,11 +13,7 @@ export default async function SafetyFactorsPage() {
 
   const factorsData = await getFactors()
   if (!factorsData) {
-    return (
-      <section className="flex justify-center">
-        Failed to load safety factors data.
-      </section>
-    )
+    return <NotFound/>
   }
   
   return (

@@ -31,6 +31,12 @@ export const soilSchema = z.object({
       path: ['endDepth'], 
       message: "End Depth must be greater than Start Depth",
     }
+  ).refine(
+    (data) => data.soilName === undefined || data.soilName.length <= 15,
+    {
+      path: ['soilName'],
+      message: "Name must be less than 15 characters long"
+    }
   )
   .refine(
     (data) => data.description === undefined || data.description.length <= 75,
@@ -57,7 +63,7 @@ export const soilSchema = z.object({
     (data) => data.angle === undefined || data.angle === null || data.angle > 0,
     {
       path: ['angle'],
-      message: "Angle is required"
+      message: "φ is required"
     }
   )
    .refine(

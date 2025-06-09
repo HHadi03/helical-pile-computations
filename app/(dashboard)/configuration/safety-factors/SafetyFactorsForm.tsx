@@ -1,6 +1,5 @@
 "use client"
-import { useToast } from "@/components/hooks/use-toast"
-import { ToastAction } from "@/components/ui/toast"
+import { toast } from "sonner"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { safetySchema, TsafetySchema } from "@/schemas/safetySchema"
@@ -13,7 +12,6 @@ import { Loader2 } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export function SafetyFactorsForm({ safetyFactors }: {safetyFactors: TsafetySchema }) {
-  const { toast } = useToast()
   const router = useRouter()
   
   const form = useForm<TsafetySchema>({
@@ -22,36 +20,23 @@ export function SafetyFactorsForm({ safetyFactors }: {safetyFactors: TsafetySche
   })
 
   const { formState: { isDirty, isSubmitting } } = form
- 
+
   async function onSubmit(values: TsafetySchema) {
     try {
-      const result = await updateSafetyFactors(values)
+      const result =  await updateSafetyFactors(values)
+
       if (result.errors) {
-        Object.entries(result.errors).forEach(([key, value]) => {
-          form.setError(key as keyof TsafetySchema, { message: Array.isArray(value) ? value[0] : String(value) })
-        })
+        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TsafetySchema, { message: Array.isArray(value) ? value[0] : (value as string) })})
+        toast.error(result.message)
       }
-      
-      toast({
-        duration: 2500,
-        variant: result.errors ? "destructive" : "default",
-        title: result.errors ? "Safety Factors Update Failed" : "Safety Factors Update Successful",
-        description: result.message,
-        action: result.errors && <ToastAction altText="Try again">Try again</ToastAction>
-      })
-      
-      if (!result.errors) {
+
+      else {
         router.back()
+        toast.success(result.message)
       }
-  
+
     } catch {
-      toast({
-        duration: 2500,
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "An unexpected error occurred. Please try again later.",
-        action: <ToastAction altText="Try again">Try again</ToastAction>
-      })
+      toast.error("An unexpected error has occurred.", { description: "Please try again later." })
     }
   }
   

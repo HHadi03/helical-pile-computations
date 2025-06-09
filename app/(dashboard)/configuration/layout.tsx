@@ -12,7 +12,7 @@ export default function ConfigurationLayout({
     <FormContextProvider>
       {children}
       {modal}
-      <Toaster position="top-right" richColors duration={3000}/>
+      <Toaster position="top-right" richColors duration={3000} visibleToasts={1}/>
     </FormContextProvider>
   )
 }

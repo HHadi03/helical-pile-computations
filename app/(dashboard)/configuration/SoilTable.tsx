@@ -151,9 +151,9 @@ export function SoilTable({ soilsData, profilesData}: { soilsData: TsoilSchema[]
                       <TableHeader>
                         <TableRow>
                           <TableHead className="font-semibold">Layer</TableHead>
-                          <TableHead className="font-semibold whitespace-nowrap">Type</TableHead>
-                          <TableHead className="font-semibold whitespace-nowrap">Density</TableHead>
-                          <TableHead className="font-semibold whitespace-nowrap">Name</TableHead>
+                          <TableHead className="font-semibold whitespace-nowrap">Soil Type</TableHead>
+                          <TableHead className="font-semibold whitespace-nowrap">Soil Density</TableHead>
+                          <TableHead className="font-semibold whitespace-nowrap">Soil Name</TableHead>
                           <TableHead className="font-semibold whitespace-nowrap">Start Depth</TableHead>
                           <TableHead className="font-semibold whitespace-nowrap">End Depth</TableHead>
                           <TableHead className="font-semibold whitespace-nowrap ">Sat Unit Weight</TableHead>

@@ -1,7 +1,8 @@
 'use client'
 import { useState,useEffect } from 'react'
-import { logOut } from '@/app/actions'
+import { logOut } from '@/app/actions/logOut'
 import { ArrowLeftToLine, ArrowRightToLine, LogOut,Save, FolderOpen, Download, RotateCcw, MessageSquareText, CircleHelp } from 'lucide-react'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -30,7 +31,7 @@ export const Sidebar = () => {
   ]
 
   return (
-    <div className={`flex flex-col border-r border-gray-300 p-2 bg-linear-to-tr from-slate-50 via-white to-blue-50 shadow-inner transition-[width] duration-300 ${expanded ? 'w-[260px]' : 'w-[70px]'}`}>
+    <aside className={`flex flex-col shrink-0 border-r border-gray-300 p-2 bg-linear-to-tr from-slate-50 via-white to-blue-50 shadow-inner transition-[width] duration-300 overflow-y-auto overflow-x-clip scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-600 ${expanded ? 'w-[260px]' : 'w-[70px]'}`}>
       
       {expanded ? (
         <div className="hidden md:flex mt-2 flex-row items-center gap-2">
@@ -47,49 +48,56 @@ export const Sidebar = () => {
         </div>
       )}
       
-      <div className='flex flex-col justify-between h-full'>
+      <div className='flex flex-col justify-between h-full gap-5'>
         <nav>
           <ul className={`space-y-4 ${expanded ? 'mt-10 md:mt-10' : 'mt-0 md:mt-10'}`}>
             {navigationItems.map((item) => {
-              const IconComponent = item.icon
               return (
-                <li key={item.href} className={`relative group rounded-lg hover:bg-indigo-200 ${!expanded && 'justify-center'}`}>
-                  <Link href={item.href} prefetch={false} className="text-gray-700 font-medium py-2 px-3 flex gap-3">
-                    <IconComponent className='size-6 text-blue-800 shrink-0'/>
-                    <span className={`transition-opacity duration-300 delay-100 ${ expanded ? 'opacity-100' : 'opacity-0 overflow-hidden'}`}> {item.text}</span>
-                  </Link>
-
-                  {!expanded && (
-                    <div
-                      className="absolute left-full top-1/2 -translate-y-1/2 px-2 py-1 bg-indigo-400 text-white text-sm rounded shadow-lg invisible opacity-0 translate-x-0 transition-all duration-200 group-hover:visible group-hover:opacity-100 group-hover:translate-x-5 z-20">
-                      {item.text}
-                    </div>
+                <li key={item.href} className='rounded-lg hover:bg-indigo-200'>
+                  {!expanded ? (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Link href={item.href} className="text-gray-700 font-medium py-2 px-3 flex gap-3">
+                          <item.icon className='size-6 text-blue-800 shrink-0'/>
+                          <span className={`transition-opacity duration-300 delay-100 ${ expanded ? 'opacity-100' : 'opacity-0 overflow-hidden'}`}> {item.text}</span>
+                        </Link>
+                      </TooltipTrigger>
+                      <TooltipContent side="right" className='px-2 py-1 bg-indigo-400 text-white text-sm rounded' sideOffset={12}>
+                        <p>{item.text}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  ) : (
+                    <Link href={item.href} className="text-gray-700 font-medium py-2 px-3 flex gap-3">
+                      <item.icon className='size-6 text-blue-800 shrink-0'/>
+                      <span className={`transition-opacity duration-300 delay-100 ${ expanded ? 'opacity-100' : 'opacity-0 overflow-hidden'}`}> {item.text}</span>
+                    </Link>
                   )}
                 </li>
               )
             })}
           </ul>
         </nav>
-
-        <ul>
-          <li className={`relative group rounded-lg hover:bg-gray-200 ${!expanded && 'justify-center'}`}>
-            <form action={logOut}>
-              <button type="submit" className="text-gray-700 font-medium py-2 px-3 flex gap-3">
+          
+        {!expanded ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button type="submit" className="text-gray-700 font-medium py-2 px-3 flex gap-3 rounded-lg hover:bg-gray-200" onClick={async () => await logOut()}>
                 <LogOut className="size-6 rotate-180 shrink-0"/>
                 <span className={`transition-opacity duration-300 delay-100 whitespace-nowrap ${ expanded ? 'opacity-100 ': 'opacity-0'}`}>Log Out</span>
               </button>
-            </form>
-
-            {!expanded && (
-              <div
-                className="absolute left-full top-1/2 -translate-y-1/2 px-2 py-1 bg-gray-300 text-gray-700 text-sm rounded shadow-lg invisible opacity-0 translate-x-0 transition-all duration-200 group-hover:visible group-hover:opacity-100 group-hover:translate-x-5 z-20 whitespace-nowrap">
-                Log Out
-              </div>
-            )}
-          </li>
-        </ul>
+            </TooltipTrigger>
+            <TooltipContent side="right" className='px-2 py-1 bg-gray-300 text-gray-700 text-sm rounded' sideOffset={12}>
+              <p>Log Out</p>
+            </TooltipContent>
+          </Tooltip>
+        ) : (
+          <button type="submit" className="text-gray-700 font-medium py-2 px-3 flex gap-3 rounded-lg hover:bg-gray-200" onClick={async () => await logOut()}>
+            <LogOut className="size-6 rotate-180 shrink-0"/>
+            <span className={`transition-opacity duration-300 delay-100 whitespace-nowrap ${ expanded ? 'opacity-100 ': 'opacity-0'}`}>Log Out</span>
+          </button>
+        )}
       </div>
 
-    </div>
+    </aside>
   )
-}
+} 
