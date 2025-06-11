@@ -14,14 +14,19 @@ export const Topbar = () => {
   return (
     <nav className="py-2 border-b border-gray-300">
       <ul className="flex gap-7 justify-center">
-        {navItems.map((item) => (
-          <li key={item.href}>
-            <Link prefetch={false} href={item.href} className={`text-gray-600 p-3 block font-semibold hover:text-blue-600 relative hover:bg-blue-100 rounded-lg
-              after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-blue-600 after:transition-transform after:duration-200 after:ease-in-out
-              ${pathname === item.href ? 'text-blue-600 after:scale-x-100' : 'after:scale-x-0 hover:after:scale-x-100'}`}> {item.label}
-            </Link>
-          </li>
-        ))}
+        {navItems.map((item) => {
+          const isActive = pathname === item.href
+          return (
+            <li key={item.href}>
+              <Link
+                prefetch={false}
+                href={item.href}
+                className={`p-3 block font-semibold relative hover:text-blue-700 hover:bg-blue-100 rounded-lg after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-blue-700 after:transition-transform after:duration-200 after:ease-in-out ${isActive ? 'text-blue-700 after:scale-x-100' : 'text-gray-700 after:scale-x-0 hover:after:scale-x-100'}`}>
+                {item.label}
+              </Link>
+            </li>
+          )
+        })}
       </ul>
     </nav>
   )

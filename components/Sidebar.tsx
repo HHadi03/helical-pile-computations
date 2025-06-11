@@ -62,7 +62,7 @@ export const Sidebar = () => {
                           <span className={`transition-opacity duration-300 delay-100 ${ expanded ? 'opacity-100' : 'opacity-0 overflow-hidden'}`}> {item.text}</span>
                         </Link>
                       </TooltipTrigger>
-                      <TooltipContent side="right" className='px-2 py-1 bg-indigo-400 text-white text-sm rounded' sideOffset={12}>
+                      <TooltipContent side="right" className='px-2 py-1 bg-indigo-400 text-sm rounded' colorCode='bg-indigo-400 fill-indigo-400'>
                         <p>{item.text}</p>
                       </TooltipContent>
                     </Tooltip>
@@ -86,7 +86,7 @@ export const Sidebar = () => {
                 <span className={`transition-opacity duration-300 delay-100 whitespace-nowrap ${ expanded ? 'opacity-100 ': 'opacity-0'}`}>Log Out</span>
               </button>
             </TooltipTrigger>
-            <TooltipContent side="right" className='px-2 py-1 bg-gray-300 text-gray-700 text-sm rounded' sideOffset={12}>
+            <TooltipContent side="right" className='px-2 py-1 bg-gray-200 text-black text-sm rounded' colorCode='bg-gray-200 fill-gray-200'>
               <p>Log Out</p>
             </TooltipContent>
           </Tooltip>

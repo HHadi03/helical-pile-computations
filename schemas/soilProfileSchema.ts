@@ -7,6 +7,12 @@ export const soilProfileSchema = z.object({
   pileStickOut: z.coerce.number().gte(0, { message: "Pile stick out must be greater than or equal to 0m" }),
   pileLength: z.coerce.number().gt(0, { message: "Pile length must be greater than 0m" }),
   waterDepth: z.coerce.number().gt(0, { message: "Water depth must be greater than 0m" }),
-})
+}).refine(
+    (data) => data.profileName === undefined || data.profileName.length <= 15,
+    {
+      path: ['profileName'],
+      message: "Name must be less than 15 characters long"
+    }
+  )
 
 export type TsoilProfileSchema = z.infer<typeof soilProfileSchema>

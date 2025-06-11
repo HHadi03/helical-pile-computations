@@ -35,7 +35,7 @@ export default async function OverviewPage() {
       <div className="h-full bg-[#F4F3F2] flex items-center justify-center border-2 border-black px-5">
         <div className="text-center">
           <span className="flex justify-center mb-2"><FolderOpen className="size-10"/></span>
-          <h3 className="text-2xl font-semibold text-gray-800 mb-2">No Soil Profiles Found</h3>
+          <h3 className="text-2xl font-semibold mb-2">No Soil Profiles Found</h3>
           <p className="text-gray-600 mb-4">Head to the configuration page to add your first soil profile</p>
           <Link href="/configuration" prefetch={true} scroll={false}>
             <Button className="w-80 rounded-lg text-white shadow-md hover:shadow-xl"><ArrowBigRight className="size-6"/>Go to Configuration</Button>
@@ -46,8 +46,7 @@ export default async function OverviewPage() {
   }
 
   return (
-    <section className="h-full overflow-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-slate-400
-     scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-600">
+    <section className="h-full overflow-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-600">
 
       <div className="space-y-12 p-6">
         {profilesData.map((profile, index) => {

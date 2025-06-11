@@ -188,7 +188,7 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                 name="soilName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Custom Soil Name <span className="font-semibold">(optional)</span></FormLabel>
+                    <FormLabel>Custom Soil Name <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                     <FormControl>
                       <Input type="text" placeholder="Enter soil name" {...field} />
                     </FormControl>
@@ -203,7 +203,7 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                   name="description"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>Description <span className="font-semibold">(optional)</span></FormLabel>
+                      <FormLabel>Description <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                       <FormControl>
                         <Input type="text" placeholder="Enter description" {...field} />
                       </FormControl>
@@ -217,7 +217,7 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                   name="color"
                   render={({ field }) => (
                     <FormItem className="w-32">
-                      <FormLabel>Color <span className="font-semibold">(optional)</span></FormLabel>
+                      <FormLabel>Color <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                       <FormControl>
                         <Input type="color" {...field} className="w-full p-1" />
                       </FormControl>
@@ -242,9 +242,9 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                   name="startDepth"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>Start Depth (m)</FormLabel>
+                      <FormLabel>Start Depth <span className="font-semibold -ml-1">(m)</span></FormLabel>
                       <FormControl>
-                        <NumberInput field={field} placeholder="0" disabled={true}/>
+                        <NumberInput field={field} placeholder="0"/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -256,7 +256,7 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                   name="endDepth"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>End Depth (m)</FormLabel>
+                      <FormLabel>End Depth <span className="font-semibold -ml-1">(m)</span></FormLabel>
                       <FormControl>
                         <NumberInput field={field} placeholder="0"/>
                       </FormControl>
@@ -271,7 +271,7 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                 name="yMoist"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Moist Unit Weight (γMoist)</FormLabel>
+                    <FormLabel>Moist Unit Weight <span className="font-semibold -ml-1">(γMoist)</span></FormLabel>
                     <FormControl>
                       <div className="relative">
                         <NumberInput field={field} placeholder="0"/>
@@ -288,7 +288,7 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                 name="ySat"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Saturated Unit Weight (γSat)</FormLabel>
+                    <FormLabel>Saturated Unit Weight <span className="font-semibold -ml-1">(γSat)</span></FormLabel>
                     <FormControl>
                       <div className="relative">
                         <NumberInput field={field} placeholder="0"/>

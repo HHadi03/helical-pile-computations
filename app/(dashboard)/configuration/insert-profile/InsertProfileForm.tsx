@@ -83,7 +83,7 @@ export function ProfileForm() {
                 name="profileName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Profile Name <span className="font-semibold">(optional)</span></FormLabel>
+                    <FormLabel>Profile Name <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                     <FormControl>
                       <Input type="text" placeholder="Enter profile name" {...field} />
                     </FormControl>
@@ -97,7 +97,7 @@ export function ProfileForm() {
                 name="waterDepth"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Water Depth (m)</FormLabel>
+                    <FormLabel>Water Depth <span className="font-semibold -ml-1">(m)</span></FormLabel>
                     <FormControl>
                       <NumberInput field={field} placeholder="0"/>
                     </FormControl>
@@ -120,7 +120,7 @@ export function ProfileForm() {
                 name="pileLength"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Pile Length (m)</FormLabel>
+                    <FormLabel>Pile Length <span className="font-semibold -ml-1">(m)</span></FormLabel>
                     <FormControl>
                       <NumberInput field={field} placeholder="0"/>
                     </FormControl>
@@ -134,7 +134,7 @@ export function ProfileForm() {
                 name="pileStickOut"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Pile Stick Out (m)</FormLabel>
+                    <FormLabel>Pile Stick Out <span className="font-semibold -ml-1">(m)</span></FormLabel>
                     <FormControl>
                       <NumberInput field={field} placeholder="0"/>
                     </FormControl>

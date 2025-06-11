@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form"
 import { TsoilSchema, soilSchema} from "@/schemas/soilSchema"
 import { updateSoil } from "@/app/(dashboard)/configuration/actions/updateSoil"
 import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { useRouter } from "next/navigation"
 import { NumberInput } from "@/components/NumberInput"
 import { useEffect, useState } from "react"
@@ -39,6 +39,30 @@ export function EditSoilForm({soil}: {soil: TsoilSchema}) {
     return () => subscription.unsubscribe()
   }, [form, setTFieldEdited, setCriticalChanges])
   
+  useEffect(() => {
+    const errorFields = Object.keys(form.formState.errors)
+
+    if (errorFields.length === 0) return
+    
+    const soilTabFields = ["soilName", "description", "color"]
+    const parametersTabFields = ["startDepth", "endDepth", "yMoist", "ySat", "nValue"]
+    const engineeredTabFields = ["su", "angle", "t", "qult"]
+
+    const hasSoilErrors = errorFields.some(field => soilTabFields.includes(field))
+    const hasParameterErrors = errorFields.some(field => parametersTabFields.includes(field))
+    const hasEngineeredErrors = errorFields.some(field => engineeredTabFields.includes(field))
+
+    if (hasSoilErrors) {
+      setActiveTab("soil")
+    }
+    else if (hasParameterErrors) {
+      setActiveTab("parameters")
+    }
+    else if (hasEngineeredErrors) {
+      setActiveTab("engineered")
+    }
+  }, [form.formState.errors])
+
   async function onSubmit(values: TsoilSchema) {
     try {
       const result = await updateSoil(values)
@@ -77,7 +101,7 @@ export function EditSoilForm({soil}: {soil: TsoilSchema}) {
                 name="soilName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Soil Name <span className="font-semibold">(optional)</span></FormLabel>
+                    <FormLabel>Soil Name <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                     <FormControl>
                       <Input type="text" placeholder="Enter soil name" {...field} />
                     </FormControl>
@@ -91,7 +115,7 @@ export function EditSoilForm({soil}: {soil: TsoilSchema}) {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description <span className="font-semibold">(optional)</span></FormLabel>
+                    <FormLabel>Description <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                     <FormControl>
                       <Input type="text" placeholder="Enter description" {...field}/>
                     </FormControl>
@@ -105,7 +129,7 @@ export function EditSoilForm({soil}: {soil: TsoilSchema}) {
                 name="color"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Color <span className="font-semibold">(optional)</span></FormLabel>
+                    <FormLabel>Color <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                     <FormControl>
                       <Input type="color" {...field} className="p-1"/>
                     </FormControl>
@@ -131,7 +155,7 @@ export function EditSoilForm({soil}: {soil: TsoilSchema}) {
                   name="startDepth"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>Start Depth (m)</FormLabel>
+                      <FormLabel>Start Depth <span className="font-semibold -ml-1">(m)</span></FormLabel>
                       <FormControl>
                         <NumberInput field={field} placeholder="0"/>
                       </FormControl>
@@ -145,7 +169,7 @@ export function EditSoilForm({soil}: {soil: TsoilSchema}) {
                   name="endDepth"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>End Depth (m)</FormLabel>
+                      <FormLabel>End Depth <span className="font-semibold -ml-1">(m)</span></FormLabel>
                       <FormControl>
                         <NumberInput field={field} placeholder="0"/>
                       </FormControl>
@@ -160,7 +184,7 @@ export function EditSoilForm({soil}: {soil: TsoilSchema}) {
                 name="yMoist"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Moist Unit Weight (γMoist)</FormLabel>
+                    <FormLabel>Moist Unit Weight <span className="font-semibold -ml-1">(γMoist)</span></FormLabel>
                     <FormControl>
                       <div className="relative">
                         <NumberInput field={field} placeholder="0"/>
@@ -177,7 +201,7 @@ export function EditSoilForm({soil}: {soil: TsoilSchema}) {
                 name="ySat"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Saturated Unit Weight (γSat)</FormLabel>
+                    <FormLabel>Saturated Unit Weight <span className="font-semibold -ml-1">(γSat)</span></FormLabel>
                     <FormControl>
                       <div className="relative">
                         <NumberInput field={field} placeholder="0"/>
@@ -216,12 +240,13 @@ export function EditSoilForm({soil}: {soil: TsoilSchema}) {
             <div className="space-y-6 border-y-2 py-3">
               {soil.soilType === "fine" ? (
                 <>
+                  <p className="text-sm text-muted-foreground mb-3 border p-2 border-dotted"> Editing Shear Strength (Su) overrides parameter values.</p>
                   <FormField
                     control={form.control}
                     name="su"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Undrained Shear Soil Strength (Su)</FormLabel>
+                        <FormLabel>Undrained Shear Soil Strength <span className="font-semibold -ml-1">(Su)</span></FormLabel>
                         <FormControl>
                           <div className="relative">
                             <NumberInput field={field} placeholder="Enter Su"/>
@@ -235,12 +260,13 @@ export function EditSoilForm({soil}: {soil: TsoilSchema}) {
                 </>
               ) : (
                 <>
+                  <p className="text-sm text-muted-foreground mb-3 border p-2 border-dotted"> Editing Shear Strength (T) and Angle (φ) overrides parameter values. If both are edited, T takes precedence.</p>
                   <FormField
                     control={form.control}
                     name="angle"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Angle of Internal Friction (φ)</FormLabel>
+                        <FormLabel>Angle of Internal Friction <span className="font-semibold -ml-1">(φ)</span></FormLabel>
                         <FormControl>
                           <div className="relative">
                             <NumberInput field={field} placeholder="Enter Angle"/>
@@ -257,7 +283,7 @@ export function EditSoilForm({soil}: {soil: TsoilSchema}) {
                     name="t"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Shear Soil Strength (T)</FormLabel>
+                        <FormLabel>Shear Soil Strength <span className="font-semibold -ml-1">(T)</span></FormLabel>
                         <FormControl>
                           <div className="relative">
                             <NumberInput field={field} placeholder="Enter T"/>
@@ -276,7 +302,7 @@ export function EditSoilForm({soil}: {soil: TsoilSchema}) {
                   name="qult"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Ultimate Bearing Pressure (Qult)</FormLabel>
+                      <FormLabel>Ultimate Bearing Pressure <span className="font-semibold -ml-1">(Qult)</span></FormLabel>
                       <FormControl>
                         <div className="relative">
                           <NumberInput field={field} placeholder="Enter Qult"/>
