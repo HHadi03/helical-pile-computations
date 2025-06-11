@@ -12,7 +12,7 @@ import { toast } from "sonner"
 import { calculateAll } from "./actions/submitCalculations"
 import { deleteSoil } from "./actions/deleteSoil"
 import { UseFormContext } from "./FormContext"
-import { Calculator, Trash2, Copy, Pencil, Layers, Plus, FolderOpen, EllipsisVertical, PlusCircle} from 'lucide-react'
+import { Calculator, Trash2, Copy, Pencil, Layers, Plus, FolderX, EllipsisVertical, PlusCircle} from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { deleteProfile } from "./actions/deleteProfile"
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -103,7 +103,7 @@ export function SoilTable({ soilsData, profilesData}: { soilsData: TsoilSchema[]
     return (
       <div className="h-full bg-[#F4F3F2] flex items-center justify-center border-2 border-black px-5">
         <div className="text-center">
-          <span className="flex justify-center mb-2"><FolderOpen className="size-10"/></span>
+          <span className="flex justify-center mb-2"><FolderX className="size-10"/></span>
           <h3 className="text-2xl font-semibold mb-2">No Soil Profiles Found</h3>
           <p className="text-gray-600 mb-4">Start by adding a new soil profile to configure soil layers for analysis</p>
           <Link href="/configuration/insert-profile" prefetch={true} scroll={false}>
@@ -166,7 +166,8 @@ export function SoilTable({ soilsData, profilesData}: { soilsData: TsoilSchema[]
                     </Button>
                   </div>
                 ) : (
-                  <Table>
+                  <>
+                  <Table className=''>
                     <TableHeader>
                       <TableRow>
                         <TableHead>Layer</TableHead>
@@ -200,20 +201,20 @@ export function SoilTable({ soilsData, profilesData}: { soilsData: TsoilSchema[]
                       ))}                        
                     </TableBody>
                   </Table>
+
+                    <div>
+                    <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button asChild variant="ghost" size="icon" className="hover:bg-gray-200">
+                        <Link href={`/configuration/insert-soil/${profile.id}`} prefetch={false} scroll={false}> <Plus className="text-muted-foreground size-6"/></Link>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className='bg-gray-200 text-black text-sm rounded' colorCode='bg-gray-200 fill-gray-200'>Add Soil Layer</TooltipContent>
+                  </Tooltip> 
+                  </div>
+                </>
                 )}
               </AccordionContent>
-              
-              <div className='flex justify-end'>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button asChild variant="ghost" size="icon" className="hover:bg-gray-200">
-                      <Link href={`/configuration/insert-soil/${profile.id}`} prefetch={false} scroll={false}> <Plus className="text-muted-foreground size-6"/>Add Soil Layer</Link>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent className='bg-gray-200 text-black text-sm rounded' colorCode='bg-gray-200 fill-gray-200'>Add Soil Layer</TooltipContent>
-                </Tooltip> 
-              </div>
-            
             </AccordionItem>
           )
         })}

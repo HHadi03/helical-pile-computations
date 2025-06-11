@@ -1,6 +1,6 @@
 import { getSoils } from "@/lib/getSoils"
 import { getProfiles } from "@/lib/getProfiles"
-import { ArrowUp, ArrowDown, FolderOpen, ArrowBigRight} from "lucide-react"
+import { ArrowUp, ArrowDown, FolderX, ArrowBigRight} from "lucide-react"
 import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
 import { SoilDepthChart } from "../visualisation/graph"
@@ -22,7 +22,7 @@ const getLuminance = (color: string) => {
 
 export default async function OverviewPage() {
   const supabase = await createClient()
-  const { data, error } = await supabase.auth.getUser()
+  const { data, error } = await supabase.auth.getUser() 
   if (error || !data?.user) {
     redirect('/')
   }
@@ -34,7 +34,7 @@ export default async function OverviewPage() {
     return (
       <div className="h-full bg-[#F4F3F2] flex items-center justify-center border-2 border-black px-5">
         <div className="text-center">
-          <span className="flex justify-center mb-2"><FolderOpen className="size-10"/></span>
+          <span className="flex justify-center mb-2"><FolderX className="size-10"/></span>
           <h3 className="text-2xl font-semibold mb-2">No Soil Profiles Found</h3>
           <p className="text-gray-600 mb-4">Head to the configuration page to add your first soil profile</p>
           <Link href="/configuration" prefetch={true} scroll={false}>
@@ -48,7 +48,7 @@ export default async function OverviewPage() {
   return (
     <section className="h-full overflow-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-600">
 
-      <div className="space-y-12 p-6">
+      <div className="p-6">
         {profilesData.map((profile, index) => {
           let newPileLength: number
           if (profile.pileStickOut > profile.pileLength) {

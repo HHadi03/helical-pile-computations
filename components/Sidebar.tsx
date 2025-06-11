@@ -1,7 +1,7 @@
 'use client'
 import { useState,useEffect } from 'react'
 import { logOut } from '@/app/actions/logOut'
-import { ArrowLeftToLine, ArrowRightToLine, LogOut,Save, FolderOpen, Download, RotateCcw, MessageSquareText, CircleHelp } from 'lucide-react'
+import { ArrowLeftToLine, ArrowRightToLine, LogOut, Save, FolderOpen, SquareArrowOutUpRight, RotateCcw, MessageSquareText, CircleHelp } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -24,7 +24,7 @@ export const Sidebar = () => {
   const navigationItems = [
     { icon: Save, text: "Save", href: "/save"},
     { icon: FolderOpen, text: "Load", href: "/load"},
-    { icon: Download, text: "Export", href: "/export"},
+    { icon: SquareArrowOutUpRight, text: "Export", href: "/export"},
     { icon: RotateCcw, text: "Restart", href: "/restart"},
     { icon: MessageSquareText, text: "Feedback", href: "/feedback"},
     { icon: CircleHelp, text: "Help", href: "/help"},
