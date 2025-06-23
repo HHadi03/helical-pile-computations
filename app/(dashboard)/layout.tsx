@@ -18,7 +18,7 @@ export default function DashboardLayout({
      
       <div className="flex flex-col flex-1 min-h-0">
         <header className="px-5 pt-5">
-          <h1 className="flex justify-center text-2xl font-extrabold text-gray-800">Dashboard</h1>
+          <h1 className="flex justify-center text-2xl font-extrabold">Dashboard</h1>
           <Topbar/>
         </header>
 

@@ -29,6 +29,7 @@ export async function calculateAll(hasCriticalChanges: boolean, isTFieldEdited: 
     const profileData = await getProfiles()
     const soilsData = await getSoils()
 
+    const soilsByProfile = Object.groupBy(soilsData, soil => soil.soilProfileId!)
     const profileCalculations = await Promise.all(profileData.map(async (profile) => {
       try {
         // Calculate in ground pile length
@@ -39,7 +40,7 @@ export async function calculateAll(hasCriticalChanges: boolean, isTFieldEdited: 
           pileLength = profile.pileLength - profile.pileStickOut
         }
 
-        const profileSoils = soilsData.filter((soil) => soil.soilProfileId === profile.id)
+        const profileSoils = soilsByProfile[profile.id!] || []
         const soilCalculations = await Promise.all(profileSoils.map(async (soil) => {
           try {
             // If soil layer starts below pile length, no need to calculate, return true for success message

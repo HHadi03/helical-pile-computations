@@ -17,7 +17,7 @@ import { useState, useEffect } from "react"
 export function EditProfileForm({ profile }: { profile: TsoilProfileSchema }) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("profile")
-  const { setHasUnsavedChanges } = UseFormContext()
+  const { sethasUncalculatedChanges } = UseFormContext()
 
   const form = useForm<TsoilProfileSchema>({
     resolver: zodResolver(soilProfileSchema),
@@ -55,7 +55,7 @@ export function EditProfileForm({ profile }: { profile: TsoilProfileSchema }) {
       }
 
       else {
-        setHasUnsavedChanges(true)
+        sethasUncalculatedChanges(true)
         router.back()
         toast.success(result.message)
       }

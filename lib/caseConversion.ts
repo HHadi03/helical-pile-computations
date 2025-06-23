@@ -1,4 +1,3 @@
-// Simpler version - works great for database records like Supabase data
 export function snakeToCamel(obj: Record<string, unknown>): Record<string, unknown> {
   if (!obj || typeof obj !== 'object' || Array.isArray(obj)) {
     return obj

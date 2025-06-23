@@ -21,7 +21,7 @@ export const Topbar = () => {
               <Link
                 prefetch={false}
                 href={item.href}
-                className={`p-3 block font-semibold relative hover:text-blue-700 hover:bg-blue-100 rounded-lg after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-blue-700 after:transition-transform after:duration-200 after:ease-in-out ${isActive ? 'text-blue-700 after:scale-x-100' : 'text-gray-700 after:scale-x-0 hover:after:scale-x-100'}`}>
+                className={`p-3 block font-semibold relative hover:text-blue-700 hover:bg-blue-100 rounded-lg after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-blue-700 after:transition-transform after:duration-200 after:ease-in-out ${isActive ? 'text-blue-700 after:scale-x-100' : 'text-foreground/70 after:scale-x-0 hover:after:scale-x-100'}`}>
                 {item.label}
               </Link>
             </li>

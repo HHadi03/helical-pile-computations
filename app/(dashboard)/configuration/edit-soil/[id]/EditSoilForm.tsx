@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form"
 import { TsoilSchema, soilSchema} from "@/schemas/soilSchema"
 import { updateSoil } from "@/app/(dashboard)/configuration/actions/updateSoil"
 import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { useRouter } from "next/navigation"
 import { NumberInput } from "@/components/NumberInput"
 import { useEffect, useState } from "react"
@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input"
 export function EditSoilForm({soil}: {soil: TsoilSchema}) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState ("parameters")
-  const { setHasUnsavedChanges, setCriticalChanges, setTFieldEdited } = UseFormContext()
+  const { sethasUncalculatedChanges, setCriticalChanges, setTFieldEdited } = UseFormContext()
 
   const form = useForm<TsoilSchema>({
     resolver: zodResolver(soilSchema),
@@ -73,7 +73,7 @@ export function EditSoilForm({soil}: {soil: TsoilSchema}) {
       }
 
       else {
-        setHasUnsavedChanges(true)
+        sethasUncalculatedChanges(true)
         router.back()
         toast.success(result.message)
       }

@@ -2,14 +2,14 @@
 import { createContext, useContext, useState } from 'react'
 
 type FormEditState = {
-  hasUnsavedChanges: boolean
+  hasUncalculatedChanges: boolean
   hasCriticalChanges: boolean
   isTFieldEdited: boolean
 }
 
 type FormEditContextType = {
   formEditStates: FormEditState
-  setHasUnsavedChanges: (value: boolean) => void
+  sethasUncalculatedChanges: (value: boolean) => void
   setCriticalChanges: (value: boolean) => void
   setTFieldEdited: (value: boolean) => void
   isAnyFormEdited: boolean
@@ -21,16 +21,12 @@ type FormEditContextType = {
 const FormEditContext = createContext<FormEditContextType | undefined>(undefined)
 
 export function FormContextProvider({ children }: { children: React.ReactNode }) {
-  const [formEditStates, setFormEditStates] = useState<FormEditState>({
-    hasUnsavedChanges: false,
-    hasCriticalChanges: false,
-    isTFieldEdited: false
-  })
+  const [formEditStates, setFormEditStates] = useState<FormEditState>({hasUncalculatedChanges: false, hasCriticalChanges: false, isTFieldEdited: false})
 
-  const setHasUnsavedChanges = (value: boolean) => {
+  const sethasUncalculatedChanges = (value: boolean) => {
     setFormEditStates(prev => ({
       ...prev,
-      hasUnsavedChanges: value
+      hasUncalculatedChanges: value
     }))
   }
 
@@ -48,19 +44,17 @@ export function FormContextProvider({ children }: { children: React.ReactNode })
     }))
   }
 
-  const isAnyFormEdited = formEditStates.hasUnsavedChanges
+  const isAnyFormEdited = formEditStates.hasUncalculatedChanges
   const hasCriticalChanges = formEditStates.hasCriticalChanges
   const isTFieldEdited = formEditStates.isTFieldEdited
 
-  const resetFormStates = () => {
-    setFormEditStates({hasUnsavedChanges: false, hasCriticalChanges: false, isTFieldEdited: false})
-  }
+  const resetFormStates = () => {setFormEditStates({hasUncalculatedChanges: false, hasCriticalChanges: false, isTFieldEdited: false})}
 
   return (
     <FormEditContext.Provider 
       value={{ 
         formEditStates, 
-        setHasUnsavedChanges,
+        sethasUncalculatedChanges,
         setCriticalChanges,
         setTFieldEdited,
         isAnyFormEdited,

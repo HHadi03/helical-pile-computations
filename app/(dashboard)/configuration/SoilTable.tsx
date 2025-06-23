@@ -12,11 +12,10 @@ import { toast } from "sonner"
 import { calculateAll } from "./actions/submitCalculations"
 import { deleteSoil } from "./actions/deleteSoil"
 import { UseFormContext } from "./FormContext"
-import { Calculator, Trash2, Copy, Pencil, Layers, Plus, FolderX, EllipsisVertical, PlusCircle} from 'lucide-react'
+import { Calculator, Trash2, Copy, Pencil, Layers, Plus, EllipsisVertical, PlusCircle, Ellipsis} from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { deleteProfile } from "./actions/deleteProfile"
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 
 const soilTypeCapitalisation = {
   'fine': 'Fine Grain',
@@ -99,40 +98,25 @@ export function SoilTable({ soilsData, profilesData}: { soilsData: TsoilSchema[]
     console.log("MEOW" + profileId)
   }
 
-  if (profilesData.length === 0) {
-    return (
-      <div className="h-full bg-[#F4F3F2] flex items-center justify-center border-2 border-black px-5">
-        <div className="text-center">
-          <span className="flex justify-center mb-2"><FolderX className="size-10"/></span>
-          <h3 className="text-2xl font-semibold mb-2">No Soil Profiles Found</h3>
-          <p className="text-gray-600 mb-4">Start by adding a new soil profile to configure soil layers for analysis</p>
-          <Link href="/configuration/insert-profile" prefetch={true} scroll={false}>
-            <Button className="w-80 rounded-lg text-white shadow-md hover:shadow-xl"><Plus className="size-6"/>Add Soil Profile</Button>
-          </Link>
-        </div>
-      </div>
-    )
-  }
-
+  const soilsByProfile = Object.groupBy(soilsData, soil => soil.soilProfileId!)
   return (
     <div className="mx-3">
-      {profilesData.length > 0 && (
-        <div className="flex justify-end mb-3">
-          <div className="flex flex-row border border-gray-300 shadow-xs rounded-md">
-            <Button variant="ghost" className="w-52 border-r border-gray-300 rounded-none hover:bg-green-100" onClick={() => handleCalculate()} disabled={!isAnyFormEdited || soilsData.length === 0 || isCalculating}>
-              {isCalculating ? (<> <span className="pr-2 size-5 animate-spin rounded-full border-2 border-solid border-green-700 border-t-transparent"></span>Calculating...</>)
-              : (<> <Calculator className="text-green-700"/> Perform Calculations </> )}
-            </Button>
-            <Button asChild variant="ghost" className="w-48 hover:bg-zinc-200 rounded-none">
-              <Link href="/configuration/insert-profile" prefetch={true} scroll={false}><Plus className="text-zinc-600 size-5"/>Add Soil Profile</Link>
-            </Button>
-          </div>
+  
+      <div className="flex justify-end mb-3">
+        <div className="flex flex-row border border-gray-300 shadow-xs rounded-md">
+          <Button variant="ghost" className="w-52 border-r border-gray-300 rounded-none hover:bg-green-100" onClick={() => handleCalculate()} disabled={!isAnyFormEdited || soilsData.length === 0 || isCalculating}>
+            {isCalculating ? (<> <span className="pr-2 size-5 animate-spin rounded-full border-2 border-solid border-green-700 border-t-transparent"></span>Calculating...</>)
+            : (<> <Calculator className="text-green-700"/> Perform Calculations </> )}
+          </Button>
+          <Button asChild variant="ghost" className="w-48 hover:bg-zinc-200 rounded-none">
+            <Link href="/configuration/insert-profile" prefetch={true} scroll={false}><Plus className="text-zinc-600 size-5"/>Add Soil Profile</Link>
+          </Button>
         </div>
-      )}
+      </div>
       
       <Accordion type="multiple" className="space-y-6">
         {profilesData.map((profile, index) => {
-          const profileSoils = soilsData.filter((soil) => soil.soilProfileId === profile.id)
+          const profileSoils = soilsByProfile[profile.id!] || []
           return (
             <AccordionItem key={profile.id} value={profile.id!}>
             
@@ -158,16 +142,16 @@ export function SoilTable({ soilsData, profilesData}: { soilsData: TsoilSchema[]
               <AccordionContent className='border-b border-x border-gray-300'>
                 {profileSoils.length === 0 ? (
                   <div className="flex flex-col items-center bg-[#f7f7f7] py-5">
-                    <Layers className="mb-2 size-8 text-gray-700"/>
+                    <Layers className="mb-2 size-8 text-muted-foreground"/>
                     <h3 className="font-medium">No soil layers detected</h3>
-                    <p className="mt-1 text-sm text-gray-600">Add soil layers to begin analysis</p>
+                    <p className="mt-1 text-sm text-muted-foreground">Add soil layers to begin analysis</p>
                     <Button asChild variant="outline" className="mt-2 border border-gray-300 hover:bg-blue-100">
-                      <Link href={`/configuration/insert-soil/${profile.id}`} prefetch={false} scroll={false}> <PlusCircle className="text-blue-500 size-5"/>Add Soil Layer </Link>
+                      <Link href={`/configuration/insert-soil/${profile.id}`} prefetch={false} scroll={false}> <PlusCircle className="text-blue-500 size-5"/>Add Soil Layer</Link>
                     </Button>
                   </div>
                 ) : (
                   <>
-                  <Table className=''>
+                  <Table>
                     <TableHeader>
                       <TableRow>
                         <TableHead>Layer</TableHead>
@@ -180,12 +164,12 @@ export function SoilTable({ soilsData, profilesData}: { soilsData: TsoilSchema[]
                         <TableHead>Moist Unit Weight</TableHead>
                         <TableHead>SPT N-value</TableHead>
                         <TableHead>Description</TableHead>
-                        <TableHead className='text-right font-light'>Actions</TableHead>
+                        <TableHead></TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {profileSoils.map((soil, index) => (
-                        <TableRow key={soil.id} onDoubleClick={() => router.push(`/configuration/edit-soil/${soil.id}`, { scroll: false })} className="cursor-pointer hover:bg-gray-100">
+                        <TableRow key={soil.id} className="hover:bg-gray-100">
                           <TableCell>{index + 1}</TableCell>
                           <TableCell>{soilTypeCapitalisation[soil.soilType]}</TableCell>
                           <TableCell>{soilDensityCapitalisation[soil.density]}</TableCell>
@@ -196,7 +180,18 @@ export function SoilTable({ soilsData, profilesData}: { soilsData: TsoilSchema[]
                           <TableCell>{`${soil.yMoist} kN/m³`}</TableCell>
                           <TableCell>{soil.nValue}</TableCell>
                           <TableCell>{soil.description}</TableCell>
-                          <TableCell className="text-right"><Button variant="outline" size="icon" className="size-6 hover:bg-red-200" onClick={(e) => {e.stopPropagation(); setSelectedSoil(soil.id!); setisSoilDeleteDialogOpen(true)}}><Trash2 className="text-red-500"/></Button></TableCell>
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="focus-visible:ring-transparent hover:bg-gray-200"><Ellipsis className='size-5 text-muted-foreground'/></Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-40 shadow-xl" sideOffset={-2}>
+                                <DropdownMenuItem onClick={() => router.push(`/configuration/edit-profile/${profile.id}`, { scroll: false })} className='hover:cursor-pointer'>Soil</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => router.push(`/configuration/edit-profile/${profile.id}`, { scroll: false })} className='hover:cursor-pointer'>Parameters</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() =>router.push(`/configuration/edit-profile/${profile.id}`, { scroll: false })} className='hover:cursor-pointer'>Engineered</DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
                         </TableRow>
                       ))}                        
                     </TableBody>

@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
 
-export async function NotFound() {
+export const NotFound = async () => {
   const supabase = await createClient()
   const { data, error } = await supabase.auth.getUser()
   if (error || !data?.user) {

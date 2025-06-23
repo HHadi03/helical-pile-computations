@@ -57,7 +57,7 @@ export const Sidebar = () => {
                   {!expanded ? (
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Link href={item.href} className="text-gray-700 font-medium py-2 px-3 flex gap-3">
+                        <Link href={item.href} className="font-medium py-2 px-3 flex gap-3">
                           <item.icon className='size-6 text-blue-800 shrink-0'/>
                           <span className={`transition-opacity duration-300 delay-100 ${ expanded ? 'opacity-100' : 'opacity-0 overflow-hidden'}`}> {item.text}</span>
                         </Link>
@@ -67,7 +67,7 @@ export const Sidebar = () => {
                       </TooltipContent>
                     </Tooltip>
                   ) : (
-                    <Link href={item.href} className="text-gray-700 font-medium py-2 px-3 flex gap-3">
+                    <Link href={item.href} className="font-medium py-2 px-3 flex gap-3">
                       <item.icon className='size-6 text-blue-800 shrink-0'/>
                       <span className={`transition-opacity duration-300 delay-100 ${ expanded ? 'opacity-100' : 'opacity-0 overflow-hidden'}`}> {item.text}</span>
                     </Link>
@@ -81,7 +81,7 @@ export const Sidebar = () => {
         {!expanded ? (
           <Tooltip>
             <TooltipTrigger asChild>
-              <button type="submit" className="text-gray-700 font-medium py-2 px-3 flex gap-3 rounded-lg hover:bg-gray-200" onClick={async () => await logOut()}>
+              <button type="submit" className="font-medium py-2 px-3 flex gap-3 rounded-lg hover:bg-gray-200" onClick={async () => await logOut()}>
                 <LogOut className="size-6 rotate-180 shrink-0"/>
                 <span className={`transition-opacity duration-300 delay-100 whitespace-nowrap ${ expanded ? 'opacity-100 ': 'opacity-0'}`}>Log Out</span>
               </button>
@@ -91,7 +91,7 @@ export const Sidebar = () => {
             </TooltipContent>
           </Tooltip>
         ) : (
-          <button type="submit" className="text-gray-700 font-medium py-2 px-3 flex gap-3 rounded-lg hover:bg-gray-200" onClick={async () => await logOut()}>
+          <button type="submit" className="font-medium py-2 px-3 flex gap-3 rounded-lg hover:bg-gray-200" onClick={async () => await logOut()}>
             <LogOut className="size-6 rotate-180 shrink-0"/>
             <span className={`transition-opacity duration-300 delay-100 whitespace-nowrap ${ expanded ? 'opacity-100 ': 'opacity-0'}`}>Log Out</span>
           </button>
