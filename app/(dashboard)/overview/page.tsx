@@ -26,13 +26,15 @@ export default async function OverviewPage() {
 
   if (profilesData.length === 0) {
     return (
-      <section className="h-full bg-[#F4F3F2] flex flex-col items-center text-center justify-center border-2 border-black px-5">
-        <span className="flex justify-center mb-2"><FolderX className="size-10 text-foreground/75"/></span>
-        <h3 className="text-2xl font-semibold mb-2">No Soil Profiles Found</h3>
-        <p className="text-muted-foreground mb-4">Head to the configuration page to add your first soil profile</p>
-        <Button asChild className="w-80 rounded-lg shadow-md hover:shadow-xl">
-          <Link href="/configuration" prefetch={true} scroll={false}><ArrowBigRight className="size-6"/>Go to Configuration</Link>
-        </Button>
+      <section className="flex items-center justify-center h-full bg-secondary border-2 border-foreground overflow-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-600">
+        <div className="flex flex-col text-center items-center">
+          <span className="flex justify-center mb-2"><FolderX className="size-10 text-muted-foreground"/></span>
+          <h3 className="text-2xl font-semibold mb-2">No Soil Profiles Found</h3>
+          <p className="mb-4 text-muted-foreground">Head to the configuration page to add your first soil profile</p>
+          <Button asChild className="w-80">
+            <Link href="/configuration" prefetch={true} scroll={false}><ArrowBigRight className="size-6"/>Go to Configuration</Link>
+          </Button>
+        </div>
       </section>
     )
   }

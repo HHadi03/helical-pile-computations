@@ -85,7 +85,7 @@ export function ProfileForm() {
                   <FormItem>
                     <FormLabel>Profile Name <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                     <FormControl>
-                      <Input type="text" placeholder="Enter profile name" {...field} />
+                      <Input type="text" placeholder="Custom label for soil profile" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -145,9 +145,7 @@ export function ProfileForm() {
             </div>
             
             <div className="pt-2 flex justify-between">
-              <Button type="submit" className="w-32" disabled={isSubmitting}>
-                {isSubmitting ? (<> <Loader2 className="mr-2 h-4 w-4 animate-spin"/> Submitting... </>) : ("Submit")}
-              </Button>
+              <Button type="submit" className="w-32" disabled={isSubmitting}> {isSubmitting ? (<> <Loader2 className="mr-2 size-4 animate-spin"/> Submitting... </>) : ("Submit")}</Button>
               <Button type="button" variant="outline" disabled={isSubmitting} onClick={router.back}>Close</Button>
             </div>
           </TabsContent>

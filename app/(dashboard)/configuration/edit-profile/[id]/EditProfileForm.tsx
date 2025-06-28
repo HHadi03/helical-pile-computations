@@ -8,7 +8,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useRouter } from "next/navigation"
 import { NumberInput } from "@/components/NumberInput"
 import { Input } from "@/components/ui/input"
-import { UseFormContext } from "../../FormContext"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -17,7 +16,6 @@ import { useState, useEffect } from "react"
 export function EditProfileForm({ profile }: { profile: TsoilProfileSchema }) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("profile")
-  const { sethasUncalculatedChanges } = UseFormContext()
 
   const form = useForm<TsoilProfileSchema>({
     resolver: zodResolver(soilProfileSchema),
@@ -55,7 +53,6 @@ export function EditProfileForm({ profile }: { profile: TsoilProfileSchema }) {
       }
 
       else {
-        sethasUncalculatedChanges(true)
         router.back()
         toast.success(result.message)
       }
@@ -75,7 +72,7 @@ export function EditProfileForm({ profile }: { profile: TsoilProfileSchema }) {
           </TabsList>
 
           <TabsContent value="profile" className="focus-visible:ring-transparent">
-            <div className="space-y-8 border-y-2 py-3">
+            <div className="space-y-6 border-y-2 py-3">
               <FormField
                 control={form.control}
                 name="profileName"
@@ -145,9 +142,7 @@ export function EditProfileForm({ profile }: { profile: TsoilProfileSchema }) {
             </div>
 
             <div className="pt-2 flex justify-between">
-              <Button type="submit" className="w-28" disabled={!isDirty || isSubmitting}>
-                {isSubmitting ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</>) : ("Save")}
-              </Button>
+              <Button type="submit" className="w-28" disabled={!isDirty || isSubmitting}> {isSubmitting ? (<><Loader2 className="mr-2 size-4 animate-spin" />Saving...</>) : ("Save")}</Button>
               <Button type="button" variant="outline" disabled={isSubmitting} onClick={router.back}>Close</Button>
             </div>
           </TabsContent>

@@ -32,10 +32,10 @@ export const soilSchema = z.object({
       message: "End Depth must be greater than Start Depth",
     }
   ).refine(
-    (data) => data.soilName === undefined || data.soilName.length <= 15,
+    (data) => data.soilName === undefined || data.soilName.length <= 25,
     {
       path: ['soilName'],
-      message: "Name must be less than 15 characters long"
+      message: "Name must be less than 25 characters long"
     }
   )
   .refine(

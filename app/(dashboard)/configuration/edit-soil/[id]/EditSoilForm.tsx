@@ -8,7 +8,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useRouter } from "next/navigation"
 import { NumberInput } from "@/components/NumberInput"
 import { useEffect, useState } from "react"
-import { UseFormContext } from "../../FormContext"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -17,27 +16,13 @@ import { Input } from "@/components/ui/input"
 export function EditSoilForm({soil}: {soil: TsoilSchema}) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState ("parameters")
-  const { sethasUncalculatedChanges, setCriticalChanges, setTFieldEdited } = UseFormContext()
-
+ 
   const form = useForm<TsoilSchema>({
     resolver: zodResolver(soilSchema),
     defaultValues: {...soil}
   })
 
   const { formState: { isDirty, isSubmitting } } = form
-
-  useEffect(() => {
-    const subscription = form.watch((_, { name }) => {
-      if (name === 't') {
-        setTFieldEdited(true)
-      } 
-      
-      else if (name === 'su' || name === 'qult' || name === 'angle') {
-        setCriticalChanges(true)
-      }
-    })
-    return () => subscription.unsubscribe()
-  }, [form, setTFieldEdited, setCriticalChanges])
   
   useEffect(() => {
     const errorFields = Object.keys(form.formState.errors)
@@ -73,7 +58,6 @@ export function EditSoilForm({soil}: {soil: TsoilSchema}) {
       }
 
       else {
-        sethasUncalculatedChanges(true)
         router.back()
         toast.success(result.message)
       }
@@ -240,7 +224,6 @@ export function EditSoilForm({soil}: {soil: TsoilSchema}) {
             <div className="space-y-6 border-y-2 py-3">
               {soil.soilType === "fine" ? (
                 <>
-                  <p className="text-sm text-muted-foreground mb-3 border p-2 border-dotted"> Editing Shear Strength (Su) overrides parameter values.</p>
                   <FormField
                     control={form.control}
                     name="su"
@@ -260,7 +243,6 @@ export function EditSoilForm({soil}: {soil: TsoilSchema}) {
                 </>
               ) : (
                 <>
-                  <p className="text-sm text-muted-foreground mb-3 border p-2 border-dotted"> Editing Shear Strength (T) and Angle (φ) overrides parameter values. If both are edited, T takes precedence.</p>
                   <FormField
                     control={form.control}
                     name="angle"
@@ -316,9 +298,7 @@ export function EditSoilForm({soil}: {soil: TsoilSchema}) {
             </div>
 
             <div className="pt-2 flex justify-between">
-            <Button type="submit" className="w-28" disabled={!isDirty || isSubmitting}>
-              {isSubmitting ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin"/>Saving...</>) : ("Save")}
-            </Button>
+              <Button type="submit" className="w-28" disabled={!isDirty || isSubmitting}> {isSubmitting ? (<><Loader2 className="mr-2 size-4 animate-spin" />Saving...</>) : ("Save")}</Button>
               <Button type="button" variant="outline" disabled={isSubmitting} onClick={router.back}>Close</Button>
             </div>
           </TabsContent>
@@ -327,10 +307,3 @@ export function EditSoilForm({soil}: {soil: TsoilSchema}) {
     </Form>
   )
 }
-
-// if  n value and t is edited, then t takes precident
-// if n value is edited and angle is edited, angle takes precident
-// if angle and t is edited, t takes precident again 
-// if n vlue and su is edited, su takes precident
-// if only n value edited, it uses them numbers.
-

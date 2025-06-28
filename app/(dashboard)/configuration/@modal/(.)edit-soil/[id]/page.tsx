@@ -9,7 +9,7 @@ export default async function EditSoilModal({params}:{params: Promise<{id: strin
   if (!soilData) {
     return (
       <Modal title="Edit Soil Layer">
-        <div className="text-red-500 text-sm">
+        <div className="text-destructive text-sm flex justify-center">
           <p>Could not find soil data</p>
         </div>
       </Modal>
