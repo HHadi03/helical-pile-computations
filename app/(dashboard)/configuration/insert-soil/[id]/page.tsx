@@ -14,13 +14,12 @@ export default async function InsertSoilPage({params}:{params: Promise<{id: stri
   const { id } =  await params
   const soilsData = await getSoils()
 
-  const {data: profileData, error: profileError} = await supabase
+  const {error: profileError} = await supabase
   .from("soil_profiles")
   .select("id")
-
-  const validId = profileData!.some((profile) => profile.id === id)
+  .eq("id", id)
   
-  if (!validId || profileError){
+  if (profileError){
     return <NotFound/>
   }
 

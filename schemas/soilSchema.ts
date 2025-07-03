@@ -39,10 +39,10 @@ export const soilSchema = z.object({
     }
   )
   .refine(
-    (data) => data.description === undefined || data.description.length <= 75,
+    (data) => data.description === undefined || data.description.length <= 60,
     {
       path: ['description'],
-      message: "Description must be less than 75 characters long"
+      message: "Description must be less than 60 characters long"
     }
   )
   .refine(

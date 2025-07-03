@@ -58,7 +58,7 @@ function AccordionContent({
       className="overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
       {...props}
     >
-      <div className={cn("", className)}>{children}</div>
+      {children}
     </AccordionPrimitive.Content>
   )
 }

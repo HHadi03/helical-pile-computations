@@ -10,7 +10,7 @@ import type { TsoilSchema } from "@/schemas/soilSchema"
 import { TsoilProfileSchema } from "@/schemas/soilProfileSchema"
 import { toast } from "sonner"
 import { deleteSoil } from "./actions/deleteSoil"
-import { Trash2, Copy, Pencil, Layers, Plus, EllipsisVertical, PlusCircle, Ellipsis} from 'lucide-react'
+import { Trash2, Copy, Pencil, Layers, Plus, EllipsisVertical, Ellipsis, RotateCcw} from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { deleteProfile } from "./actions/deleteProfile"
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -99,7 +99,7 @@ export function SoilTable({ soilsData, profilesData}: { soilsData: TsoilSchema[]
                 <div className="absolute top-0 right-0 mt-1.5 border-l-2">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="mx-2 hover:bg-secondary-foreground/7 dark:hover:bg-secondary-foreground/7"><EllipsisVertical className='size-6 text-muted-foreground'/></Button>
+                      <Button variant="ghost" size="icon" className="mx-2 hover:bg-foreground/7 dark:hover:bg-foreground/7"><EllipsisVertical className='size-6 text-muted-foreground'/></Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-42" sideOffset={-2}>
                       <DropdownMenuLabel className='font-semibold'>{profile.profileName ? profile.profileName : `Soil Profile ${index + 1}`}</DropdownMenuLabel>
@@ -112,14 +112,14 @@ export function SoilTable({ soilsData, profilesData}: { soilsData: TsoilSchema[]
                 </div>
               </div>
 
-              <AccordionContent className='border-b border-x'>
+              <AccordionContent>
                 {profileSoils.length === 0 ? (
-                  <div className="flex flex-col items-center text-center bg-secondary py-5">
+                  <div className="flex flex-col items-center text-center py-5 border-b border-x">
                     <Layers className="mb-2 size-8 text-muted-foreground"/>
                     <h3>No soil layers detected</h3>
                     <p className="mt-1 text-muted-foreground">Add soil layers to begin analysis</p>
-                    <Button asChild variant="outline" className="mt-2 border border-gray-300 hover:bg-blue-100">
-                      <Link href={`/configuration/insert-soil/${profile.id}`} prefetch={false} scroll={false}> <PlusCircle className="text-blue-500 size-5"/>Add Soil Layer</Link>
+                    <Button asChild variant="outline" className="mt-2">
+                      <Link href={`/configuration/insert-soil/${profile.id}`} prefetch={false} scroll={false}>Add Soil Layer</Link>
                     </Button>
                   </div>
                 ) : (
@@ -136,7 +136,7 @@ export function SoilTable({ soilsData, profilesData}: { soilsData: TsoilSchema[]
                           <TableHead>Sat Unit Weight</TableHead>
                           <TableHead>Moist Unit Weight</TableHead>
                           <TableHead>SPT N-value</TableHead>
-                          <TableHead>Description</TableHead>
+                          <TableHead className='hidden xl:table-cell'>Description</TableHead>
                           <TableHead></TableHead>
                         </TableRow>
                       </TableHeader>
@@ -152,11 +152,11 @@ export function SoilTable({ soilsData, profilesData}: { soilsData: TsoilSchema[]
                             <TableCell>{`${soil.ySat} kN/m³`}</TableCell>
                             <TableCell>{`${soil.yMoist} kN/m³`}</TableCell>
                             <TableCell>{soil.nValue}</TableCell>        
-                            <TableCell>{soil.description}</TableCell>
+                            <TableCell className='hidden xl:table-cell'>{soil.description}</TableCell>
                             <TableCell className="text-right">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button variant="outline" size="sm"><Ellipsis className='size-5 text-muted-foreground'/></Button>
+                                  <Button variant="outline" size="sm" className='hover:bg-foreground/7 dark:hover:bg-foreground/7'><Ellipsis className='size-5 text-muted-foreground'/></Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-40">
                                   <DropdownMenuLabel className='text-foreground/70'>Edit Soil...</DropdownMenuLabel>
@@ -172,6 +172,15 @@ export function SoilTable({ soilsData, profilesData}: { soilsData: TsoilSchema[]
                         ))}                        
                       </TableBody>
                     </Table>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button asChild variant="ghost" size="icon" className="hover:bg-gray-200">
+                          <Link href={`/configuration/insert-soil/${profile.id}`} prefetch={false} scroll={false}> <Plus className="text-muted-foreground size-6"/></Link>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent className='bg-gray-200 text-black text-sm rounded'>Add Soil Layer</TooltipContent>
+                    </Tooltip> 
                   </>
                 )}
               </AccordionContent>

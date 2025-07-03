@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { SoilGraph } from "./SoilGraph"
 import { SoilDiagram } from "./SoilDiagram"
 import { ToggleButton } from "./ToggleButton"
+import { Fragment } from "react"
 
 export const metadata = {
   title: "Overview | Helical Pile Computations",
@@ -26,9 +27,9 @@ export default async function OverviewPage() {
 
   if (profilesData.length === 0) {
     return (
-      <section className="flex items-center justify-center h-full bg-secondary border-2 border-foreground overflow-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-600">
-        <div className="flex flex-col text-center items-center">
-          <span className="flex justify-center mb-2"><FolderX className="size-10 text-muted-foreground"/></span>
+      <section className="bg-secondary border-2 border-foreground grid place-items-center h-full overflow-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-600">
+       <div className="text-center py-5">
+          <FolderX className="size-10 text-muted-foreground mb-2 mx-auto"/>
           <h3 className="text-2xl font-semibold mb-2">No Soil Profiles Found</h3>
           <p className="mb-4 text-muted-foreground">Head to the configuration page to add your first soil profile</p>
           <Button asChild className="w-80">
@@ -42,21 +43,19 @@ export default async function OverviewPage() {
   const soilsByProfile = Object.groupBy(soilsData, soil => soil.soilProfileId!)
   return (
     <section className="h-full overflow-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-600">
-
-      <div className="mx-3">
+      <div className="mx-3 my-1">
         {profilesData.map((profile, index) => {
           const profileSoils = soilsByProfile[profile.id!] || []
           return (
-            <div key={profile.id} className="border-2 border-yellow-500 mt-5">
+            <Fragment key={profile.id}>
               <ToggleButton>
                 <SoilDiagram profile={profile} profileSoils={profileSoils} index={index}/>
                 <SoilGraph profileSoils={profileSoils}/>
               </ToggleButton>
-            </div>
+            </Fragment>
           )
         })}
       </div>
-
     </section>
   )
 }

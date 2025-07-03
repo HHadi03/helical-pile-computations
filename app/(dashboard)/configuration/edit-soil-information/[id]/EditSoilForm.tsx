@@ -1,61 +1,44 @@
 "use client"
-import { Loader2} from "lucide-react"
-import { useEffect, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { soilOptions, soilProperties } from "./soilData"
-import { soilSchema, TsoilSchema } from "@/schemas/soilSchema"
-import { insertSoil } from "../../actions/insertSoil"
+import { TsoilSchema, soilSchema} from "@/schemas/soilSchema"
+import { updateSoil } from "@/app/(dashboard)/configuration/actions/updateSoil"
 import { Button } from "@/components/ui/button"
-import { toast } from "sonner"
-import { Input } from "@/components/ui/input"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import { useRouter } from "next/navigation"
 import { NumberInput } from "@/components/NumberInput"
-import { createPortal } from 'react-dom'
-import Image from 'next/image'
+import { useEffect, useState } from "react"
+import { Loader2 } from "lucide-react"
+import { toast } from "sonner"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Input } from "@/components/ui/input"
+import { soilOptions,soilProperties } from "../../insert-soil/[id]/soilData"
 
-export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: number, profileId: string}) {
+export function EditSoilForm({soil}: {soil: TsoilSchema}) {
   const router = useRouter()
-  const [activeTab, setActiveTab] = useState("soil")
-  
+  const [activeTab, setActiveTab] = useState ("parameters")
+ 
   const form = useForm<TsoilSchema>({
     resolver: zodResolver(soilSchema),
-    defaultValues: {
-      soilType: undefined,
-      density: undefined,
-      soil: undefined,
-      startDepth: previousEndDepth || "" as unknown as number,
-      endDepth: "" as unknown as number,
-      nValue: "" as unknown as number,
-      yMoist: undefined,
-      ySat: undefined,
-      soilName: "",
-      description: "",
-      color: "#e5e5e5"
-    }
+    defaultValues: {...soil}
   })
+
+  const { formState: { isDirty, isSubmitting } } = form
+    const soilType = form.watch("soilType")
   
-  const { formState: { isSubmitting } } = form
-
-  const soilType = form.watch("soilType")
-  const soil = form.watch("soil")
-  const density = form.watch("density")
-  const showParametersTab = Boolean(soilType && soil && density)
-
   useEffect(() => {
     const errorFields = Object.keys(form.formState.errors)
 
     if (errorFields.length === 0) return
     
-    const soilTabFields = ["soilType", "soil", "density", "soilName", "description", "color"]
+    const soilTabFields = ["soilName", "description", "color"]
     const parametersTabFields = ["startDepth", "endDepth", "yMoist", "ySat", "nValue"]
+    const engineeredTabFields = ["su", "angle", "t", "qult"]
 
     const hasSoilErrors = errorFields.some(field => soilTabFields.includes(field))
     const hasParameterErrors = errorFields.some(field => parametersTabFields.includes(field))
+    const hasEngineeredErrors = errorFields.some(field => engineeredTabFields.includes(field))
 
     if (hasSoilErrors) {
       setActiveTab("soil")
@@ -63,32 +46,17 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
     else if (hasParameterErrors) {
       setActiveTab("parameters")
     }
+    else if (hasEngineeredErrors) {
+      setActiveTab("engineered")
+    }
   }, [form.formState.errors])
-
-  useEffect(() => {
-    if (soil && density && soilProperties[soil]) {
-      const values = soilProperties[soil][density]
-      form.setValue("yMoist", values.yMoist)
-      form.setValue("ySat", values.ySat)
-    }
-  }, [soil, density, form])
-
-  useEffect(() => {
-    form.resetField("soil")
-  }, [soilType, form])
-
-  const handleNext = () => {
-    if (soilType && soil && density) {
-      setActiveTab("parameters")
-    }
-  }
 
   async function onSubmit(values: TsoilSchema) {
     try {
-      const result = await insertSoil(values, profileId)
+      const result = await updateSoil(values)
 
       if (result.errors) {
-        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TsoilSchema, { message: Array.isArray(value) ? value[0] : (value as string) })})
+        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TsoilSchema, { message: Array.isArray(value) ? value[0] : String(value) })})
         toast.error(result.message)
       }
 
@@ -100,17 +68,19 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
     } catch {
       toast.error("An unexpected error has occurred.", { description: "Please try again later." })
     }
-  }
+  } 
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+        
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="soil">Soil</TabsTrigger>
-            {showParametersTab && <TabsTrigger value="parameters">Parameters</TabsTrigger>}
+            <TabsTrigger value="parameters">Parameters</TabsTrigger>
+            <TabsTrigger value="engineered">Engineered</TabsTrigger>
           </TabsList>
-      
+
           <TabsContent value="soil" className="focus-visible:ring-transparent">
             <div className="space-y-6 border-y-2 py-3">
               <div className="flex gap-4 items-start">
@@ -187,9 +157,9 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Soil Description <span className="font-semibold -ml-1">(optional)</span></FormLabel>
+                    <FormLabel>Description <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                     <FormControl>
-                      <Input type="text" placeholder="Brief description of soil composition" {...field} />
+                      <Input type="text" placeholder="Brief description of soil composition" {...field}/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -210,7 +180,7 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                     </FormItem>
                   )}
                 />
-                  
+
                 <FormField
                   control={form.control}
                   name="color"
@@ -218,7 +188,7 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                     <FormItem className="w-32">
                       <FormLabel>Color <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                       <FormControl>
-                        <Input type="color" {...field} className="w-full p-1"/>
+                        <Input type="color" {...field} className="p-1"/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -228,12 +198,14 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
             </div>
 
             <div className="pt-2 flex justify-between">
-              <Button type="button" className="w-32" onClick={handleNext} disabled={!showParametersTab}>Next</Button>
-              <Button type="button" variant="outline" onClick={router.back}>Close</Button>
+              <Button type="submit" className="w-28" disabled={!isDirty || isSubmitting}>
+                {isSubmitting ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</>) : ("Save")}
+              </Button>
+              <Button type="button" variant="outline" disabled={isSubmitting} onClick={router.back}>Close</Button>
             </div>
           </TabsContent>
-
-          {showParametersTab && (<TabsContent value="parameters" className="focus-visible:ring-transparent">
+          
+          <TabsContent value="parameters" className="focus-visible:ring-transparent">
             <div className="space-y-6 border-y-2 py-3">
               <div className="flex gap-4 items-start">
                 <FormField
@@ -264,7 +236,7 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                   )}
                 />
               </div>
-
+              
               <FormField
                 control={form.control}
                 name="yMoist"
@@ -308,18 +280,102 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                     <FormControl>
                       <NumberInput field={field} placeholder="0"/>
                     </FormControl>
-                    <FormMessage/>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
 
             <div className="pt-2 flex justify-between">
-              <Button type="submit" className="w-32" disabled={isSubmitting}> {isSubmitting ? (<> <Loader2 className="mr-2 size-4 animate-spin"/> Submitting... </>) : ("Submit")}</Button>
+              <Button type="submit" className="w-28" disabled={!isDirty || isSubmitting}>
+                {isSubmitting ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</>) : ("Save")}
+              </Button>
               <Button type="button" variant="outline" disabled={isSubmitting} onClick={router.back}>Close</Button>
             </div>
-          </TabsContent>)}
+          </TabsContent>
+          
+          <TabsContent value="engineered" className="focus-visible:ring-transparent">
+            <div className="space-y-6 border-y-2 py-3">
+              {soil.soilType === "fine" ? (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="su"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Undrained Shear Soil Strength <span className="font-semibold -ml-1">(Su)</span></FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <NumberInput field={field} placeholder="Enter Su"/>
+                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm">kPa</span>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              ) : (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="angle"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Angle of Internal Friction <span className="font-semibold -ml-1">(φ)</span></FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <NumberInput field={field} placeholder="Enter Angle"/>
+                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm">°</span>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
+                  <FormField
+                    control={form.control}
+                    name="t"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Shear Soil Strength <span className="font-semibold -ml-1">(T)</span></FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <NumberInput field={field} placeholder="Enter T"/>
+                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm">kPa</span>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
+
+              <FormField
+                  control={form.control}
+                  name="qult"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Ultimate Bearing Pressure <span className="font-semibold -ml-1">(Qult)</span></FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <NumberInput field={field} placeholder="Enter Qult"/>
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm">kPa</span>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+            </div>
+
+            <div className="pt-2 flex justify-between">
+              <Button type="submit" className="w-28" disabled={!isDirty || isSubmitting}> {isSubmitting ? (<><Loader2 className="mr-2 size-4 animate-spin" />Saving...</>) : ("Save")}</Button>
+              <Button type="button" variant="outline" disabled={isSubmitting} onClick={router.back}>Close</Button>
+            </div>
+          </TabsContent>
         </Tabs>
       </form>
     </Form>

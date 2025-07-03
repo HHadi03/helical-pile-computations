@@ -1,21 +1,19 @@
 "use client"
 
 import * as React from "react"
-
+import { ScrollBar, ScrollArea } from "./scroll-area"
 import { cn } from "@/lib/utils"
 
 function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
-    <div
-      data-slot="table-container"
-      className="relative w-full overflow-x-auto"
-    >
+    <ScrollArea className="w-full overflow-auto grid grid-cols-1 h-full border-x border-b">
       <table
         data-slot="table"
-        className={cn("w-full caption-bottom text-sm", className)}
+        className={cn("relative w-full caption-bottom text-sm", className)}
         {...props}
       />
-    </div>
+      <ScrollBar orientation="horizontal"/>
+    </ScrollArea>
   )
 }
 

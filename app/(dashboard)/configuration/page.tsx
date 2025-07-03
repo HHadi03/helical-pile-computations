@@ -24,9 +24,9 @@ export default async function ConfigurationPage() {
 
   if (profilesData.length === 0) {
     return (
-      <section className="bg-secondary border-2 flex items-center justify-center h-full overflow-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-600">
-        <div className="flex flex-col text-center items-center">
-          <span className="flex justify-center mb-2 pt-5"><FolderX className="size-10 text-muted-foreground"/></span>
+      <section className="bg-secondary border-2 border-foreground grid place-items-center h-full overflow-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-600">
+       <div className="text-center py-5">
+          <FolderX className="size-10 text-muted-foreground mb-2 mx-auto"/>
           <h3 className="text-2xl font-semibold mb-2">No Soil Profiles Found</h3>
           <p className="mb-4 text-muted-foreground">Start by adding a new soil profile to configure soil layers for analysis</p>
           <Button asChild className="w-80">
