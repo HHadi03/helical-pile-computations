@@ -19,7 +19,7 @@ export default async function EditProfilePage({params}:{params: Promise<{id: str
   }
 
   return (
-    <section className="p-5 border rounded-lg min-h-full">
+    <section className="p-5 rounded-lg border max-w-lg mx-auto">
     <EditProfileForm profile={profileData}/>
     </section>
   )

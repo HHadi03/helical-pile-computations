@@ -19,7 +19,7 @@ export default async function EditSoilEngineeredPage({params}:{params: Promise<{
   }
 
   return (
-    <section className="p-5 border rounded-lg min-h-full">
+    <section className="p-5 rounded-lg border max-w-lg mx-auto">
       <EditSoilEngineered soil={soilData}/>
     </section>
   )

@@ -27,7 +27,7 @@ export default async function InsertSoilPage({params}:{params: Promise<{id: stri
   const previousEndDepth = profileSoils.length > 0 ? profileSoils[profileSoils.length - 1].endDepth : undefined
 
   return (
-    <section className='p-5 min-h-full rounded-lg border'>
+    <section className='p-5 rounded-lg border max-w-lg mx-auto'>
       <InsertSoilForm previousEndDepth={previousEndDepth} profileId={id}/>
     </section>
   )
