@@ -53,7 +53,7 @@ export function ProfileForm() {
       const result = await insertProfile(values)
 
       if (result.errors) {
-        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TsoilProfileSchema, { message: Array.isArray(value) ? value[0] : (value as string) })})
+        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TsoilProfileSchema, { message: Array.isArray(value) ? value[0] : (value as string)})})
         toast.error(result.message)
       }
 
@@ -85,7 +85,7 @@ export function ProfileForm() {
                   <FormItem>
                     <FormLabel>Profile Name <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                     <FormControl>
-                      <Input type="text" placeholder="Custom label for soil profile" {...field} />
+                      <Input type="text" placeholder="Custom label for soil profile" {...field} className="text-sm"/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -99,7 +99,7 @@ export function ProfileForm() {
                   <FormItem>
                     <FormLabel>Water Depth <span className="font-semibold -ml-1">(m)</span></FormLabel>
                     <FormControl>
-                      <NumberInput field={field} placeholder="0"/>
+                      <NumberInput field={field} placeholder="0" className="text-sm"/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -122,7 +122,7 @@ export function ProfileForm() {
                   <FormItem>
                     <FormLabel>Pile Length <span className="font-semibold -ml-1">(m)</span></FormLabel>
                     <FormControl>
-                      <NumberInput field={field} placeholder="0"/>
+                      <NumberInput field={field} placeholder="0" className="text-sm"/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -136,7 +136,7 @@ export function ProfileForm() {
                   <FormItem>
                     <FormLabel>Pile Stick Out <span className="font-semibold -ml-1">(m)</span></FormLabel>
                     <FormControl>
-                      <NumberInput field={field} placeholder="0"/>
+                      <NumberInput field={field} placeholder="0" className="text-sm"/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

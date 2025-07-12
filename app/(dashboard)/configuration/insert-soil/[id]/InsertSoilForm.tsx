@@ -12,46 +12,42 @@ import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { useRouter } from "next/navigation"
 import { NumberInput } from "@/components/NumberInput"
-import { createPortal } from 'react-dom'
 import Image from 'next/image'
+import { SketchPicker } from 'react-color'
 
-export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: number, profileId: string}) {
+export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDepth?: number, profileId: string}) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("soil")
   
   const form = useForm<TsoilSchema>({
     resolver: zodResolver(soilSchema),
     defaultValues: {
-      soilType: undefined,
-      density: undefined,
-      soil: undefined,
-      startDepth: previousEndDepth || "" as unknown as number,
+      startDepth: previousEndDepth || 0,
       endDepth: "" as unknown as number,
       nValue: "" as unknown as number,
       yMoist: undefined,
       ySat: undefined,
       soilName: "",
       description: "",
-      color: "#e5e5e5"
+      colour: "#000000",
     }
   })
   
   const { formState: { isSubmitting } } = form
-
   const soilType = form.watch("soilType")
   const soil = form.watch("soil")
   const density = form.watch("density")
   const showParametersTab = Boolean(soilType && soil && density)
-
+  
   useEffect(() => {
     const errorFields = Object.keys(form.formState.errors)
 
     if (errorFields.length === 0) return
     
-    const soilTabFields = ["soilType", "soil", "density", "soilName", "description", "color"]
+    const soilTabFields = ["soilType", "soil", "density", "soilName", "description", "colour"]
     const parametersTabFields = ["startDepth", "endDepth", "yMoist", "ySat", "nValue"]
 
     const hasSoilErrors = errorFields.some(field => soilTabFields.includes(field))
@@ -73,22 +69,12 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
     }
   }, [soil, density, form])
 
-  useEffect(() => {
-    form.resetField("soil")
-  }, [soilType, form])
-
-  const handleNext = () => {
-    if (soilType && soil && density) {
-      setActiveTab("parameters")
-    }
-  }
-
   async function onSubmit(values: TsoilSchema) {
     try {
       const result = await insertSoil(values, profileId)
 
       if (result.errors) {
-        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TsoilSchema, { message: Array.isArray(value) ? value[0] : (value as string) })})
+        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TsoilSchema, { message: Array.isArray(value) ? value[0] : (value as string)})})
         toast.error(result.message)
       }
 
@@ -119,10 +105,10 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                   name="soilType"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>Soil Type</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormLabel htmlFor="soilType">Soil Type</FormLabel>
+                      <Select onValueChange={(value) => {field.onChange(value); form.setValue("soil", "")}} defaultValue={field.value} name={field.name}>
                         <FormControl>
-                          <SelectTrigger className="w-full">
+                          <SelectTrigger className="w-full" id="soilType">
                             <SelectValue placeholder="Select type"/>
                           </SelectTrigger>
                         </FormControl>
@@ -142,10 +128,10 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                   name="density"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>Soil Density</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormLabel htmlFor="density">Soil Density</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value} name={field.name}>
                         <FormControl>
-                          <SelectTrigger className="w-full">
+                          <SelectTrigger className="w-full" id="density">
                             <SelectValue placeholder="Select density"/>
                           </SelectTrigger>
                         </FormControl>
@@ -164,11 +150,11 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                 control={form.control}
                 name="soil"
                 render={({ field }) => (
-                  <FormItem className="">
-                    <FormLabel>Soil</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormItem>
+                    <FormLabel htmlFor="soil">Soil</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value || ""} name={field.name}>
                       <FormControl>
-                        <SelectTrigger className="w-full">
+                        <SelectTrigger className="w-full" id="soil">
                           <SelectValue placeholder="Select soil"/>
                         </SelectTrigger>
                       </FormControl>
@@ -189,7 +175,7 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                   <FormItem>
                     <FormLabel>Soil Description <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                     <FormControl>
-                      <Input type="text" placeholder="Brief description of soil composition" {...field} />
+                      <Input type="text" placeholder="Brief description of soil composition" {...field} className="text-sm"/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -204,7 +190,7 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                     <FormItem className="flex-1">
                       <FormLabel>Soil Name <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                       <FormControl>
-                        <Input type="text" placeholder="Custom label for soil layer" {...field} />
+                        <Input type="text" placeholder="Custom label for soil layer" {...field} className="text-sm"/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -213,12 +199,20 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                   
                 <FormField
                   control={form.control}
-                  name="color"
+                  name="colour"
                   render={({ field }) => (
                     <FormItem className="w-32">
-                      <FormLabel>Color <span className="font-semibold -ml-1">(optional)</span></FormLabel>
+                      <FormLabel htmlFor="colour">Colour <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                       <FormControl>
-                        <Input type="color" {...field} className="w-full p-1"/>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button id="colour" variant="outline" className="p-2"><span style={{ backgroundColor: field.value}} className="w-full h-full"></span></Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="p-0 w-auto rounded-none" align="end" side="top">
+                            <SketchPicker color={field.value} onChangeComplete={(color) => field.onChange(color.hex)} className="text-black" disableAlpha={true}
+                            presetColors={['#8B7355', '#A0522D', '#CD853F', '#D2691E', '#654321', '#0F903A', '#DEB887', '#BC9A6A', '#8FBC8F', '#696969', '#2F4F4F', '#708090', '#A9A9A9', '#D3D3D3', '#1C1C1C', '#F5DEB3']}/>
+                          </PopoverContent>
+                        </Popover>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -228,7 +222,7 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
             </div>
 
             <div className="pt-2 flex justify-between">
-              <Button type="button" className="w-32" onClick={handleNext} disabled={!showParametersTab}>Next</Button>
+              <Button type="button" className="w-32" onClick={() => showParametersTab && setActiveTab("parameters")} disabled={!showParametersTab}>Next</Button>
               <Button type="button" variant="outline" onClick={router.back}>Close</Button>
             </div>
           </TabsContent>
@@ -240,10 +234,10 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                   control={form.control}
                   name="startDepth"
                   render={({ field }) => (
-                    <FormItem className="flex-1">
+                    <FormItem className="w-27 hover:cursor-not-allowed">
                       <FormLabel>Start Depth <span className="font-semibold -ml-1">(m)</span></FormLabel>
                       <FormControl>
-                        <NumberInput field={field} placeholder="0"/>
+                        <NumberInput field={field} placeholder="0" disabled/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -257,7 +251,7 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                     <FormItem className="flex-1">
                       <FormLabel>End Depth <span className="font-semibold -ml-1">(m)</span></FormLabel>
                       <FormControl>
-                        <NumberInput field={field} placeholder="0"/>
+                        <NumberInput field={field} placeholder="0" className="text-sm"/>
                       </FormControl>
                       <FormMessage/>
                     </FormItem>
@@ -270,12 +264,9 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                 name="yMoist"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Moist Unit Weight <span className="font-semibold -ml-1">(γMoist)</span></FormLabel>
+                    <FormLabel>Moist Unit Weight <span className="font-semibold -ml-1">(kN/m³)</span></FormLabel>  
                     <FormControl>
-                      <div className="relative">
-                        <NumberInput field={field} placeholder="0"/>
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm">kN/m³</span>
-                      </div>
+                      <NumberInput field={field} placeholder="0" className="text-sm"/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -287,12 +278,9 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                 name="ySat"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Saturated Unit Weight <span className="font-semibold -ml-1">(γSat)</span></FormLabel>
+                    <FormLabel>Saturated Unit Weight <span className="font-semibold -ml-1">(kN/m³)</span></FormLabel>
                     <FormControl>
-                      <div className="relative">
-                        <NumberInput field={field} placeholder="0"/>
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm">kN/m³</span>
-                      </div>
+                      <NumberInput field={field} placeholder="0" className="text-sm"/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -303,10 +291,18 @@ export function SoilForm({ previousEndDepth, profileId }: { previousEndDepth?: n
                 control={form.control}
                 name="nValue"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="relative">
                     <FormLabel>SPT N-Value</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="link" className="absolute -top-3 -right-2 text-blue-500">I dont know SPT N-Value</Button>
+                        </PopoverTrigger>
+                        <PopoverContent align="end" side="top" sideOffset={-2} className="w-[500px]">
+                          <Image src="/SPTNPicture.png" alt="SPT N-Value Guide Picture" width="0" height="0" sizes="100vw" className="w-full h-auto"/>
+                        </PopoverContent>
+                      </Popover>
                     <FormControl>
-                      <NumberInput field={field} placeholder="0"/>
+                      <NumberInput field={field} placeholder="0" className="text-sm"/>
                     </FormControl>
                     <FormMessage/>
                   </FormItem>

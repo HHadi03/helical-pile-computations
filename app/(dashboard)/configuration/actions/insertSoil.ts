@@ -1,10 +1,9 @@
 "use server"
-import { soilSchema, TsoilSchema } from "@/schemas/soilSchema"
+import { TsoilSchema } from "@/schemas/soilSchema"
 import { calculateResultsForFineSoil, calculateResultsForSoils } from "@/lib/equations"
 import { createClient } from "@/utils/supabase/server"
 import { camelToSnake } from "@/lib/caseConversion"
 import { revalidatePath } from "next/cache"
-import { getProfile } from "@/lib/getProfile"
 
 type ReturnType = {
   message: string
@@ -13,22 +12,16 @@ type ReturnType = {
 
 export async function insertSoil(soil: TsoilSchema, profileId: string): Promise<ReturnType> {
 
-  const parsed = soilSchema.safeParse(soil)
-  if (!parsed.success) {
-    return {
-      message: "Please check the highlighted fields and try again.",
-      errors: parsed.error.flatten().fieldErrors
-    }
+  if (soil.soilName) {
+    soil = {...soil, soilName: soil.soilName.charAt(0).toUpperCase() + soil.soilName.slice(1)}
   }
-  
+
   if (soil.soilType === "fine") {
-    soil = { ...soil,...await calculateResultsForFineSoil(soil)}
+    soil = { ...soil,...await calculateResultsForFineSoil(soil, profileId)}
   }
 
   else {
-    const profileData = await getProfile(profileId)
-    const waterDepth = profileData!.waterDepth
-    soil = { ...soil,...await calculateResultsForSoils(soil, waterDepth)}
+    soil = { ...soil,...await calculateResultsForSoils(soil, profileId)}
   }
 
   try {

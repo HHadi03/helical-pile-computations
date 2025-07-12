@@ -58,12 +58,14 @@ export function SoilDiagram ({ profileSoils, profile, index}: { profileSoils: Ts
         const isLayerBeyondPile = soil.startDepth >= newPileLength
         const isBottomLayer = soil.startDepth < newPileLength && soil.endDepth >= newPileLength
 
-        const backgroundColor = soil.color
+        const isDefaultColour = soil.colour === "#000000"
+        const backgroundColor = soil.colour
         const isDark = getLuminance(backgroundColor) < 0.5
         const textColor = isDark ? "text-white" : "text-black"
 
         return (
-          <div key={soil.id || index} className={`relative border-x-2 border-b-2 border-stone-500 py-4 ${index === 0 ? 'border-t-2' : ''} ${''}`} style={{backgroundColor}}>
+          <div key={soil.id || index}  className={`relative border-x-2 border-b-2 border-stone-500 py-4 ${index === 0 ? 'border-t-2' : ''} ${isDefaultColour ? 'bg-secondary text-secondary-foreground' : ''}`}
+          style={!isDefaultColour ? { backgroundColor } : undefined}>
 
             <div className={`absolute z-10 right-4 top-4 p-2 shadow text-sm font-semibold ${isDark ? "text-white bg-gray-700" : "bg-white"}`}> {soil.h!.toFixed(1)} m </div>
 

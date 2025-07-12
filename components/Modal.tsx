@@ -8,16 +8,12 @@ export const Modal = ({ children, title}: {children: React.ReactNode, title: str
   const router = useRouter()
   const titleRef = useRef<HTMLHeadingElement>(null)
 
-  const handleOpenChange = () => {
-    router.back()
-  }
-
   return (
-    <Dialog defaultOpen={true} open={true} onOpenChange={handleOpenChange}>
+    <Dialog defaultOpen={true} open={true} onOpenChange={router.back}>
         <DialogContent onInteractOutside={(e) => {e.preventDefault()}} onOpenAutoFocus={(e) => {e.preventDefault(); titleRef.current?.focus()}}>
           <DialogHeader>
             <DialogTitle tabIndex={-1} ref={titleRef} className="flex justify-center items-center outline-none">{title}</DialogTitle>
-            <VisuallyHidden.Root><DialogDescription> A Modal with a form to obtain releveant data </DialogDescription></VisuallyHidden.Root>
+            <VisuallyHidden.Root><DialogDescription>A Modal with a form to request user input</DialogDescription></VisuallyHidden.Root>
           </DialogHeader>
           {children}
         </DialogContent>

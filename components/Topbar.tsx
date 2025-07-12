@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Button } from './ui/button'
+import { ModeToggle } from './ThemeToggle'
 
 export const Topbar = () => {
   const pathname = usePathname()
@@ -13,20 +14,28 @@ export const Topbar = () => {
   ] 
 
   return (
-    <nav className="border-b py-2 mx-5">
-      <ul className="flex gap-7 justify-center">
-        {navItems.map((item) => {
-          const isActive = pathname.includes(item.href)
-          return (
-            <li key={item.href} className='relative'>
-              <Button asChild variant="ghost">
-                <Link prefetch={false} href={item.href} className={`after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-primary after:transition-transform after:duration-200 after:ease-in-out ${isActive ? 'font-semibold after:scale-x-100' :'text-muted-foreground after:scale-x-0 hover:after:scale-x-100'}`}>{item.label}</Link>
-              </Button>
-            </li>
-          )
-        })}
-      </ul>
-    </nav>
+    <header className='flex flex-col shrink-0 mt-5 mx-4'>
+
+      <div className='flex justify-center relative'>
+        <h1 className="text-2xl font-semibold">Helical Pile Computations</h1>
+        <div className='absolute right-0'><ModeToggle/></div>
+      </div>
+      
+      <nav className="border-b py-2">
+        <ul className="flex gap-7 justify-center">
+          {navItems.map((item) => {
+            const isActive = pathname.includes(item.href)
+            return (
+              <li key={item.href} className='relative'>
+                <Button asChild variant="ghost">
+                  <Link prefetch={false} href={item.href} className={`font-semibold after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-primary after:transition-transform after:duration-200 after:ease-in-out ${isActive ? 'after:scale-x-100' :'text-muted-foreground after:scale-x-0 hover:after:scale-x-100'}`}>{item.label}</Link>
+                </Button>
+              </li>
+            )
+          })}
+        </ul>
+      </nav>
+    </header>
   )
 }
 

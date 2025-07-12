@@ -8,12 +8,12 @@ export const soilSchema = z.object({
   soil: z.string().min(1, { message: "Please select a soil" }),
   soilName: z.string().optional(),
   description: z.string().optional(),
-  color: z.string(),
+  colour: z.string(),
   startDepth: z.coerce.number().gte(0, { message: "Start Depth is required" }),
   endDepth: z.coerce.number().gt(0,{ message: "End Depth is required"}),
   nValue: z.coerce.number().gt(0, { message: "SPT N-Value is required" }),
-  yMoist: z.coerce.number().gt(0, { message: "γMoist is required" }),
-  ySat: z.coerce.number().gt(0, { message: "γSat is required" }),
+  yMoist: z.coerce.number().gt(0, { message: "Moist Unit Weight is required" }),
+  ySat: z.coerce.number().gt(0, { message: "Sat Unit Weight is required" }),
   po: z.coerce.number().nullish(),
   ko: z.coerce.number().nullish(),
   angle: z.coerce.number().nullish(),
@@ -49,28 +49,28 @@ export const soilSchema = z.object({
     (data) => data.su === undefined || data.su === null || data.su > 0,
     {
       path: ['su'],
-      message: "Su is required"
+      message: "Undrained Shear Soil Strength is required"
     }
   )
   .refine(
     (data) => data.t === undefined || data.t === null || data.t > 0,
     {
       path: ['t'],
-      message: "T is required"
+      message: "Shear Soil Strength is required"
     }
   )
   .refine(
     (data) => data.angle === undefined || data.angle === null || data.angle > 0,
     {
       path: ['angle'],
-      message: "φ is required"
+      message: "Angle of Internal Friction is required"
     }
   )
    .refine(
     (data) => data.qult === undefined || data.qult === null || data.qult > 0,
     {
       path: ['qult'],
-      message: "Qult is required"
+      message: "Bearing Pressure is required"
     }
   )
    

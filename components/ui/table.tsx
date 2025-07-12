@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils"
 
 function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
-    <ScrollArea className="w-full overflow-auto grid grid-cols-1 h-full border-x border-b">
+    <ScrollArea className="w-full overflow-auto grid grid-cols-1 h-full">
       <table
         data-slot="table"
         className={cn("relative w-full caption-bottom text-sm", className)}

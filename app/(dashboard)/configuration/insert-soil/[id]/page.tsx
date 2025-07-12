@@ -1,4 +1,4 @@
-import { SoilForm } from './InsertSoilForm'
+import { InsertSoilForm } from './InsertSoilForm'
 import { getSoils } from '@/lib/getSoils'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
@@ -27,8 +27,8 @@ export default async function InsertSoilPage({params}:{params: Promise<{id: stri
   const previousEndDepth = profileSoils.length > 0 ? profileSoils[profileSoils.length - 1].endDepth : undefined
 
   return (
-    <section className='p-5 border border-gray-600 rounded-lg max-h-full overflow-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-600'>
-      <SoilForm previousEndDepth={previousEndDepth} profileId={id}/>
+    <section className='p-5 min-h-full rounded-lg border'>
+      <InsertSoilForm previousEndDepth={previousEndDepth} profileId={id}/>
     </section>
   )
 }

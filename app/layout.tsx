@@ -7,12 +7,7 @@ export const metadata: Metadata = {
   description: "A tool for calculating tensile and compression capacities on helical pile foundations",
 }
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-  
-}>) {
+export default function RootLayout({children}: Readonly<{children: React.ReactNode}>) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body>

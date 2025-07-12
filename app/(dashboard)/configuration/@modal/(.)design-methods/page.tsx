@@ -1,8 +1,8 @@
 import { getFactors } from "@/lib/getFactors"
-import { SafetyFactorsForm } from "../../safety-factors/SafetyFactorsForm"
+import { SafetyFactorsForm } from "../../design-methods/SafetyFactorsForm"
 import { Modal } from '@/components/Modal'
 
-export default async function SafetyFactorsModal() {
+export default async function DesignMethodsModal() {
   const factorsData = await getFactors()
 
   if (!factorsData) {
@@ -16,7 +16,7 @@ export default async function SafetyFactorsModal() {
   }
   
   return (
-    <Modal title="Define Parameters">
+    <Modal title="Determine Design Methods">
       <div className="px-4">
         <SafetyFactorsForm safetyFactors={factorsData}/>
       </div>

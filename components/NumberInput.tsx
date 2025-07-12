@@ -1,16 +1,14 @@
 import { Input } from "./ui/input"
 import { ControllerRenderProps, FieldValues, Path } from "react-hook-form"
 
-type NumberInputProps<T extends FieldValues = FieldValues, K extends Path<T> = Path<T>> =
-  Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> & {
-    field: ControllerRenderProps<T, K>
-  }
+type NumberInputProps<T extends FieldValues = FieldValues, K extends Path<T> = Path<T>> = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> & {field: ControllerRenderProps<T, K>}
 
-export const NumberInput = <T extends FieldValues, K extends Path<T>>({field, placeholder, disabled,}: NumberInputProps<T, K>) => {
+export const NumberInput = <T extends FieldValues, K extends Path<T>>({field, placeholder, disabled, ...props}: NumberInputProps<T, K>) => {
   return (
     <Input
       type="number"
       {...field}
+      {...props}
       value={field.value === undefined ? "" : field.value}
       step={0.1}
       min={0}
@@ -22,4 +20,3 @@ export const NumberInput = <T extends FieldValues, K extends Path<T>>({field, pl
     />
   )
 }
-

@@ -1,12 +1,6 @@
 import { Toaster } from "@/components/ui/sonner"
 
-export default function ConfigurationLayout({
-  children,
-  modal,
-}: {
-  children: React.ReactNode
-  modal: React.ReactNode
-}) {
+export default function ConfigurationLayout({children, modal}: {children: React.ReactNode, modal: React.ReactNode}) {
   return (
     <>
       {children}

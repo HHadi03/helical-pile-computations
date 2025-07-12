@@ -44,16 +44,16 @@ export const Sidebar = () => {
   const allNavigationItems = navigationSections.flatMap(section => section.items)
 
   return (
-    <aside className={`shrink-0 bg-sidebar flex flex-col border-r border-sidebar-border p-2 shadow-inner overflow-y-auto overflow-x-clip scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-600 ${expanded ? 'w-[260px] animate-in ease-in-out duration-500' : 'w-[70px] animate-out ease-out duration-500'}`}>
+    <aside className={`bg-sidebar flex flex-col shrink-0 border-r border-sidebar-border p-2 shadow-inner overflow-y-auto overflow-x-clip scrollbar-thin scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-500 ${expanded ? 'w-[260px] animate-in ease-in-out duration-500' : 'w-[70px] animate-out ease-out duration-500'}`}>
       
       {expanded ? (
         <div className="hidden xl:flex flex-row items-center justify-between mt-2">
-          <Image height={39} width={187} src='/logo.png' alt='Company Logo'/>
-          <Button variant="ghost" size="icon" onClick={() => setExpanded(false)} aria-label="Collapse Sidebar" aria-expanded={expanded} className='hover:bg-sidebar-foreground/5 dark:hover:bg-sidebar-foreground/5'><ArrowLeftToLine className="size-6 text-muted-foreground"/></Button>
+          <Image height="0" width="180" src='/logo.png' alt='Company Logo'/>
+          <Button title='Collapse Sidebar' variant="ghost" size="icon" onClick={() => setExpanded(false)} aria-label="Collapse Sidebar" aria-expanded={expanded} className='hover:bg-sidebar-foreground/5 dark:hover:bg-sidebar-foreground/5'><ArrowLeftToLine className="size-6 text-muted-foreground"/></Button>
         </div>
       ) : (
         <div className="hidden xl:block">
-          <Button variant="ghost" onClick={() => setExpanded(true)} aria-label="Expand Sidebar" aria-expanded={expanded} className='hover:bg-sidebar-foreground/5 dark:hover:bg-sidebar-foreground/5'><ArrowRightToLine className="size-6 text-muted-foreground"/></Button>
+          <Button title='Expand Sidebar' variant="ghost" onClick={() => setExpanded(true)} aria-label="Expand Sidebar" aria-expanded={expanded} className='hover:bg-sidebar-foreground/5 dark:hover:bg-sidebar-foreground/5'><ArrowRightToLine className="size-6 text-muted-foreground"/></Button>
         </div>
       )}
       
@@ -95,15 +95,17 @@ export const Sidebar = () => {
           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" type="submit" className='hover:bg-sidebar-foreground/5 dark:hover:bg-sidebar-foreground/5' onClick={async () => await logOut()}>
-                <LogOut className="size-6 rotate-180 text-muted-foreground"/>
+                <LogOut className="size-6 rotate-180"/>
               </Button>
             </TooltipTrigger>
             <TooltipContent side="right" className='p-2 text-sm'>Log Out</TooltipContent>
           </Tooltip>
         ) : (
-          <Button variant="ghost" type="submit" className='w-full justify-start animate-in fade-in slide-in-from-left-8 duration-700 hover:bg-sidebar-foreground/5 dark:hover:bg-sidebar-foreground/5' onClick={async () => await logOut()}>
-            <LogOut className="size-6 rotate-180 text-muted-foreground"/>Log Out
-          </Button>
+          <div className='animate-in fade-in slide-in-from-left-8 duration-700'>
+            <Button variant="ghost" type="submit" className='w-full justify-start hover:bg-sidebar-foreground/5 dark:hover:bg-sidebar-foreground/5' onClick={async () => await logOut()}>
+              <LogOut className="size-6 rotate-180"/>Log Out
+            </Button>
+          </div>
         )}
       </div>
      

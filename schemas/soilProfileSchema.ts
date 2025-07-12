@@ -11,7 +11,7 @@ export const soilProfileSchema = z.object({
     (data) => data.profileName === undefined || data.profileName.length <= 20,
     {
       path: ['profileName'],
-      message: "Name must be less than 20 characters long"
+      message: "Profile Name must be less than 20 characters long"
     }
   )
 

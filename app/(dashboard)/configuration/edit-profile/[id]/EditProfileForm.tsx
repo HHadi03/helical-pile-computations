@@ -23,7 +23,7 @@ export function EditProfileForm({ profile }: { profile: TsoilProfileSchema }) {
   })
 
   const { formState: { isDirty, isSubmitting } } = form
-
+  
   useEffect(() => {
     const errorFields = Object.keys(form.formState.errors)
 
@@ -48,7 +48,7 @@ export function EditProfileForm({ profile }: { profile: TsoilProfileSchema }) {
       const result = await updateProfile(values)
 
       if (result.errors) {
-        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TsoilProfileSchema, { message: Array.isArray(value) ? value[0] : String(value) })})
+        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TsoilProfileSchema, { message: Array.isArray(value) ? value[0] : String(value)})})
         toast.error(result.message)
       }
 
@@ -80,7 +80,7 @@ export function EditProfileForm({ profile }: { profile: TsoilProfileSchema }) {
                   <FormItem>
                     <FormLabel>Profile Name <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                     <FormControl>
-                      <Input type="text" placeholder="Enter profile name" {...field} />
+                      <Input type="text" placeholder="Custom label for soil profile" {...field} className="text-sm"/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -94,7 +94,7 @@ export function EditProfileForm({ profile }: { profile: TsoilProfileSchema }) {
                   <FormItem>
                     <FormLabel>Water Depth <span className="font-semibold -ml-1">(m)</span></FormLabel>
                     <FormControl>
-                      <NumberInput field={field} placeholder="0"/>
+                      <NumberInput field={field} placeholder="0" className="text-sm"/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -103,9 +103,7 @@ export function EditProfileForm({ profile }: { profile: TsoilProfileSchema }) {
             </div>
 
             <div className="pt-2 flex justify-between">
-              <Button type="submit" className="w-28" disabled={!isDirty || isSubmitting}>
-                {isSubmitting ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</>) : ("Save")}
-              </Button>
+              <Button type="submit" className="w-28" disabled={!isDirty || isSubmitting}>{isSubmitting ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</>) : ("Save")}</Button>
               <Button type="button" variant="outline" disabled={isSubmitting} onClick={router.back}>Close</Button>
             </div>
           </TabsContent>
@@ -119,7 +117,7 @@ export function EditProfileForm({ profile }: { profile: TsoilProfileSchema }) {
                   <FormItem>
                     <FormLabel>Pile Length <span className="font-semibold -ml-1">(m)</span></FormLabel>
                     <FormControl>
-                      <NumberInput field={field} placeholder="0"/>
+                      <NumberInput field={field} placeholder="0" className="text-sm"/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -133,7 +131,7 @@ export function EditProfileForm({ profile }: { profile: TsoilProfileSchema }) {
                   <FormItem>
                     <FormLabel>Pile Stick Out <span className="font-semibold -ml-1">(m)</span></FormLabel>
                     <FormControl>
-                      <NumberInput field={field} placeholder="0"/>
+                      <NumberInput field={field} placeholder="0" className="text-sm"/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

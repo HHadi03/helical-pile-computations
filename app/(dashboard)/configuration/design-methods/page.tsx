@@ -2,9 +2,8 @@ import { getFactors } from "@/lib/getFactors"
 import { SafetyFactorsForm } from "./SafetyFactorsForm"
 import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
-import { NotFound } from "@/components/NotFound"
 
-export default async function SafetyFactorsPage() {
+export default async function DesignMethodsPage() {
   const supabase = await createClient()
   const { data, error } = await supabase.auth.getUser()
   if (error || !data?.user) {
@@ -13,7 +12,7 @@ export default async function SafetyFactorsPage() {
 
   const factorsData = await getFactors()
   if (!factorsData) {
-    return <NotFound/>
+    throw new Error
   }
   
   return (

@@ -1,4 +1,4 @@
-import { EditSoilEngineeredForm } from '../../../edit-soil-information/[id]/EditSoilForm'
+import { EditSoilEngineered } from '../../../edit-soil-engineered/[id]/EditSoilEngineeredForm'
 import { Modal } from '@/components/Modal'
 import { getSoil } from "@/lib/getSoil"
 
@@ -19,7 +19,7 @@ export default async function EditSoilEngineeredModal({params}:{params: Promise<
   return (
     <Modal title="Edit Soil Engineered">
       <div className="px-4">
-        <EditSoilEngineeredForm soil={soilData}/>
+        <EditSoilEngineered soil={soilData}/>
       </div>
     </Modal>
   )
