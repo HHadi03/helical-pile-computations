@@ -48,12 +48,12 @@ export const Sidebar = () => {
       
       {expanded ? (
         <div className="hidden xl:flex flex-row items-center justify-between mt-2">
-          <Image height="0" width="180" src='/logo.png' alt='Company Logo'/>
-          <Button title='Collapse Sidebar' variant="ghost" size="icon" onClick={() => setExpanded(false)} aria-label="Collapse Sidebar" aria-expanded={expanded} className='hover:bg-sidebar-foreground/5 dark:hover:bg-sidebar-foreground/5'><ArrowLeftToLine className="size-6 text-muted-foreground"/></Button>
+          <Image src='/logo.png' alt='Company Logo' width={195} height={40}/>
+          <Button title='Collapse Sidebar' variant="ghost" size="icon" onClick={() => setExpanded(false)} aria-label="Collapse Sidebar" aria-expanded={expanded} className='hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7'><ArrowLeftToLine className="size-6 text-muted-foreground"/></Button>
         </div>
       ) : (
         <div className="hidden xl:block">
-          <Button title='Expand Sidebar' variant="ghost" onClick={() => setExpanded(true)} aria-label="Expand Sidebar" aria-expanded={expanded} className='hover:bg-sidebar-foreground/5 dark:hover:bg-sidebar-foreground/5'><ArrowRightToLine className="size-6 text-muted-foreground"/></Button>
+          <Button title='Expand Sidebar' variant="ghost" onClick={() => setExpanded(true)} aria-label="Expand Sidebar" aria-expanded={expanded} className='hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7'><ArrowRightToLine className="size-6 text-muted-foreground"/></Button>
         </div>
       )}
       
@@ -66,7 +66,7 @@ export const Sidebar = () => {
                 <li className="px-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase">{section.title}</li>
                 {section.items.map((item) => (
                   <li key={item.href} className='my-3 animate-in fade-in slide-in-from-top-8 duration-700'>
-                    <Button asChild variant="ghost" className='hover:bg-sidebar-foreground/5 dark:hover:bg-sidebar-foreground/5'>
+                    <Button asChild variant="ghost" className='hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7'>
                       <Link prefetch={false} href={item.href} className="flex gap-3 w-full justify-start"><item.icon className='size-6'/>{item.text}</Link>
                     </Button>
                   </li>
@@ -78,7 +78,7 @@ export const Sidebar = () => {
               <li key={item.href} className='my-4'>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button asChild variant="ghost" className='hover:bg-sidebar-foreground/5 dark:hover:bg-sidebar-foreground/5'>
+                    <Button asChild variant="ghost" className='hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7'>
                       <Link prefetch={false} href={item.href}> <item.icon className='size-6'/></Link>
                     </Button>
                   </TooltipTrigger>
@@ -94,7 +94,7 @@ export const Sidebar = () => {
         {!expanded ? (
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" type="submit" className='hover:bg-sidebar-foreground/5 dark:hover:bg-sidebar-foreground/5' onClick={async () => await logOut()}>
+              <Button variant="ghost" type="submit" className='hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7' onClick={async () => await logOut()}>
                 <LogOut className="size-6 rotate-180"/>
               </Button>
             </TooltipTrigger>
@@ -102,7 +102,7 @@ export const Sidebar = () => {
           </Tooltip>
         ) : (
           <div className='animate-in fade-in slide-in-from-left-8 duration-700'>
-            <Button variant="ghost" type="submit" className='w-full justify-start hover:bg-sidebar-foreground/5 dark:hover:bg-sidebar-foreground/5' onClick={async () => await logOut()}>
+            <Button variant="ghost" type="submit" className='w-full justify-start hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7' onClick={async () => await logOut()}>
               <LogOut className="size-6 rotate-180"/>Log Out
             </Button>
           </div>

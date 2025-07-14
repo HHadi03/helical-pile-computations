@@ -1,6 +1,6 @@
 "use server"
 import { camelToSnake } from "@/lib/caseConversion"
-import { soilProfileSchema, TsoilProfileSchema } from "@/schemas/soilProfileSchema"
+import { TsoilProfileSchema } from "@/schemas/soilProfileSchema"
 import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
 
@@ -11,14 +11,10 @@ type ReturnType = {
   
 export async function insertProfile(profile: TsoilProfileSchema): Promise<ReturnType> {
   
-  const parsed = soilProfileSchema.safeParse(profile)
-  if (!parsed.success) {
-    return {
-      message: "Please check the highlighted fields and try again.",
-      errors: parsed.error.flatten().fieldErrors
-    }
+  if (profile.profileName) {
+    profile = {...profile, profileName: profile. profileName.charAt(0).toUpperCase() + profile. profileName.slice(1)}
   }
-
+  
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -33,14 +29,14 @@ export async function insertProfile(profile: TsoilProfileSchema): Promise<Return
     .insert(snakeCaseProfile)
 
     if (error) {
-      return {message: "Failed to insert soil profile, please try again later.", errors:{}}
+      return {message: `Failed to add  ${profile.profileName ? profile.profileName: `Soil Profile`}, please try again later.`, errors:{}}
     }
 
     revalidatePath('/configuration')
-    return { message: "Soil profile has been successfully inserted" }
+    return { message: `${profile.profileName ? profile.profileName: `Soil Profile`} has been successfully added` }
   }
   
   catch {
-    return { message: "Failed to insert soil profile, please try again later.", errors: {}}
+    return { message: `Failed to add ${profile.profileName ? profile.profileName: `Soil Profile`}, please try again later.`, errors: {}}
   }
 }

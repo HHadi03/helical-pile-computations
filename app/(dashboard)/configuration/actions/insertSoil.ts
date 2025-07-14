@@ -39,14 +39,14 @@ export async function insertSoil(soil: TsoilSchema, profileId: string): Promise<
     .insert(snakeCaseSoil)
      
     if (error) {
-      return { message: "Failed to insert soil layer, please try again later.", errors: {}}
+      return { message: `Failed to add ${soil.soilName ? soil.soilName : soil.soil}, please try again later.`, errors: {}}
     }
     
     revalidatePath('/configuration')
-    return { message: "Soil layer has been successfully inserted" }
+    return { message: ` ${soil.soilName ? soil.soilName : soil.soil} has been successfully added` }
   }
   
   catch {
-    return { message: "Failed to insert soil layer, please try again later.", errors: {}}
+    return { message: `Failed to add ${soil.soilName ? soil.soilName : soil.soil}, please try again later.`, errors: {}}
   }
 }

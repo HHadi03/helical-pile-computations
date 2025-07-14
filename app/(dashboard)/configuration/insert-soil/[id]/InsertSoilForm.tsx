@@ -17,10 +17,14 @@ import { useRouter } from "next/navigation"
 import { NumberInput } from "@/components/NumberInput"
 import Image from 'next/image'
 import { SketchPicker } from 'react-color'
+import { useTheme } from 'next-themes'
+import lightSPTImage from '@/public/SPTNPicture.png'
+import darkSPTImage from '@/public/SPTNPictureDark.png'
 
 export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDepth?: number, profileId: string}) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("soil")
+  const { theme } = useTheme()
   
   const form = useForm<TsoilSchema>({
     resolver: zodResolver(soilSchema),
@@ -208,7 +212,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                           <PopoverTrigger asChild>
                             <Button id="colour" variant="outline" className="p-2"><span style={{ backgroundColor: field.value}} className="w-full h-full"></span></Button>
                           </PopoverTrigger>
-                          <PopoverContent className="p-0 w-auto rounded-none" align="end" side="top">
+                          <PopoverContent className="p-0 w-auto rounded-sm" align="end" side="top">
                             <SketchPicker color={field.value} onChangeComplete={(color) => field.onChange(color.hex)} className="text-black" disableAlpha={true}
                             presetColors={['#8B7355', '#A0522D', '#CD853F', '#D2691E', '#654321', '#0F903A', '#DEB887', '#BC9A6A', '#8FBC8F', '#696969', '#2F4F4F', '#708090', '#A9A9A9', '#D3D3D3', '#1C1C1C', '#F5DEB3']}/>
                           </PopoverContent>
@@ -297,8 +301,8 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                         <PopoverTrigger asChild>
                           <Button variant="link" className="absolute -top-3 -right-2 text-blue-500">I dont know SPT N-Value</Button>
                         </PopoverTrigger>
-                        <PopoverContent align="end" side="top" sideOffset={-2} className="w-[500px]">
-                          <Image src="/SPTNPicture.png" alt="SPT N-Value Guide Picture" width="0" height="0" sizes="100vw" className="w-full h-auto"/>
+                        <PopoverContent align="end" side="top" sideOffset={-2} className="w-sm sm:w-lg md:w-xl lg:w-2xl dark:bg-black rounded-none p-1">
+                          <Image src={theme === "light" ? lightSPTImage : darkSPTImage} placeholder="blur" alt="SPT N-Value Guide Picture"/>
                         </PopoverContent>
                       </Popover>
                     <FormControl>

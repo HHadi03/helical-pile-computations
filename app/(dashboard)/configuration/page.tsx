@@ -36,6 +36,8 @@ export default async function ConfigurationPage() {
   }
  
   return (
-    <SoilTable soilsData={soilsData} profilesData={profilesData}/>
+    <section className="min-h-full flex flex-col">
+      <SoilTable soilsData={soilsData} profilesData={profilesData}/>
+    </section>
   )
 }

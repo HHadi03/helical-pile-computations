@@ -9,7 +9,7 @@ export default function LandingPage() {
     style={{backgroundImage: "url('/pageBackground.jpg')", backgroundColor: 'rgba(0, 0, 0, 0.3)', backgroundBlendMode: 'darken', backgroundRepeat: 'no-repeat'}}>
       
       <header className="bg-gray-900/90 justify-center py-2 flex items-center space-x-5 shadow-xl">
-        <Image width={250} height={250} src="/logo.png" alt="Company Logo"/>
+        <Image width={624} height={128} src="/logo.png" alt="Company Logo" priority={true}/>
         <h1 className="text-neutral-400 text-2xl">Helical Pile Computations</h1>
       </header>
       

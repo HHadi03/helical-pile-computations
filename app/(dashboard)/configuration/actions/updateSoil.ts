@@ -1,5 +1,5 @@
 "use server"
-import { soilSchema, TsoilSchema } from "@/schemas/soilSchema"
+import { TsoilSchema } from "@/schemas/soilSchema"
 import { createClient } from "@/utils/supabase/server"
 import { camelToSnake } from "@/lib/caseConversion"
 import { revalidatePath } from "next/cache"
@@ -11,14 +11,10 @@ type ReturnType = {
 
 export async function updateSoil(soil: TsoilSchema): Promise<ReturnType> {
   
-  const parsed = soilSchema.safeParse(soil)
-  if (!parsed.success) {
-    return {
-      message: "Please check the highlighted fields and try again.",
-      errors: parsed.error.flatten().fieldErrors
-    }
+  if (soil.soilName) {
+    soil = {...soil, soilName: soil.soilName.charAt(0).toUpperCase() + soil.soilName.slice(1)}
   }
- 
+
   try {
     const snakeCaseSoil = camelToSnake(soil)
     const supabase = await createClient()
@@ -28,14 +24,14 @@ export async function updateSoil(soil: TsoilSchema): Promise<ReturnType> {
     .eq('id', soil.id)
     
     if (error) {
-      return { message: "Failed to update soil layer, please try again later.", errors: {}}
+      return { message: `Failed to edit ${soil.soilName ? soil.soilName : soil.soil}, please try again later.`, errors: {}}
     }
 
     revalidatePath('/configuration')
-    return { message: "Soil layer has been successfully updated" }
+    return { message: `${soil.soilName ? soil.soilName : soil.soil} has been successfully edited` }
   } 
   
   catch {
-    return { message: "Failed to update soil layer, please try again later.", errors: {}}
+    return { message: `Failed to edit ${soil.soilName ? soil.soilName : soil.soil}, please try again later.`, errors: {}}
   }
 }
