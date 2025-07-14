@@ -1,6 +1,8 @@
 "use client"
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { Button } from './ui/button'
+import { ModeToggle } from './ThemeToggle'
 
 export const Topbar = () => {
   const pathname = usePathname()
@@ -8,22 +10,32 @@ export const Topbar = () => {
   const navItems = [
     { href: '/configuration', label: 'Configuration' },
     { href: '/overview', label: 'Overview' },
-    { href: '/visulisation', label: 'Visulisation' }
+    { href: '/visualisation', label: 'Visualisation' }
   ] 
 
   return (
-    <nav className="py-2 border-b border-gray-300">
-      <ul className="flex gap-7 justify-center">
-        {navItems.map((item) => (
-          <li key={item.href}>
-            <Link prefetch={false} href={item.href} className={`text-gray-600 p-3 block font-semibold hover:text-blue-600 relative hover:bg-blue-100 rounded-lg
-              after:absolute after:bottom-[-0.5rem] after:left-0 after:w-full after:h-0.5 after:bg-blue-600 after:transition-transform after:duration-200 after:ease-in-out
-              ${pathname === item.href ? 'text-blue-600 after:scale-x-100' : 'after:scale-x-0 hover:after:scale-x-100'}`}> {item.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </nav>
+    <header className='flex flex-col shrink-0 mt-5 mx-4 mb-2'>
+
+      <div className='flex justify-center relative'>
+        <h1 className="text-2xl font-semibold">Helical Pile Computations</h1>
+        <div className='absolute right-0'><ModeToggle/></div>
+      </div>
+      
+      <nav className="border-b py-2">
+        <ul className="flex gap-7 justify-center">
+          {navItems.map((item) => {
+            const isActive = pathname.includes(item.href)
+            return (
+              <li key={item.href} className='relative'>
+                <Button asChild variant="ghost">
+                  <Link prefetch={false} href={item.href} className={`font-semibold after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-primary after:transition-transform after:duration-200 after:ease-in-out ${isActive ? 'after:scale-x-100' :'text-muted-foreground after:scale-x-0 hover:after:scale-x-100'}`}>{item.label}</Link>
+                </Button>
+              </li>
+            )
+          })}
+        </ul>
+      </nav>
+    </header>
   )
 }
 

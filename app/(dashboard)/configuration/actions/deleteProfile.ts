@@ -7,7 +7,7 @@ type ReturnType = {
   errors?: Record<string, string[]>
 }
 
-export async function deleteProfile(id: string): Promise<ReturnType> {
+export async function deleteProfile(id: string, name: string): Promise<ReturnType> {
 
 	try {
 		const supabase = await createClient()
@@ -17,14 +17,14 @@ export async function deleteProfile(id: string): Promise<ReturnType> {
 		.eq("id", id)
 
 		if (error) {
-			return { message: "Failed to delete soil profile, please try again later.", errors: {}}
+			return { message: `Failed to delete ${name}, please try again later.`, errors: {}}
 		}
 
 		revalidatePath('/configuration')
-		return { message: "Soil profile has been successfully deleted" }
+		return { message: `${name} has been successfully deleted` }
 	}
 	
 	catch {
-		return { message: "Failed to delete soil profile. please try again later.", errors: {}}
+		return { message: `Failed to delete ${name}. please try again later.`, errors: {}}
 	}
 }

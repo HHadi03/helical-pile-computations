@@ -7,8 +7,8 @@ type ReturnType = {
   errors?: Record<string, string[]>
 }
 
-export async function deleteSoil(id: string): Promise<ReturnType> {
-  
+export async function deleteSoil(id: string, name: string): Promise<ReturnType> {
+
   try {
     const supabase = await createClient()
     const { error } = await supabase
@@ -17,14 +17,14 @@ export async function deleteSoil(id: string): Promise<ReturnType> {
     .eq('id', id)
 
     if (error) {
-      return { message: "Failed to delete soil layer, please try again later.", errors: {}}
+      return { message: `Failed to delete ${name}, please try again later.`, errors: {}}
     }
   
     revalidatePath('/configuration')
-    return { message: "Soil layer has been successfully deleted" }
+    return { message: ` ${name} has been successfully deleted` }
   } 
   
   catch {
-    return { message: "Failed to delete soil layer, please try again later.", errors: {}}
+    return { message: `Failed to delete ${name}, please try again later.`, errors: {}}
   }
 }

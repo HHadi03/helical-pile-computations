@@ -9,7 +9,7 @@ export default async function EditSProfileModal({params}:{params: Promise<{id: s
   if (!profileData) {
     return (
       <Modal title="Edit Soil Profile">
-        <div className="text-red-500 text-sm">
+        <div className="text-destructive text-sm flex justify-center">
           <p>Could not find profile data</p>
         </div>
       </Modal>

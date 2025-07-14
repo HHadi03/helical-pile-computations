@@ -1,20 +1,11 @@
-import { Toaster } from "@/components/ui/toaster"
-import { FormContextProvider } from "./FormContext"
+import { Toaster } from "@/components/ui/sonner"
 
-export default function ConfigurationLayout({
-  children,
-  modal,
-}: {
-  children: React.ReactNode
-  modal: React.ReactNode
-}) {
+export default function ConfigurationLayout({children, modal}: {children: React.ReactNode, modal: React.ReactNode}) {
   return (
     <>
-      <FormContextProvider>
-        {children}
-        {modal}
-        <Toaster/>
-      </FormContextProvider>
+      {children}
+      {modal}
+      <Toaster position="top-right" richColors duration={3000} visibleToasts={1}/>
     </>
   )
 }

@@ -1,33 +1,22 @@
 "use client"
-import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogOverlay, DialogTitle } from "./ui/dialog"
+import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog"
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden"
 import { useRouter } from "next/navigation"
+import { useRef } from "react"
 
-interface ModalProps {
-  children: React.ReactNode
-  title: string
-}
-
-export const Modal = ({ children, title}: ModalProps) => {
+export const Modal = ({ children, title}: {children: React.ReactNode, title: string}) => {
   const router = useRouter()
-
-  const handleOpenChange = () => {
-    router.back()
-  }
+  const titleRef = useRef<HTMLHeadingElement>(null)
 
   return (
-    <Dialog defaultOpen={true} open={true} onOpenChange={handleOpenChange}>
-      <DialogOverlay className="backdrop-blur-sm bg-white/30">
-        <DialogContent onInteractOutside={(e) => {e.preventDefault()}} onOpenAutoFocus={(e) => e.preventDefault()} onCloseAutoFocus={(e) => e.preventDefault()}>
+    <Dialog defaultOpen={true} open={true} onOpenChange={router.back}>
+        <DialogContent onInteractOutside={(e) => {e.preventDefault()}} onOpenAutoFocus={(e) => {e.preventDefault(); titleRef.current?.focus()}}>
           <DialogHeader>
-            <DialogTitle className="flex justify-center">{title}</DialogTitle>
-            <VisuallyHidden.Root><DialogDescription> A Modal that provides user interactivity </DialogDescription></VisuallyHidden.Root>
+            <DialogTitle tabIndex={-1} ref={titleRef} className="flex justify-center items-center outline-none">{title}</DialogTitle>
+            <VisuallyHidden.Root><DialogDescription>A Modal with a form to request user input</DialogDescription></VisuallyHidden.Root>
           </DialogHeader>
-          <div className="p-5 border border-gray-400 rounded-lg shadow-lg">
-            {children}
-          </div>
+          {children}
         </DialogContent>
-      </DialogOverlay>
     </Dialog>
   )
 }

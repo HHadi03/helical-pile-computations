@@ -1,5 +1,5 @@
 "use server"
-import { TsoilProfileSchema, soilProfileSchema } from "@/schemas/soilProfileSchema"
+import { TsoilProfileSchema } from "@/schemas/soilProfileSchema"
 import { createClient } from "@/utils/supabase/server"
 import { camelToSnake } from "@/lib/caseConversion"
 import { revalidatePath } from "next/cache"
@@ -10,13 +10,9 @@ type ReturnType = {
 }
 
 export async function updateProfile(profile: TsoilProfileSchema): Promise<ReturnType> {
-
-  const parsed = soilProfileSchema.safeParse(profile)
-  if (!parsed.success) {
-    return {
-      message: "Please check the highlighted fields and try again.",
-      errors: parsed.error.flatten().fieldErrors
-    }
+  
+  if (profile.profileName) {
+    profile = {...profile, profileName: profile. profileName.charAt(0).toUpperCase() + profile. profileName.slice(1)}
   }
 
   try {
@@ -28,14 +24,14 @@ export async function updateProfile(profile: TsoilProfileSchema): Promise<Return
     .eq("id", profile.id)
 
     if (error) {
-      return { message: "Failed to update profile, please try again later.", errors: {}}
+      return { message: `Failed to edit ${profile.profileName ? profile.profileName: `Soil Profile`}, please try again later.`, errors: {}}
     }
 
     revalidatePath("/configuration")
-    return {message: "Profile has been successfully updated"}
+    return {message: `${profile.profileName ? profile.profileName: `Soil Profile`} has been successfully edited`}
   }
 
   catch {
-   return { message: "Failed to update profile, please try again later.", errors: {}}
+   return { message: `Failed to edit ${profile.profileName ? profile.profileName: `Soil Profile`}, please try again later.`, errors: {}}
   }
 }

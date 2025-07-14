@@ -1,86 +1,116 @@
 'use client'
-import { useState } from 'react'
-import { logOut } from '@/app/actions'
-import {ArrowLeftToLine, ArrowRightToLine, LogOut } from 'lucide-react'
+import { useState, useEffect, Fragment } from 'react'
+import { logOut } from '@/app/actions/logOut'
+import { ArrowLeftToLine, ArrowRightToLine, LogOut, Save, FolderOpen, Upload, MessageSquareText, CircleHelp } from 'lucide-react'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import Link from 'next/link'
+import Image from 'next/image'
+import { Button } from './ui/button'
 
 export const Sidebar = () => {
   const [expanded, setExpanded] = useState(false)
+   
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1280) {
+        setExpanded(false)
+      }
+    }
+
+    handleResize()
+
+    window.addEventListener('resize', handleResize)
+    return () => {window.removeEventListener('resize', handleResize)}
+  }, [])
   
-  const navigationItems = [
-    { icon: "/save-icon.png", text: "Save", alt: "Save Icon", href: "/save"},
-    { icon: "/load-icon.png", text: "Load", alt: "Load Icon", href: "/load"},
-    { icon: "/export-icon.png", text: "Export", alt: "Export Icon", href: "/export"},
-    { icon: "/restart-icon.png", text: "Restart", alt: "Restart Icon", href: "/restart"},
-    { icon: "/feedback-icon.png", text: "Feedback", alt: "Feedback Icon", href: "/feedback"},
-    { icon: "/help-icon.png", text: "Help", alt: "Help Icon", href: "/help"},
+  const navigationSections = [
+    {
+      title: "File",
+      items: [
+        { icon: Save, text: "Save", href: "/save"},
+        { icon: FolderOpen, text: "Load", href: "/load"},
+        { icon: Upload, text: "Export", href: "/export"},
+      ]
+    },
+    {
+      title: "Support",
+      items: [
+        { icon: MessageSquareText, text: "Feedback", href: "/feedback"},
+        { icon: CircleHelp, text: "Help", href: "/help"},
+      ]
+    }
   ]
 
-  const toggleSidebar = () => setExpanded(!expanded)
-
-  const renderNavBar = (item: typeof navigationItems[number]) => (
-    <li key={item.href} className={`relative group rounded-lg hover:bg-indigo-200 transition-all duration-200 ${!expanded && 'justify-center'}`}>
-      <Link href={item.href} prefetch={false} className="text-gray-700 font-medium py-2 px-3 flex gap-3">
-        <img src={item.icon} alt={item.alt} className='w-6 h-auto'/>
-        {expanded && <span className='whitespace-nowrap'>{item.text}</span>}
-      </Link>
-
-      {!expanded && (
-        <div
-          className="absolute left-full top-1/2 -translate-y-1/2 px-2 py-1 bg-indigo-400 text-white text-sm rounded shadow-lg
-          invisible opacity-0 translate-x-0 transition-all group-hover:visible group-hover:opacity-100 group-hover:translate-x-5 z-20 whitespace-nowrap">
-          {item.text}
-        </div>
-      )}
-    </li>
-  )
+  const allNavigationItems = navigationSections.flatMap(section => section.items)
 
   return (
-    <aside className={`flex flex-col border-r border-gray-300 p-2 bg-gradient-to-tr from-slate-50 via-white to-blue-50 shadow-inner
-    ${expanded ? 'w-[260px]' : 'w-[70px]'} transition-all duration-300`}>
+    <aside className={`bg-sidebar flex flex-col shrink-0 border-r border-sidebar-border p-2 shadow-inner overflow-y-auto overflow-x-clip scrollbar-thin scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-500 ${expanded ? 'w-[260px] animate-in ease-in-out duration-500' : 'w-[70px] animate-out ease-out duration-500'}`}>
       
-      <div className='pt-2 flex gap-2'>
-        {expanded ? (
-          <>
-            <div> 
-              <img src='/logo.png' alt='Company Logo' className="transition-opacity duration-200 hover:opacity-85 w-auto h-auto"/>
-            </div>
-
-            <button onClick={toggleSidebar} aria-label="Collapse Sidebar" aria-expanded={expanded} className="px-3 rounded hover:bg-gray-200 shrink-0">
-               <ArrowLeftToLine className="w-6 h-6" />
-            </button>
-          </>
-        ) : (
-          <button onClick={toggleSidebar} aria-label="Expand Sidebar" aria-expanded={expanded} className="p-2 rounded hover:bg-gray-200 grow">
-           <ArrowRightToLine className="w-6 h-6" />
-          </button>
-        )}
-      </div>
-
-      <nav>
-        <ul className='space-y-4 pt-10'>
-          {navigationItems.map(renderNavBar)}
+      {expanded ? (
+        <div className="hidden xl:flex flex-row items-center justify-between mt-2">
+          <Image src='/logo.png' alt='Company Logo' width={195} height={40}/>
+          <Button title='Collapse Sidebar' variant="ghost" size="icon" onClick={() => setExpanded(false)} aria-label="Collapse Sidebar" aria-expanded={expanded} className='hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7'><ArrowLeftToLine className="size-6 text-muted-foreground"/></Button>
+        </div>
+      ) : (
+        <div className="hidden xl:block">
+          <Button title='Expand Sidebar' variant="ghost" onClick={() => setExpanded(true)} aria-label="Expand Sidebar" aria-expanded={expanded} className='hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7'><ArrowRightToLine className="size-6 text-muted-foreground"/></Button>
+        </div>
+      )}
+      
+      <nav className='flex-1'>
+        <ul className={`mb-2 ${expanded ? 'mt-0 xl:mt-10' : 'mt-0 xl:mt-10'}`}>
+          {expanded ? (
+            navigationSections.map((section, sectionIndex) => (
+              <Fragment key={section.title}>
+                {sectionIndex > 0 && <li className="my-8"></li>}
+                <li className="px-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase">{section.title}</li>
+                {section.items.map((item) => (
+                  <li key={item.href} className='my-3 animate-in fade-in slide-in-from-top-8 duration-700'>
+                    <Button asChild variant="ghost" className='hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7'>
+                      <Link prefetch={false} href={item.href} className="flex gap-3 w-full justify-start"><item.icon className='size-6'/>{item.text}</Link>
+                    </Button>
+                  </li>
+                ))}
+              </Fragment>
+            ))
+          ) : (
+            allNavigationItems.map((item) => (
+              <li key={item.href} className='my-4'>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button asChild variant="ghost" className='hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7'>
+                      <Link prefetch={false} href={item.href}> <item.icon className='size-6'/></Link>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className='p-2 text-sm'>{item.text}</TooltipContent>
+                </Tooltip>
+              </li>
+            ))
+          )}
         </ul>
       </nav>
-
-      <ul className='mt-auto'>
-        <li className={`relative group rounded-lg hover:bg-gray-200 ${!expanded && 'justify-center'}`}>
-          <form action={logOut}>
-            <button type="submit" className="text-gray-700 font-medium py-2 px-3 flex gap-3">
-              <LogOut className="w-6 h-6"/> {expanded && <span className='whitespace-nowrap'>Sign Out</span>}
-            </button>
-          </form>
-
-          {!expanded && (
-            <div
-              className="absolute left-full top-1/2 -translate-y-1/2 px-2 py-1 bg-gray-300 text-gray-700 text-sm rounded shadow-lg
-              invisible opacity-0 translate-x-0 transition-all group-hover:visible group-hover:opacity-100 group-hover:translate-x-5 z-20 whitespace-nowrap">
-              Sign Out
-            </div>
-          )}
-        </li>
-      </ul>
-
+        
+      <div className='mt-auto pt-1 border-t border-sidebar-border'>
+        {!expanded ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" type="submit" className='hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7' onClick={async () => await logOut()}>
+                <LogOut className="size-6 rotate-180"/>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right" className='p-2 text-sm'>Log Out</TooltipContent>
+          </Tooltip>
+        ) : (
+          <div className='animate-in fade-in slide-in-from-left-8 duration-700'>
+            <Button variant="ghost" type="submit" className='w-full justify-start hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7' onClick={async () => await logOut()}>
+              <LogOut className="size-6 rotate-180"/>Log Out
+            </Button>
+          </div>
+        )}
+      </div>
+     
     </aside>
   )
 }
+
+

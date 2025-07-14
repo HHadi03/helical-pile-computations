@@ -1,4 +1,4 @@
-import { SoilForm } from '../../../insert-soil/[id]/InsertSoilForm'
+import { InsertSoilForm } from '../../../insert-soil/[id]/InsertSoilForm'
 import { Modal } from '@/components/Modal'
 import { getSoils } from '@/lib/getSoils'
 
@@ -12,7 +12,7 @@ export default async function InsertSoilModal({params}:{params: Promise<{id: str
   return (
     <Modal title='Add Soil Layer'>
       <div className='px-4'>
-        <SoilForm previousEndDepth={previousEndDepth} profileId={id}/>
+        <InsertSoilForm previousEndDepth={previousEndDepth} profileId={id}/>
       </div>
     </Modal>
   )
