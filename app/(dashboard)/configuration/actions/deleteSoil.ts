@@ -21,7 +21,7 @@ export async function deleteSoil(id: string, name: string): Promise<ReturnType> 
     }
   
     revalidatePath('/configuration')
-    return { message: ` ${name} has been successfully deleted` }
+    return { message: ` ${name} has been successfully deleted`}
   } 
   
   catch {

@@ -8,7 +8,7 @@ export async function getProfiles(): Promise<TsoilProfileSchema[]>{
     const {data, error} = await supabase
     .from("soil_profiles")
     .select("*")
-    .order("created_at", {ascending: true})
+    .order("created_at", { ascending: true })
 
     if (error || !data) {
       return []

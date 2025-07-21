@@ -1,5 +1,5 @@
 import { TsoilSchema } from '@/schemas/soilSchema'
-import { getProfile } from './getProfile'
+import { createClient } from '@/utils/supabase/server'
 
 const SPT = 6.2
 const UNITWEIGHT = 9.8
@@ -21,23 +21,23 @@ export async function calculateResultsForSoils (soil: TsoilSchema, profileId: st
   let shaftCapacity100: number
   let bearingCapacity60: number
   let bearingCapacity100: number
-  let pileLength: number
   let soilHeight: number
 
-  const profile = await getProfile(profileId)
-  if (!profile) throw new Error('Profile not found')
+  const supabase = await createClient()
+  const { data, error } = await supabase
+  .from('soil_profiles')
+  .select("water_depth, effective_pile_length")
+  .eq('id', profileId)
+  .single()
 
-  if (profile.pileStickOut > profile.pileLength) {
-    pileLength = 0
-  } 
-  
-  else {
-    pileLength = profile.pileLength - profile.pileStickOut
+  if (error || !data) {
+    throw new Error("Unable to fetch Pile Data")
   }
-  
+  const pileLength = data.effective_pile_length
+
   const h = roundToTwoDecimals(soil.endDepth - soil.startDepth)
-  const hMoist = Math.max(0, Math.min(profile.waterDepth, soil.endDepth) - soil.startDepth)
-  const hSat = Math.max(0, soil.endDepth - Math.max(profile.waterDepth, soil.startDepth))
+  const hMoist = Math.max(0, Math.min(data.water_depth, soil.endDepth) - soil.startDepth)
+  const hSat = Math.max(0, soil.endDepth - Math.max(data.water_depth, soil.startDepth))
   const po = roundToTwoDecimals((soil.yMoist * hMoist) + (soil.ySat * hSat) - (UNITWEIGHT * hSat))
 
   let angle = 25 + 28 * (soil.nValue / po)
@@ -97,20 +97,20 @@ export async function calculateResultsForFineSoil (soil: TsoilSchema, profileId:
   let shaftCapacity100: number
   let bearingCapacity60: number
   let bearingCapacity100: number
-  let pileLength: number
   let soilHeight: number
 
-  const profile = await getProfile(profileId)
-  if (!profile) throw new Error('Profile not found')
+  const supabase = await createClient()
+  const { data, error } = await supabase
+  .from('soil_profiles')
+  .select("effective_pile_length")
+  .eq('id', profileId)
+  .single()
 
-  if (profile.pileStickOut > profile.pileLength) {
-    pileLength = 0
-  } 
-
-  else {
-    pileLength = profile.pileLength - profile.pileStickOut
+  if (error || !data) {
+    throw new Error("Unable to fetch Pile Data")
   }
-
+  const pileLength = data.effective_pile_length
+ 
   const h = roundToTwoDecimals(soil.endDepth - soil.startDepth)
   const su = roundToTwoDecimals(soil.nValue * SPT)
   const qult = roundToTwoDecimals(11 * SPT * soil.nValue)

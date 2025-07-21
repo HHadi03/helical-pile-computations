@@ -21,7 +21,7 @@ export async function deleteProfile(id: string, name: string): Promise<ReturnTyp
 		}
 
 		revalidatePath('/configuration')
-		return { message: `${name} has been successfully deleted` }
+		return { message: `${name} has been successfully deleted`}
 	}
 	
 	catch {

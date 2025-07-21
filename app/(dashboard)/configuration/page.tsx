@@ -1,15 +1,57 @@
 import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
-import { getSoils } from "@/lib/getSoils"
-import { getProfiles } from "@/lib/getProfiles"
-import { SoilTable } from "./SoilTable"
-import { Plus, FolderX } from 'lucide-react'
+import { TsoilSchema } from "@/schemas/soilSchema"
+import { snakeToCamel } from "@/lib/caseConversion"
+import { ConfigAccordion } from "./ConfigAccordion"
+import { Plus, FolderX, ShieldCheck, PlusCircle } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { TsoilProfileSchema } from "@/schemas/soilProfileSchema"
 
 export const metadata = {
   title: "Configuration | Helical Pile Computations",
   description: "Set up soil profiles and piles for analysis",
+}
+
+async function getProfiles(): Promise<TsoilProfileSchema[]>{
+  try {
+    const supabase = await createClient()
+    const {data, error} = await supabase
+    .from("soil_profiles")
+    .select("profile_name, id")
+    .order("created_at", { ascending: true })
+
+    if (error || !data) {
+      return []
+    }
+
+    const profiles = data.map(profile => snakeToCamel(profile))
+    return profiles as TsoilProfileSchema[]
+
+  }
+  catch {
+    return []
+  }
+}
+
+async function getSoils(): Promise<TsoilSchema[]> {
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('soils')
+      .select("id, soil_type, density, soil, soil_name, description, start_depth, end_depth, n_value, y_moist, y_sat, soil_profile_id")
+      .order('start_depth', { ascending: true })
+
+    if (error || !data) {
+      return []
+    }
+    
+    const soils = data.map(soil => snakeToCamel(soil))
+    return soils as TsoilSchema[]
+    
+  } catch {
+    return []
+  }
 }
 
 export default async function ConfigurationPage() {
@@ -19,7 +61,6 @@ export default async function ConfigurationPage() {
     redirect('/')
   }
   
-  const soilsData = await getSoils()
   const profilesData = await getProfiles()
 
   if (profilesData.length === 0) {
@@ -34,10 +75,22 @@ export default async function ConfigurationPage() {
       </section>
     )
   }
- 
+
+  const soilsData = await getSoils()
   return (
     <section className="min-h-full flex flex-col">
-      <SoilTable soilsData={soilsData} profilesData={profilesData}/>
+      
+      <div className="mb-3 flex flex-col sm:flex-row sm:justify-end sm:gap-5">
+        <Button asChild variant="outline" className="sm:w-58 hover:bg-blue-200 dark:hover:bg-blue-900/50 shadow-sm" size="lg">
+          <Link href="/configuration/design-methods" prefetch={false} scroll={false}><ShieldCheck className='size-5 text-blue-700'/>Determine Design Methods</Link>
+        </Button>
+
+        <Button asChild variant="outline" className="mt-2 sm:w-58 sm:mt-0 hover:bg-green-200 dark:hover:bg-green-900/50 shadow-sm" size="lg">
+          <Link href="/configuration/insert-profile" prefetch={true} scroll={false}><PlusCircle className="size-5 text-green-700"/>Add Soil Profile</Link>
+        </Button>
+      </div>
+
+      <ConfigAccordion soilsData={soilsData} profilesData={profilesData}/>
     </section>
   )
 }

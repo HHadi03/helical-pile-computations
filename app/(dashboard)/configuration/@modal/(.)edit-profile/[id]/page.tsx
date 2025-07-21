@@ -1,12 +1,20 @@
 import { Modal } from '@/components/Modal'
 import { EditProfileForm } from '../../../edit-profile/[id]/EditProfileForm'
-import { getProfile } from '@/lib/getProfile'
+import { createClient } from '@/utils/supabase/server'
+import { snakeToCamel } from '@/lib/caseConversion'
+import { TsoilProfileSchema } from '@/schemas/soilProfileSchema'
 
-export default async function EditSProfileModal({params}:{params: Promise<{id: string}>}) {
+export default async function EditProfileModal({params}:{params: Promise<{id: string}>}) {
   const { id } = await params
-  const profileData = await getProfile(id)
 
-  if (!profileData) {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+  .from('soil_profiles')
+  .select("id, profile_name, water_depth, pile_length, pile_stick_out")
+  .eq('id', id)
+  .single()
+    
+  if (error || !data) {
     return (
       <Modal title="Edit Soil Profile">
         <div className="text-destructive text-sm flex justify-center">
@@ -15,7 +23,9 @@ export default async function EditSProfileModal({params}:{params: Promise<{id: s
       </Modal>
     )
   }
-
+  
+  const profileData = snakeToCamel(data) as TsoilProfileSchema
+  
   return (
     <Modal title="Edit Soil Profile">
       <div className="px-4">

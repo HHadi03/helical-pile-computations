@@ -10,9 +10,18 @@ type ReturnType = {
 }
   
 export async function insertProfile(profile: TsoilProfileSchema): Promise<ReturnType> {
-  
+ 
   if (profile.profileName) {
     profile = {...profile, profileName: profile. profileName.charAt(0).toUpperCase() + profile. profileName.slice(1)}
+  }
+
+  let effectivePileLength: number
+  if (profile.pileLength < profile.pileStickOut) {
+    effectivePileLength = 0
+  } 
+
+  else {
+    effectivePileLength = profile.pileLength - profile.pileStickOut
   }
   
   try {
@@ -21,7 +30,8 @@ export async function insertProfile(profile: TsoilProfileSchema): Promise<Return
     
     const snakeCaseProfile = camelToSnake ({
       ...profile,
-      user_id: user!.id
+      user_id: user!.id,
+      effective_pile_length: effectivePileLength
     })
     
     const { error } = await supabase

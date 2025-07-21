@@ -10,7 +10,7 @@ type ReturnType = {
 }
 
 export async function updateSoil(soil: TsoilSchema): Promise<ReturnType> {
-  
+
   if (soil.soilName) {
     soil = {...soil, soilName: soil.soilName.charAt(0).toUpperCase() + soil.soilName.slice(1)}
   }

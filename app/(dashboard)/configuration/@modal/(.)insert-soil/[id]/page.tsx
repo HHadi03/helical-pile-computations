@@ -1,13 +1,25 @@
 import { InsertSoilForm } from '../../../insert-soil/[id]/InsertSoilForm'
 import { Modal } from '@/components/Modal'
-import { getSoils } from '@/lib/getSoils'
+import { createClient } from '@/utils/supabase/server'
 
 export default async function InsertSoilModal({params}:{params: Promise<{id: string}>}) {
-  const { id } =  await params
+  const supabase = await createClient()
 
-  const soilsData = await getSoils()
-  const profileSoils = soilsData.filter((soil) => soil.soilProfileId === id)
-  const previousEndDepth = profileSoils.length > 0 ? profileSoils[profileSoils.length - 1].endDepth : undefined
+  const { id } =  await params
+  const {data: profileSoils, error: profileSoilsError} = await supabase
+  .from("soils")
+  .select("end_depth")
+  .order('end_depth', { ascending: true })
+  .eq("soil_profile_id", id)
+
+  let previousEndDepth: number | undefined
+  if (profileSoilsError || !profileSoils || profileSoils.length === 0){
+    previousEndDepth = undefined
+  }
+
+  else {
+    previousEndDepth = profileSoils[profileSoils.length - 1].end_depth
+  }
 
   return (
     <Modal title='Add Soil Layer'>

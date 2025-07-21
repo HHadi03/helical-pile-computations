@@ -7,6 +7,7 @@ export const soilProfileSchema = z.object({
   pileStickOut: z.coerce.number().gte(0, { message: "Pile Stick Out is required" }),
   pileLength: z.coerce.number().gt(0, { message: "Pile Length is required" }),
   waterDepth: z.coerce.number().gt(0, { message: "Water Depth is required" }),
+  effectivePileLength: z.coerce.number().optional()
 }).refine(
     (data) => data.profileName === undefined || data.profileName.length <= 20,
     {

@@ -11,7 +11,7 @@ type ReturnType = {
 }
 
 export async function insertSoil(soil: TsoilSchema, profileId: string): Promise<ReturnType> {
-
+  console.log(soil)
   if (soil.soilName) {
     soil = {...soil, soilName: soil.soilName.charAt(0).toUpperCase() + soil.soilName.slice(1)}
   }

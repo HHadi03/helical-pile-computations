@@ -1,5 +1,4 @@
 import { EditSoilEngineered } from "./EditSoilEngineeredForm"
-import { getSoil } from "@/lib/getSoil"
 import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
 import { NotFound } from '@/components/NotFound'

@@ -1,5 +1,3 @@
-import { getSoils } from "@/lib/getSoils"
-import { getProfiles } from "@/lib/getProfiles"
 import { FolderX, ArrowBigRight} from "lucide-react"
 import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
@@ -9,10 +7,54 @@ import { SoilGraph } from "./SoilGraph"
 import { SoilDiagram } from "./SoilDiagram"
 import { ToggleButton } from "./ToggleButton"
 import { Fragment } from "react"
+import { TsoilSchema } from "@/schemas/soilSchema"
+import { TsoilProfileSchema } from "@/schemas/soilProfileSchema"
+import { snakeToCamel } from "@/lib/caseConversion"
 
 export const metadata = {
   title: "Overview | Helical Pile Computations",
   description: "Summary of your soil profiles and pile settings",
+}
+
+async function getProfiles(): Promise<TsoilProfileSchema[]>{
+  try {
+    const supabase = await createClient()
+    const {data, error} = await supabase
+    .from("soil_profiles")
+    .select("profile_name, id, water_depth, pile_length, pile_stick_out")
+    .order("created_at", { ascending: true })
+
+    if (error || !data) {
+      return []
+    }
+
+    const profiles = data.map(profile => snakeToCamel(profile))
+    return profiles as TsoilProfileSchema[]
+
+  }
+  catch {
+    return []
+  }
+}
+
+async function getSoils(): Promise<TsoilSchema[]> {
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('soils')
+      .select("id, soil, soil_name, description, colour, start_depth, end_depth, n_value, y_moist, y_sat, soil_profile_id, h, su, t, shaft_capacity60, shaft_capacity100, bearing_capacity60, bearing_capacity100")
+      .order('start_depth', { ascending: true })
+
+    if (error || !data) {
+      return []
+    }
+    
+    const soils = data.map(soil => snakeToCamel(soil))
+    return soils as TsoilSchema[]
+    
+  } catch {
+    return []
+  }
 }
 
 export default async function OverviewPage() {
@@ -23,8 +65,7 @@ export default async function OverviewPage() {
   }
 
   const profilesData = await getProfiles()
-  const soilsData = await getSoils()
-
+ 
   if (profilesData.length === 0) {
     return (
       <section className="bg-secondary border-2 border-foreground flex flex-col items-center text-center justify-center min-h-full p-5">
@@ -38,6 +79,7 @@ export default async function OverviewPage() {
     )
   }
   
+  const soilsData = await getSoils()
   const soilsByProfile = Object.groupBy(soilsData, soil => soil.soilProfileId!)
   return (
     <>

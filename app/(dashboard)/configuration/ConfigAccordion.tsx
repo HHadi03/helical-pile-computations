@@ -10,10 +10,10 @@ import type { TsoilSchema } from "@/schemas/soilSchema"
 import { TsoilProfileSchema } from "@/schemas/soilProfileSchema"
 import { toast } from "sonner"
 import { deleteSoil } from "./actions/deleteSoil"
-import { Trash2, Copy, Pencil, Layers, PlusCircle, EllipsisVertical, Ellipsis, RotateCcw, ArrowDown, ShieldCheck} from 'lucide-react'
+import { Trash2, Copy, Pencil, Layers, EllipsisVertical, Ellipsis, ArrowDown, RotateCcw } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { deleteProfile } from "./actions/deleteProfile"
-
+import { duplicateProfile } from './actions/duplicateProfile'
 
 const soilTypeCapitalisation = {
   'fine': 'Fine Grain',
@@ -26,7 +26,7 @@ const soilDensityCapitalisation = {
   'dense' : 'Dense'
 }
 
-export function SoilTable({ soilsData, profilesData}: { soilsData: TsoilSchema[], profilesData: TsoilProfileSchema[] }) {
+export function ConfigAccordion({ soilsData, profilesData}: { soilsData: TsoilSchema[], profilesData: TsoilProfileSchema[] }) {
   const router = useRouter()
   const [selectedSoil, setSelectedSoil] = useState<{ id: string; name: string } | null>(null)
   const [selectedProfile, setSelectedProfile] = useState<{ id: string; name: string } | null>(null)
@@ -72,22 +72,19 @@ export function SoilTable({ soilsData, profilesData}: { soilsData: TsoilSchema[]
   }
 
   const handleDuplicateProfile = async (profileId: string) => {
-    console.log("MEOW" + profileId)
+    try {
+      const result = await duplicateProfile(profileId)
+      
+    }
+
+    catch {
+
+    }
   }
 
   const soilsByProfile = Object.groupBy(soilsData, soil => soil.soilProfileId!)
   return (
     <>
-      <div className="mb-3 flex flex-col sm:flex-row sm:justify-end sm:gap-5">
-        <Button asChild variant="outline" className="sm:w-58 hover:bg-blue-200 dark:hover:bg-blue-900/50 shadow-sm" size="lg">
-          <Link href="/configuration/design-methods" prefetch={false} scroll={false}><ShieldCheck className='size-5 text-blue-700'/>Determine Design Methods</Link>
-        </Button>
-
-        <Button asChild variant="outline" className="mt-2 sm:w-58 sm:mt-0 hover:bg-green-200 dark:hover:bg-green-900/50 shadow-sm" size="lg">
-          <Link href="/configuration/insert-profile" prefetch={true} scroll={false}><PlusCircle className="size-5 text-green-700"/>Add Soil Profile</Link>
-        </Button>
-      </div>
-      
       <Accordion type="multiple" className="space-y-6">
         {profilesData.map((profile, index) => {
           const profileSoils = soilsByProfile[profile.id!] || []

@@ -1,31 +1,31 @@
 "use client"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { TsoilSchema, soilSchema } from "@/schemas/soilSchema"
-import { updateSoil } from "@/app/(dashboard)/configuration/actions/updateSoil"
+import { updateSoilEngineered } from "../../actions/updateSoilEngineered"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { useRouter } from "next/navigation"
 import { NumberInput } from "@/components/NumberInput"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
+import { engineeredSoilSchema, TEngineeredSoilSchema } from "@/schemas/engineeredSoilSchema"
 
-export function EditSoilEngineered({ soil }: { soil: TsoilSchema }) {
+export function EditSoilEngineered({ soil }: { soil: TEngineeredSoilSchema }) {
   const router = useRouter()
 
-  const form = useForm<TsoilSchema>({
-    resolver: zodResolver(soilSchema),
+  const form = useForm<TEngineeredSoilSchema>({
+    resolver: zodResolver(engineeredSoilSchema),
     defaultValues: { ...soil }
   })
 
   const { formState: { isDirty, isSubmitting } } = form
 
-  async function onSubmit(values: TsoilSchema) {
+  async function onSubmit(values: TEngineeredSoilSchema) {
     try {
-      const result = await updateSoil(values)
+      const result = await updateSoilEngineered(values)
 
       if (result.errors) {
-        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TsoilSchema, {message: Array.isArray(value) ? value[0] : String(value)})})
+        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TEngineeredSoilSchema, {message: Array.isArray(value) ? value[0] : String(value)})})
         toast.error(result.message)
       } 
       

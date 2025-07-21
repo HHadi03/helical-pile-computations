@@ -24,7 +24,7 @@ export async function updateProfile(profile: TsoilProfileSchema): Promise<Return
     .eq("id", profile.id)
 
     if (error) {
-      return { message: `Failed to edit ${profile.profileName ? profile.profileName: `Soil Profile`}, please try again later.`, errors: {}}
+      return { message: `Failed to edit ${profile.profileName ? profile.profileName: `soil profile`}, please try again later.`, errors: {}}
     }
 
     revalidatePath("/configuration")
@@ -32,6 +32,6 @@ export async function updateProfile(profile: TsoilProfileSchema): Promise<Return
   }
 
   catch {
-   return { message: `Failed to edit ${profile.profileName ? profile.profileName: `Soil Profile`}, please try again later.`, errors: {}}
+   return { message: `Failed to edit ${profile.profileName ? profile.profileName: `soil profile`}, please try again later.`, errors: {}}
   }
 }
