@@ -2,7 +2,7 @@
 import { safetySchema, TsafetySchema } from "@/schemas/safetySchema"
 import { roundToTwoDecimals } from "@/lib/equations"
 import { createClient } from "@/utils/supabase/server"
-import { camelToSnake } from "@/lib/caseConversion"
+
 
 type ReturnType = {
   message: string
@@ -29,11 +29,10 @@ export async function updateSafetyFactors(safetyFactors: TsafetySchema): Promise
   }
  
   try {
-    const snakeCaseSafetyFactors = camelToSnake(updatedSafetyFactors)
     const supabase = await createClient()
     const { error } = await supabase
     .from('factors')
-    .update(snakeCaseSafetyFactors)
+    .update(updatedSafetyFactors)
     .eq('id', safetyFactors.id)
 
     if (error) {

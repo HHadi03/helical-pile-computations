@@ -20,7 +20,7 @@ async function getProfiles(): Promise<TconfigSoilProfileSchema[]>{
     .select("profile_name, id, created_at")
     .order("created_at", { ascending: true })
 
-    if (error || !data) {
+    if (error) {
       return []
     }
     return data

@@ -28,3 +28,14 @@ export const configSoilProfileSchema = z.object({
   profile_name: z.string().optional(),
 })
 export type TconfigSoilProfileSchema = z.infer<typeof configSoilProfileSchema>
+
+//overview page schema
+export const overviewSoilProfileSchema = z.object({
+  id: z.string(),
+  created_at: z.string(),
+  profile_name: z.string().optional(),
+  pile_stick_out: z.number(),
+  effective_pile_length: z.number(),
+  water_depth: z.number(),
+})
+export type ToverviewSoilProfileSchema = z.infer<typeof overviewSoilProfileSchema>

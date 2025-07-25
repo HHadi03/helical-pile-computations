@@ -52,6 +52,29 @@ export const configSoilSchema = z.object({
 })
 export type TconfigSoilSchema = z.infer<typeof configSoilSchema>
 
+//overview page schema
+export const overviewSoilSchema = z.object({
+  id: z.string(),
+  soil_profile_id: z.string(),
+  soil: z.string(),
+  soil_name: z.string().optional(),
+  description: z.string().optional(),
+  colour: z.string(),
+  start_depth: z.number(),
+  end_depth: z.number(),
+  n_value: z.number(),
+  y_moist: z.number(),
+  y_sat: z.number(),
+  h: z.number(),
+  su: z.number(),
+  t: z.number(),
+  shaft_capacity60: z.number(),
+  shaft_capacity100: z.number(),
+  bearing_capacity60: z.number(),
+  bearing_capacity100: z.number(),
+})
+export type ToverviewSoilSchema = z.infer<typeof overviewSoilSchema>
+
 //edit soil information schema
 export const editSoilInformationSchema = z.object({
   soil_type: z.enum(["coarse", "fine", "manmade"], { message: "Please select a soil type" }),

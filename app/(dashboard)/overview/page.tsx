@@ -7,27 +7,25 @@ import { SoilGraph } from "./SoilGraph"
 import { SoilDiagram } from "./SoilDiagram"
 import { ToggleButton } from "./ToggleButton"
 import { Fragment } from "react"
-import { TsoilSchema } from "@/schemas/soilSchemas"
-import { TsoilProfileSchema } from "@/schemas/soilProfileSchemas"
-import { snakeToCamel } from "@/lib/caseConversion"
+import { ToverviewSoilSchema } from "@/schemas/soilSchemas"
+import { ToverviewSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 
 export const metadata = {
   title: "Overview | Helical Pile Computations",
   description: "Summary of your soil profiles and pile settings",
 }
 
-async function getProfiles(): Promise<TsoilProfileSchema[]>{
+async function getProfiles(): Promise<ToverviewSoilProfileSchema[]>{
   try {
     const supabase = await createClient()
     const {data, error} = await supabase
     .from("soil_profiles")
-    .select("profile_name, id, water_depth, effective_pile_length, pile_stick_out")
+    .select("profile_name, id, water_depth, effective_pile_length, pile_stick_out, created_at")
     .order("created_at", { ascending: true })
 
     if (error) {
       return []
     }
-
     return data
 
   }
@@ -36,7 +34,7 @@ async function getProfiles(): Promise<TsoilProfileSchema[]>{
   }
 }
 
-async function getSoils(): Promise<TsoilSchema[]> {
+async function getSoils(): Promise<ToverviewSoilSchema[]> {
   try {
     const supabase = await createClient()
     const { data, error } = await supabase
@@ -44,12 +42,10 @@ async function getSoils(): Promise<TsoilSchema[]> {
       .select("id, soil, soil_name, description, colour, start_depth, end_depth, n_value, y_moist, y_sat, soil_profile_id, h, su, t, shaft_capacity60, shaft_capacity100, bearing_capacity60, bearing_capacity100")
       .order('start_depth', { ascending: true })
 
-    if (error || !data) {
+    if (error) {
       return []
     }
-    
-    const soils = data.map(soil => snakeToCamel(soil))
-    return soils as TsoilSchema[]
+    return data 
     
   } catch {
     return []
@@ -79,11 +75,11 @@ export default async function OverviewPage() {
   }
   
   const soilsData = await getSoils()
-  const soilsByProfile = Object.groupBy(soilsData, soil => soil.soilProfileId!)
+  const soilsByProfile = Object.groupBy(soilsData, soil => soil.soil_profile_id)
   return (
     <>
       {profilesData.map((profile, index) => {
-        const profileSoils = soilsByProfile[profile.id!] || []
+        const profileSoils = soilsByProfile[profile.id] || []
         return (
           <Fragment key={profile.id}>
             <ToggleButton>
