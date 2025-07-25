@@ -1,6 +1,5 @@
 import { createClient } from "@/utils/supabase/server"
 import { TsafetySchema } from "@/schemas/safetySchema"
-import { snakeToCamel } from "./caseConversion"
 
 export async function getFactors(): Promise<TsafetySchema | null> {
   try {
@@ -14,9 +13,7 @@ export async function getFactors(): Promise<TsafetySchema | null> {
       return null
     }
     
-    const factors = snakeToCamel(data)
-    return factors as TsafetySchema
-    
+    return data
   } catch {
     return null
   }

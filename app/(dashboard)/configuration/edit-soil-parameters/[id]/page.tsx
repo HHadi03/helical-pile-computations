@@ -1,5 +1,4 @@
 import { EditSoilParameters } from "./EditSoilParametersForm"
-import { getSoil } from "@/lib/getSoil"
 import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
 import { NotFound } from '@/components/NotFound'
@@ -12,15 +11,19 @@ export default async function EditSoilParametersPage({params}:{params: Promise<{
   }
 
   const { id } =  await params
-  const soilData = await getSoil(id)
+  const { data: soilData, error: soilError } = await supabase
+  .from('soils')
+  .select("start_depth, end_depth, y_moist, y_sat, n_value, soil, soil_name, soil_type, soil_profile_id")
+  .eq('id', id)
+  .single()
 
-  if (!soilData) {
+  if (soilError) {
     return <NotFound/>
   }
 
   return (
     <section className="p-5 rounded-lg border max-w-lg mx-auto">
-      <EditSoilParameters soil={soilData}/>
+      <EditSoilParameters soil={soilData} soilId={id}/>
     </section>
   )
 }

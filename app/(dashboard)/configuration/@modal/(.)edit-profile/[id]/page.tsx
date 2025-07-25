@@ -1,12 +1,18 @@
 import { Modal } from '@/components/Modal'
 import { EditProfileForm } from '../../../edit-profile/[id]/EditProfileForm'
-import { getProfile } from '@/lib/getProfile'
+import { createClient } from '@/utils/supabase/server'
 
-export default async function EditSProfileModal({params}:{params: Promise<{id: string}>}) {
+export default async function EditProfileModal({params}:{params: Promise<{id: string}>}) {
   const { id } = await params
-  const profileData = await getProfile(id)
 
-  if (!profileData) {
+  const supabase = await createClient()
+  const { data, error} = await supabase
+  .from('soil_profiles')
+  .select("profile_name, water_depth, pile_length, pile_stick_out")
+  .eq('id', id)
+  .single()
+ 
+  if (error) {
     return (
       <Modal title="Edit Soil Profile">
         <div className="text-destructive text-sm flex justify-center">
@@ -15,11 +21,11 @@ export default async function EditSProfileModal({params}:{params: Promise<{id: s
       </Modal>
     )
   }
-
+  
   return (
     <Modal title="Edit Soil Profile">
       <div className="px-4">
-       <EditProfileForm profile={profileData}/>
+       <EditProfileForm profile={data} profileId={id}/>
       </div>
     </Modal>
   )

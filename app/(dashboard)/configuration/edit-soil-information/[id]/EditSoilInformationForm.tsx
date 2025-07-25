@@ -1,8 +1,8 @@
 "use client"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { TsoilSchema, soilSchema } from "@/schemas/soilSchema"
-import { updateSoil } from "@/app/(dashboard)/configuration/actions/updateSoil"
+import { TeditSoilInformationSchema, editSoilInformationSchema } from "@/schemas/soilSchemas"
+import { updateSoilInformation } from "@/app/(dashboard)/configuration/actions/updateSoilInformation"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -14,23 +14,22 @@ import { Input } from "@/components/ui/input"
 import { SketchPicker } from "react-color"
 import { soilOptions } from "../../insert-soil/[id]/soilData"
 
-export function EditSoilInformation({ soil }: { soil: TsoilSchema }) {
+export function EditSoilInformation({ soil, soilId }: { soil: TeditSoilInformationSchema, soilId: string }) {
   const router = useRouter()
 
-  const form = useForm<TsoilSchema>({ 
-    resolver: zodResolver(soilSchema),
+  const form = useForm<TeditSoilInformationSchema>({ 
+    resolver: zodResolver(editSoilInformationSchema),
     defaultValues: { ...soil }
   })
   
-  const { formState: { isDirty, isSubmitting } } = form
-  const soilType = form.watch("soilType")
-  
-  async function onSubmit(values: TsoilSchema) {
+  const { formState: { isDirty, isSubmitting, dirtyFields } } = form
+  const soilType = form.watch("soil_type")
+
+  async function onSubmit(values: TeditSoilInformationSchema) {
     try {
-      const result = await updateSoil(values)
+      const result = await updateSoilInformation(values, soilId, dirtyFields)
 
       if (result.errors) {
-        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TsoilSchema, {message: Array.isArray(value) ? value[0] : String(value)})})
         toast.error(result.message)
       } 
       
@@ -51,13 +50,13 @@ export function EditSoilInformation({ soil }: { soil: TsoilSchema }) {
           <div className="flex gap-4 items-start">
             <FormField
               control={form.control}
-              name="soilType"
+              name="soil_type"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel htmlFor="soilType">Soil Type</FormLabel>
+                  <FormLabel htmlFor="soil_type">Soil Type</FormLabel>
                   <Select onValueChange={(value) => {field.onChange(value); form.setValue("soil", "")}} defaultValue={field.value} name={field.name}>
                     <FormControl>
-                      <SelectTrigger className="w-full" id="soilType">
+                      <SelectTrigger className="w-full" id="soil_type">
                         <SelectValue placeholder="Select type"/>
                       </SelectTrigger>
                     </FormControl>
@@ -133,7 +132,7 @@ export function EditSoilInformation({ soil }: { soil: TsoilSchema }) {
           <div className="flex gap-4 items-start">
             <FormField
               control={form.control}
-              name="soilName"
+              name="soil_name"
               render={({ field }) => (
                 <FormItem className="flex-1">
                   <FormLabel>Soil Name <span className="font-semibold -ml-1">(optional)</span></FormLabel>

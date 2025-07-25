@@ -1,30 +1,41 @@
 import { InsertSoilForm } from './InsertSoilForm'
-import { getSoils } from '@/lib/getSoils'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { NotFound } from '@/components/NotFound'
 
 export default async function InsertSoilPage({params}:{params: Promise<{id: string}>}) {
   const supabase = await createClient()
+  
   const { data, error } = await supabase.auth.getUser()
   if (error || !data?.user) {
     redirect('/')
   }
 
   const { id } =  await params
-  const soilsData = await getSoils()
-
-  const {error: profileError} = await supabase
+  const {data: profileData, error: profileError} = await supabase
   .from("soil_profiles")
   .select("id")
   .eq("id", id)
+  .single()
   
-  if (profileError){
+  if (profileData?.id !== id || profileError) {
     return <NotFound/>
   }
 
-  const profileSoils = soilsData.filter((soil) => soil.soilProfileId === id)
-  const previousEndDepth = profileSoils.length > 0 ? profileSoils[profileSoils.length - 1].endDepth : undefined
+  const {data: profileSoils, error: profileSoilsError} = await supabase
+  .from("soils")
+  .select("end_depth")
+  .order('end_depth', { ascending: true })
+  .eq("soil_profile_id", id)
+
+  let previousEndDepth: number | undefined
+  if (profileSoilsError || profileSoils.length === 0){
+    previousEndDepth = undefined
+  }
+
+  else {
+    previousEndDepth = profileSoils[profileSoils.length - 1].end_depth
+  }
 
   return (
     <section className='p-5 rounded-lg border max-w-lg mx-auto'>

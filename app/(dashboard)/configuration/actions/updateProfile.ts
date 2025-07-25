@@ -1,37 +1,87 @@
 "use server"
-import { TsoilProfileSchema } from "@/schemas/soilProfileSchema"
+import { TinsertSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { createClient } from "@/utils/supabase/server"
-import { camelToSnake } from "@/lib/caseConversion"
 import { revalidatePath } from "next/cache"
+import { calculateResultsForFineSoilNoFetch, calculateResultsForSoilsNoFetch } from "@/lib/equations"
 
 type ReturnType = {
   message: string
   errors?: Record<string, string[]>
 }
 
-export async function updateProfile(profile: TsoilProfileSchema): Promise<ReturnType> {
+type DirtyFields = Partial<Record<keyof TinsertSoilProfileSchema, boolean>>
+
+export async function updateProfile(profile: TinsertSoilProfileSchema, profileId: string, dirtyFields: DirtyFields = {}): Promise<ReturnType> {
   
-  if (profile.profileName) {
-    profile = {...profile, profileName: profile. profileName.charAt(0).toUpperCase() + profile. profileName.slice(1)}
+  if (profile.profile_name && dirtyFields.profile_name) {
+    profile = {...profile, profile_name: profile.profile_name.charAt(0).toUpperCase() + profile.profile_name.slice(1)}
+  }
+
+  const effectivePileLength = profile.pile_length - profile.pile_stick_out
+  
+  if (dirtyFields.water_depth || dirtyFields.pile_length || dirtyFields.pile_stick_out) {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+    .from("soils")
+    .select("id, start_depth, end_depth, y_moist, y_sat, n_value, soil_type")
+    .eq("soil_profile_id", profileId)
+      
+    if (error) {
+      return { message: `Failed to edit ${profile.profile_name ? profile.profile_name: `soil profile`}, please try again later.`, errors: {} }
+    }
+
+    const pileParametersChanged = dirtyFields.pile_length || dirtyFields.pile_stick_out
+    const soilCalculations = await Promise.all(data.map(async (soil) => {
+      try {
+        let result
+        
+        if (dirtyFields.water_depth && !pileParametersChanged && soil.soil_type === "fine") {
+          return true 
+        }
+        
+        if (soil.soil_type !== "fine") {
+          result = await calculateResultsForSoilsNoFetch(soil, effectivePileLength, profile.water_depth)
+        } 
+        
+        else {
+          result = await calculateResultsForFineSoilNoFetch(soil, effectivePileLength)
+        }
+
+        const { error } = await supabase
+        .from("soils")
+        .update(result)
+        .eq("id", soil.id)
+
+        return !error
+      } 
+      
+      catch {
+        return false
+      }
+    }))
+
+    const allSuccessful = soilCalculations.every((success) => success)
+    if (!allSuccessful) {
+      return { message: `Failed to edit ${profile.profile_name ? profile.profile_name: `soil profile`}, some soil layers failed to calculate.`, errors: {} }
+    }
   }
 
   try {
-    const snakeCaseProfile = camelToSnake(profile)
+    const fullProfile = {...profile, effective_pile_length: effectivePileLength}
     const supabase = await createClient()
     const { error } = await supabase
     .from("soil_profiles")
-    .update(snakeCaseProfile)
-    .eq("id", profile.id)
+    .update(fullProfile)
+    .eq("id", profileId)
 
     if (error) {
-      return { message: `Failed to edit ${profile.profileName ? profile.profileName: `Soil Profile`}, please try again later.`, errors: {}}
+      return { message: `Failed to edit ${profile.profile_name ? profile.profile_name: `soil profile`}, please try again later.`, errors: {}}
     }
 
     revalidatePath("/configuration")
-    return {message: `${profile.profileName ? profile.profileName: `Soil Profile`} has been successfully edited`}
+    return {message: `${profile.profile_name ? profile.profile_name: `Soil Profile`} has been successfully edited`}
   }
-
   catch {
-   return { message: `Failed to edit ${profile.profileName ? profile.profileName: `Soil Profile`}, please try again later.`, errors: {}}
+   return { message: `Failed to edit ${profile.profile_name ? profile.profile_name: `soil profile`}, please try again later.`, errors: {}}
   }
 }

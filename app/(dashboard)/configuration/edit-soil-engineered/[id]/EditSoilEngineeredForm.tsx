@@ -1,31 +1,30 @@
 "use client"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { TsoilSchema, soilSchema } from "@/schemas/soilSchema"
-import { updateSoil } from "@/app/(dashboard)/configuration/actions/updateSoil"
+import { updateSoilEngineered } from "../../actions/updateSoilEngineered"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { useRouter } from "next/navigation"
 import { NumberInput } from "@/components/NumberInput"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
+import { editSoilEngineeredSchema, TeditSoilEngineeredSchema } from "@/schemas/soilSchemas"
 
-export function EditSoilEngineered({ soil }: { soil: TsoilSchema }) {
+export function EditSoilEngineered({ soil, soilId }: { soil: TeditSoilEngineeredSchema, soilId: string }) {
   const router = useRouter()
 
-  const form = useForm<TsoilSchema>({
-    resolver: zodResolver(soilSchema),
+  const form = useForm<TeditSoilEngineeredSchema>({
+    resolver: zodResolver(editSoilEngineeredSchema),
     defaultValues: { ...soil }
   })
 
-  const { formState: { isDirty, isSubmitting } } = form
+  const { formState: { isDirty, isSubmitting, dirtyFields } } = form
 
-  async function onSubmit(values: TsoilSchema) {
+  async function onSubmit(values: TeditSoilEngineeredSchema) {
     try {
-      const result = await updateSoil(values)
+      const result = await updateSoilEngineered(values, soilId, dirtyFields)
 
       if (result.errors) {
-        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TsoilSchema, {message: Array.isArray(value) ? value[0] : String(value)})})
         toast.error(result.message)
       } 
       
@@ -43,7 +42,7 @@ export function EditSoilEngineered({ soil }: { soil: TsoilSchema }) {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
         <div className="space-y-6 border-y-2 py-3">
-          {soil.soilType === "fine" ? (
+          {soil.soil_type === "fine" ? (
             <FormField
               control={form.control}
               name="su"

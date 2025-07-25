@@ -6,14 +6,15 @@ import {DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import type { TsoilSchema } from "@/schemas/soilSchema"
-import { TsoilProfileSchema } from "@/schemas/soilProfileSchema"
+import type { TconfigSoilSchema } from "@/schemas/soilSchemas"
+import { TconfigSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { toast } from "sonner"
 import { deleteSoil } from "./actions/deleteSoil"
-import { Trash2, Copy, Pencil, Layers, PlusCircle, EllipsisVertical, Ellipsis, RotateCcw, ArrowDown, ShieldCheck} from 'lucide-react'
+import { Trash2, Copy, Pencil, Layers, EllipsisVertical, Ellipsis, ArrowDown, RotateCcw } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { deleteProfile } from "./actions/deleteProfile"
-
+import { duplicateProfile } from './actions/duplicateProfile'
+import { deleteAll } from './actions/deleteAll'
 
 const soilTypeCapitalisation = {
   'fine': 'Fine Grain',
@@ -26,17 +27,18 @@ const soilDensityCapitalisation = {
   'dense' : 'Dense'
 }
 
-export function SoilTable({ soilsData, profilesData}: { soilsData: TsoilSchema[], profilesData: TsoilProfileSchema[] }) {
+export function ConfigAccordion({ soilsData, profilesData}: { soilsData: TconfigSoilSchema[], profilesData: TconfigSoilProfileSchema[] }) {
   const router = useRouter()
-  const [selectedSoil, setSelectedSoil] = useState<{ id: string; name: string } | null>(null)
+  const [selectedSoil, setSelectedSoil] = useState<{ id: string; name: string; profileId: string} | null>(null)
   const [selectedProfile, setSelectedProfile] = useState<{ id: string; name: string } | null>(null)
   const [isSoilDeleteDialogOpen, setisSoilDeleteDialogOpen] = useState(false)
   const [isProfileDeleteDialogOpen, setIsProfileDeleteDialogOpen] = useState(false)
+  const [isDeleteAlleDialogOpen, setIsDeleteAllDialogOpen] = useState(false)
 
   const handleSoilDelete = async () => {
     if (selectedSoil !== null) {
       try {
-        const result = await deleteSoil(selectedSoil.id, selectedSoil.name)
+        const result = await deleteSoil(selectedSoil.id, selectedSoil.name, selectedSoil.profileId)
         if (result.errors) {
           toast.error(result.message)
         }
@@ -72,31 +74,50 @@ export function SoilTable({ soilsData, profilesData}: { soilsData: TsoilSchema[]
   }
 
   const handleDuplicateProfile = async (profileId: string) => {
-    console.log("MEOW" + profileId)
+    try {
+      const result = await duplicateProfile(profileId)
+      if (result.errors) {
+        toast.error(result.message)
+      }
+
+      else {
+        toast.success(result.message)
+      }
+
+    } catch {
+      toast.error("An unexpected error has occurred.", { description: "Please try again later." })
+    }
   }
 
-  const soilsByProfile = Object.groupBy(soilsData, soil => soil.soilProfileId!)
+  const handleStartOver = async () => {
+    try {
+      const result = await deleteAll()
+      if (result.errors) {
+        toast.error(result.message)
+      }
+
+      else {
+        toast.success(result.message)
+      }
+    }
+
+    catch {
+      toast.error("An unexpected error has occurred.", { description: "Please try again later." })
+    }
+  }
+
+  const soilsByProfile = Object.groupBy(soilsData, soil => soil.soil_profile_id)
   return (
     <>
-      <div className="mb-3 flex flex-col sm:flex-row sm:justify-end sm:gap-5">
-        <Button asChild variant="outline" className="sm:w-58 hover:bg-blue-200 dark:hover:bg-blue-900/50 shadow-sm" size="lg">
-          <Link href="/configuration/design-methods" prefetch={false} scroll={false}><ShieldCheck className='size-5 text-blue-700'/>Determine Design Methods</Link>
-        </Button>
-
-        <Button asChild variant="outline" className="mt-2 sm:w-58 sm:mt-0 hover:bg-green-200 dark:hover:bg-green-900/50 shadow-sm" size="lg">
-          <Link href="/configuration/insert-profile" prefetch={true} scroll={false}><PlusCircle className="size-5 text-green-700"/>Add Soil Profile</Link>
-        </Button>
-      </div>
-      
       <Accordion type="multiple" className="space-y-6">
         {profilesData.map((profile, index) => {
-          const profileSoils = soilsByProfile[profile.id!] || []
+          const profileSoils = soilsByProfile[profile.id] || []
           return (
-            <AccordionItem key={profile.id} value={profile.id!}>
+            <AccordionItem key={profile.id} value={profile.id}>
             
               <div className="relative">
                 <AccordionTrigger className="border-2 pl-2 pr-16 shadow-inner bg-secondary">
-                  <h2 className="text-xl font-semibold"> {profile.profileName ? profile.profileName : `Soil Profile ${index + 1}`}</h2>
+                  <h2 className="text-xl font-semibold"> {profile.profile_name ? profile.profile_name : `Soil Profile ${index + 1}`}</h2>
                 </AccordionTrigger>
 
                 <div className="absolute top-0 right-0 mt-1.5 border-l-2">
@@ -105,11 +126,11 @@ export function SoilTable({ soilsData, profilesData}: { soilsData: TsoilSchema[]
                       <Button title='Profile Menu' variant="ghost" size="icon" className="mx-2 hover:bg-foreground/7 dark:hover:bg-foreground/7"><EllipsisVertical className='size-6 text-muted-foreground'/></Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-42" sideOffset={-2}>
-                      <DropdownMenuLabel className='font-semibold'>{profile.profileName ? profile.profileName : `Soil Profile ${index + 1}`}</DropdownMenuLabel>
+                      <DropdownMenuLabel className='font-semibold'>{profile.profile_name ? profile.profile_name : `Soil Profile ${index + 1}`}</DropdownMenuLabel>
                       <DropdownMenuSeparator/>
                       <DropdownMenuItem onClick={() => router.push(`/configuration/edit-profile/${profile.id}`, { scroll: false })} className='hover:cursor-pointer'><Pencil className='text-muted-foreground'/>Edit</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleDuplicateProfile(profile.id!)} className='hover:cursor-pointer'><Copy className='text-muted-foreground'/>Duplicate</DropdownMenuItem>
-                      <DropdownMenuItem variant='destructive' onClick={() => {setSelectedProfile({id: profile.id!, name: profile.profileName || `Soil Profile ${index + 1}`}); setIsProfileDeleteDialogOpen(true)}} className='hover:cursor-pointer'><Trash2/>Delete</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleDuplicateProfile(profile.id)} className='hover:cursor-pointer'><Copy className='text-muted-foreground'/>Duplicate</DropdownMenuItem>
+                      <DropdownMenuItem variant='destructive' onClick={() => {setSelectedProfile({id: profile.id, name: profile.profile_name || `Soil Profile ${index + 1}`}); setIsProfileDeleteDialogOpen(true)}} className='hover:cursor-pointer'><Trash2/>Delete</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -147,14 +168,14 @@ export function SoilTable({ soilsData, profilesData}: { soilsData: TsoilSchema[]
                         {profileSoils.map((soil, index) => (
                           <TableRow key={soil.id}>
                             <TableCell>{index + 1}</TableCell>
-                            <TableCell>{soilTypeCapitalisation[soil.soilType]}</TableCell>
+                            <TableCell>{soilTypeCapitalisation[soil.soil_type]}</TableCell>
                             <TableCell>{soilDensityCapitalisation[soil.density]}</TableCell>
-                            <TableCell>{soil.soilName || soil.soil}</TableCell>
-                            <TableCell>{`${soil.startDepth} m`}</TableCell>
-                            <TableCell>{`${soil.endDepth} m`}</TableCell>
-                            <TableCell>{`${soil.ySat} kN/m³`}</TableCell>
-                            <TableCell>{`${soil.yMoist} kN/m³`}</TableCell>
-                            <TableCell>{soil.nValue}</TableCell>        
+                            <TableCell>{soil.soil_name || soil.soil}</TableCell>
+                            <TableCell>{`${soil.start_depth} m`}</TableCell>
+                            <TableCell>{`${soil.end_depth} m`}</TableCell>
+                            <TableCell>{`${soil.y_sat} kN/m³`}</TableCell>
+                            <TableCell>{`${soil.y_moist} kN/m³`}</TableCell>
+                            <TableCell>{soil.n_value}</TableCell>        
                             <TableCell className='hidden 2xl:table-cell'>{soil.description}</TableCell>
                             <TableCell className="text-right">
                               <DropdownMenu>
@@ -167,7 +188,7 @@ export function SoilTable({ soilsData, profilesData}: { soilsData: TsoilSchema[]
                                   <DropdownMenuItem onClick={() => router.push(`/configuration/edit-soil-parameters/${soil.id}`, { scroll: false })} className='hover:cursor-pointer'>Parameters</DropdownMenuItem>
                                   <DropdownMenuItem onClick={() =>router.push(`/configuration/edit-soil-engineered/${soil.id}`, { scroll: false })} className='hover:cursor-pointer'>Engineered</DropdownMenuItem>
                                   <DropdownMenuSeparator/>
-                                  <DropdownMenuItem variant='destructive' onClick={() => {setSelectedSoil({ id: soil.id!, name: soil.soilName || soil.soil }); setisSoilDeleteDialogOpen(true)}} className='hover:cursor-pointer'><Trash2/>Delete</DropdownMenuItem>
+                                  <DropdownMenuItem variant='destructive' onClick={() => {setSelectedSoil({ id: soil.id, name: soil.soil_name || soil.soil, profileId: profile.id }); setisSoilDeleteDialogOpen(true)}} className='hover:cursor-pointer'><Trash2/>Delete</DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </TableCell>
@@ -191,7 +212,7 @@ export function SoilTable({ soilsData, profilesData}: { soilsData: TsoilSchema[]
       
       {profilesData.length > 1 && 
         <div className='flex justify-center mt-auto py-2'>
-          <Button variant="ghost" className='hover:bg-red-200 dark:hover:bg-red-900/50' size="lg"><RotateCcw className='size-5 text-destructive'/>Start Over</Button>
+          <Button onClick={() => setIsDeleteAllDialogOpen(true)} variant="ghost" className='hover:bg-red-200 dark:hover:bg-red-900/50' size="lg"><RotateCcw className='size-5 text-destructive'/>Start Over</Button>
         </div>
       }
 
@@ -217,6 +238,19 @@ export function SoilTable({ soilsData, profilesData}: { soilsData: TsoilSchema[]
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleSoilDelete}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={isDeleteAlleDialogOpen} onOpenChange={setIsDeleteAllDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription> This action cannot be undone. All soil profiles will be permanently deleted and removed from the configuration.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleStartOver}>Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

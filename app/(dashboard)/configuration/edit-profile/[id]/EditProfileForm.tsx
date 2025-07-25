@@ -1,7 +1,7 @@
 "use client"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { TsoilProfileSchema, soilProfileSchema } from "@/schemas/soilProfileSchema"
+import { TinsertSoilProfileSchema, insertSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { updateProfile } from "../../actions/updateProfile"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -13,24 +13,24 @@ import { toast } from "sonner"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useState, useEffect } from "react"
 
-export function EditProfileForm({ profile }: { profile: TsoilProfileSchema }) {
+export function EditProfileForm({ profile, profileId }: { profile: TinsertSoilProfileSchema, profileId: string }) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("profile")
 
-  const form = useForm<TsoilProfileSchema>({
-    resolver: zodResolver(soilProfileSchema),
+  const form = useForm<TinsertSoilProfileSchema>({
+    resolver: zodResolver(insertSoilProfileSchema),
     defaultValues: { ...profile }
   })
 
-  const { formState: { isDirty, isSubmitting } } = form
-  
+  const { formState: { isDirty, isSubmitting, dirtyFields } } = form
+
   useEffect(() => {
     const errorFields = Object.keys(form.formState.errors)
 
     if (errorFields.length === 0) return
     
-    const profileTabFields = ["profileName", "waterDepth"]
-    const pileTabFields = ["pileLength", "pileStickOut"]
+    const profileTabFields = ["profile_name", "water_depth"]
+    const pileTabFields = ["pile_length", "pile_stick_out"]
 
     const hasProfileErrors = errorFields.some(field => profileTabFields.includes(field))
     const hasPileErrors = errorFields.some(field => pileTabFields.includes(field))
@@ -43,12 +43,11 @@ export function EditProfileForm({ profile }: { profile: TsoilProfileSchema }) {
     }
   }, [form.formState.errors])
 
-  async function onSubmit(values: TsoilProfileSchema) {
+  async function onSubmit(values: TinsertSoilProfileSchema) {
     try {
-      const result = await updateProfile(values)
+      const result = await updateProfile(values, profileId, dirtyFields)
 
       if (result.errors) {
-        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TsoilProfileSchema, { message: Array.isArray(value) ? value[0] : String(value)})})
         toast.error(result.message)
       }
 
@@ -75,7 +74,7 @@ export function EditProfileForm({ profile }: { profile: TsoilProfileSchema }) {
             <div className="space-y-6 border-y-2 py-3">
               <FormField
                 control={form.control}
-                name="profileName"
+                name="profile_name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Profile Name <span className="font-semibold -ml-1">(optional)</span></FormLabel>
@@ -89,7 +88,7 @@ export function EditProfileForm({ profile }: { profile: TsoilProfileSchema }) {
 
               <FormField
                 control={form.control}
-                name="waterDepth"
+                name="water_depth"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Water Depth <span className="font-semibold -ml-1">(m)</span></FormLabel>
@@ -112,7 +111,7 @@ export function EditProfileForm({ profile }: { profile: TsoilProfileSchema }) {
             <div className="space-y-6 border-y-2 py-3">
               <FormField
                 control={form.control}
-                name="pileLength"
+                name="pile_length"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Pile Length <span className="font-semibold -ml-1">(m)</span></FormLabel>
@@ -126,7 +125,7 @@ export function EditProfileForm({ profile }: { profile: TsoilProfileSchema }) {
 
               <FormField
                 control={form.control}
-                name="pileStickOut"
+                name="pile_stick_out"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Pile Stick Out <span className="font-semibold -ml-1">(m)</span></FormLabel>
