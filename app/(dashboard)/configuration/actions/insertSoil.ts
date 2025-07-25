@@ -1,8 +1,7 @@
 "use server"
-import { TsoilSchema } from "@/schemas/soilSchema"
+import { TinsertSoilSchema } from "@/schemas/soilSchemas"
 import { calculateResultsForFineSoil, calculateResultsForSoils } from "@/lib/equations"
 import { createClient } from "@/utils/supabase/server"
-import { camelToSnake } from "@/lib/caseConversion"
 import { revalidatePath } from "next/cache"
 
 type ReturnType = {
@@ -10,13 +9,13 @@ type ReturnType = {
   errors?: Record<string, string[]>
 }
 
-export async function insertSoil(soil: TsoilSchema, profileId: string): Promise<ReturnType> {
-  console.log(soil)
-  if (soil.soilName) {
-    soil = {...soil, soilName: soil.soilName.charAt(0).toUpperCase() + soil.soilName.slice(1)}
+export async function insertSoil(soil: TinsertSoilSchema, profileId: string): Promise<ReturnType> {
+
+  if (soil.soil_name) {
+    soil = {...soil, soil_name: soil.soil_name.charAt(0).toUpperCase() + soil.soil_name.slice(1)}
   }
 
-  if (soil.soilType === "fine") {
+  if (soil.soil_type === "fine") {
     soil = { ...soil,...await calculateResultsForFineSoil(soil, profileId)}
   }
 
@@ -28,25 +27,25 @@ export async function insertSoil(soil: TsoilSchema, profileId: string): Promise<
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
-    const snakeCaseSoil = camelToSnake({
+    const fullSoil = {
       ...soil,
       user_id: user!.id,
       soil_profile_id: profileId
-    })
+    }
 
     const { error } = await supabase
     .from('soils')
-    .insert(snakeCaseSoil)
+    .insert(fullSoil)
      
     if (error) {
-      return { message: `Failed to add ${soil.soilName ? soil.soilName : soil.soil}, please try again later.`, errors: {}}
+      return { message: `Failed to add ${soil.soil_name ? soil.soil_name : soil.soil}, please try again later.`, errors: {}}
     }
     
     revalidatePath('/configuration')
-    return { message: ` ${soil.soilName ? soil.soilName : soil.soil} has been successfully added` }
+    return { message: ` ${soil.soil_name ? soil.soil_name : soil.soil} has been successfully added` }
   }
   
   catch {
-    return { message: `Failed to add ${soil.soilName ? soil.soilName : soil.soil}, please try again later.`, errors: {}}
+    return { message: `Failed to add ${soil.soil_name ? soil.soil_name : soil.soil}, please try again later.`, errors: {}}
   }
 }

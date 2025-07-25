@@ -7,8 +7,8 @@ import { SoilGraph } from "./SoilGraph"
 import { SoilDiagram } from "./SoilDiagram"
 import { ToggleButton } from "./ToggleButton"
 import { Fragment } from "react"
-import { TsoilSchema } from "@/schemas/soilSchema"
-import { TsoilProfileSchema } from "@/schemas/soilProfileSchema"
+import { TsoilSchema } from "@/schemas/soilSchemas"
+import { TsoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { snakeToCamel } from "@/lib/caseConversion"
 
 export const metadata = {
@@ -21,15 +21,14 @@ async function getProfiles(): Promise<TsoilProfileSchema[]>{
     const supabase = await createClient()
     const {data, error} = await supabase
     .from("soil_profiles")
-    .select("profile_name, id, water_depth, pile_length, pile_stick_out")
+    .select("profile_name, id, water_depth, effective_pile_length, pile_stick_out")
     .order("created_at", { ascending: true })
 
-    if (error || !data) {
+    if (error) {
       return []
     }
 
-    const profiles = data.map(profile => snakeToCamel(profile))
-    return profiles as TsoilProfileSchema[]
+    return data
 
   }
   catch {

@@ -1,12 +1,18 @@
 import { EditSoilInformation } from '../../../edit-soil-information/[id]/EditSoilInformationForm'
 import { Modal } from '@/components/Modal'
-import { getSoil } from "@/lib/getSoil"
+import { createClient } from '@/utils/supabase/server'
 
 export default async function EditSoilInformationModal({params}:{params: Promise<{id: string}>}) {
   const { id } = await params
-  const soilData = await getSoil(id)
- 
-  if (!soilData) {
+   
+  const supabase = await createClient()
+  const { data, error } = await supabase
+  .from('soils')
+  .select("soil_type, density, soil, soil_name, description, colour")
+  .eq('id', id)
+  .single()
+    
+  if (error) {
     return (
       <Modal title="Edit Soil Information">
         <div className="text-destructive text-sm flex justify-center">
@@ -19,7 +25,7 @@ export default async function EditSoilInformationModal({params}:{params: Promise
   return (
     <Modal title="Edit Soil Information">
       <div className="px-4">
-        <EditSoilInformation soil={soilData}/>
+        <EditSoilInformation soil={data} soilId={id}/>
       </div>
     </Modal>
   )

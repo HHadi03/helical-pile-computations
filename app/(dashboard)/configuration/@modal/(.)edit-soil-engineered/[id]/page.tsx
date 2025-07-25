@@ -1,7 +1,6 @@
 import { EditSoilEngineered } from '../../../edit-soil-engineered/[id]/EditSoilEngineeredForm'
 import { Modal } from '@/components/Modal'
 import { createClient } from '@/utils/supabase/server'
-import { snakeToCamel } from '@/lib/caseConversion'
 
 export default async function EditSoilEngineeredModal({params}:{params: Promise<{id: string}>}) {
   const { id } = await params
@@ -9,11 +8,11 @@ export default async function EditSoilEngineeredModal({params}:{params: Promise<
   const supabase = await createClient()
   const { data, error } = await supabase
   .from('soils')
-  .select("id, su, t, angle, qult, h, po, start_depth, end_depth, soil_type, soil, soil_name, soil_profile_id")
+  .select("su, t, angle, qult, soil_type")
   .eq('id', id)
   .single()
     
-  if (error || !data) {
+  if (error) {
     return (
       <Modal title="Edit Soil Engineered">
         <div className="text-destructive text-sm flex justify-center">
@@ -23,12 +22,10 @@ export default async function EditSoilEngineeredModal({params}:{params: Promise<
     )
   }
   
-  const soilData = snakeToCamel(data)
-
   return (
     <Modal title="Edit Soil Engineered">
       <div className="px-4">
-        <EditSoilEngineered soil={soilData}/>
+        <EditSoilEngineered soil={data} soilId={id}/>
       </div>
     </Modal>
   )

@@ -1,53 +1,48 @@
 import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
-import { TsoilSchema } from "@/schemas/soilSchema"
-import { snakeToCamel } from "@/lib/caseConversion"
+import { TconfigSoilSchema } from "@/schemas/soilSchemas"
 import { ConfigAccordion } from "./ConfigAccordion"
 import { Plus, FolderX, ShieldCheck, PlusCircle } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { TsoilProfileSchema } from "@/schemas/soilProfileSchema"
+import { TconfigSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 
 export const metadata = {
   title: "Configuration | Helical Pile Computations",
   description: "Set up soil profiles and piles for analysis",
 }
 
-async function getProfiles(): Promise<TsoilProfileSchema[]>{
+async function getProfiles(): Promise<TconfigSoilProfileSchema[]>{
   try {
     const supabase = await createClient()
     const {data, error} = await supabase
     .from("soil_profiles")
-    .select("profile_name, id")
+    .select("profile_name, id, created_at")
     .order("created_at", { ascending: true })
 
     if (error || !data) {
       return []
     }
-
-    const profiles = data.map(profile => snakeToCamel(profile))
-    return profiles as TsoilProfileSchema[]
-
+    return data
+    
   }
   catch {
     return []
   }
 }
 
-async function getSoils(): Promise<TsoilSchema[]> {
+async function getSoils(): Promise<TconfigSoilSchema[]> {
   try {
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('soils')
-      .select("id, soil_type, density, soil, soil_name, description, start_depth, end_depth, n_value, y_moist, y_sat, soil_profile_id")
+      .select("id, soil_profile_id, soil_type, density, soil, soil_name, description, start_depth, end_depth, n_value, y_moist, y_sat")
       .order('start_depth', { ascending: true })
 
-    if (error || !data) {
+    if (error) {
       return []
     }
-    
-    const soils = data.map(soil => snakeToCamel(soil))
-    return soils as TsoilSchema[]
+    return data
     
   } catch {
     return []

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { soilOptions, soilProperties } from "./soilData"
-import { soilSchema, TsoilSchema } from "@/schemas/soilSchema"
+import { insertSoilSchema, TinsertSoilSchema } from "@/schemas/soilSchemas"
 import { insertSoil } from "../../actions/insertSoil"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
@@ -26,22 +26,22 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
   const [activeTab, setActiveTab] = useState("soil")
   const { theme } = useTheme()
   
-  const form = useForm<TsoilSchema>({
-    resolver: zodResolver(soilSchema),
+  const form = useForm<TinsertSoilSchema>({
+    resolver: zodResolver(insertSoilSchema),
     defaultValues: {
-      startDepth: previousEndDepth || 0,
-      endDepth: "" as unknown as number,
-      nValue: "" as unknown as number,
-      yMoist: undefined,
-      ySat: undefined,
-      soilName: "",
+      start_depth: previousEndDepth || 0,
+      end_depth: "" as unknown as number,
+      n_value: "" as unknown as number,
+      y_moist: undefined,
+      y_sat: undefined,
+      soil_name: "",
       description: "",
       colour: "#000000",
     }
   })
   
   const { formState: { isSubmitting } } = form
-  const soilType = form.watch("soilType")
+  const soilType = form.watch("soil_type")
   const soil = form.watch("soil")
   const density = form.watch("density")
   const showParametersTab = Boolean(soilType && soil && density)
@@ -51,8 +51,8 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
 
     if (errorFields.length === 0) return
     
-    const soilTabFields = ["soilType", "soil", "density", "soilName", "description", "colour"]
-    const parametersTabFields = ["startDepth", "endDepth", "yMoist", "ySat", "nValue"]
+    const soilTabFields = ["soil_type", "soil", "density", "soil_name", "description", "colour"]
+    const parametersTabFields = ["start_depth", "end_depth", "y_moist", "y_sat", "n_value"]
 
     const hasSoilErrors = errorFields.some(field => soilTabFields.includes(field))
     const hasParameterErrors = errorFields.some(field => parametersTabFields.includes(field))
@@ -68,17 +68,16 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
   useEffect(() => {
     if (soil && density && soilProperties[soil]) {
       const values = soilProperties[soil][density]
-      form.setValue("yMoist", values.yMoist)
-      form.setValue("ySat", values.ySat)
+      form.setValue("y_moist", values.yMoist)
+      form.setValue("y_sat", values.ySat)
     }
   }, [soil, density, form])
 
-  async function onSubmit(values: TsoilSchema) {
+  async function onSubmit(values: TinsertSoilSchema) {
     try {
       const result = await insertSoil(values, profileId)
 
       if (result.errors) {
-        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TsoilSchema, { message: Array.isArray(value) ? value[0] : (value as string)})})
         toast.error(result.message)
       }
 
@@ -106,13 +105,13 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
               <div className="flex gap-4 items-start">
                 <FormField
                   control={form.control}
-                  name="soilType"
+                  name="soil_type"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel htmlFor="soilType">Soil Type</FormLabel>
+                      <FormLabel htmlFor="soil_type">Soil Type</FormLabel>
                       <Select onValueChange={(value) => {field.onChange(value); form.setValue("soil", "")}} defaultValue={field.value} name={field.name}>
                         <FormControl>
-                          <SelectTrigger className="w-full" id="soilType">
+                          <SelectTrigger className="w-full" id="soil_type">
                             <SelectValue placeholder="Select type"/>
                           </SelectTrigger>
                         </FormControl>
@@ -189,7 +188,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
               <div className="flex gap-4 items-start">
                 <FormField
                   control={form.control}
-                  name="soilName"
+                  name="soil_name"
                   render={({ field }) => (
                     <FormItem className="flex-1">
                       <FormLabel>Soil Name <span className="font-semibold -ml-1">(optional)</span></FormLabel>
@@ -236,7 +235,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
               <div className="flex gap-4 items-start">
                 <FormField
                   control={form.control}
-                  name="startDepth"
+                  name="start_depth"
                   render={({ field }) => (
                     <FormItem className="w-27 hover:cursor-not-allowed">
                       <FormLabel>Start Depth <span className="font-semibold -ml-1">(m)</span></FormLabel>
@@ -250,7 +249,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                 
                 <FormField
                   control={form.control}
-                  name="endDepth"
+                  name="end_depth"
                   render={({ field }) => (
                     <FormItem className="flex-1">
                       <FormLabel>End Depth <span className="font-semibold -ml-1">(m)</span></FormLabel>
@@ -265,7 +264,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
 
               <FormField
                 control={form.control}
-                name="yMoist"
+                name="y_moist"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Moist Unit Weight <span className="font-semibold -ml-1">(kN/m³)</span></FormLabel>  
@@ -279,7 +278,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
 
               <FormField
                 control={form.control}
-                name="ySat"
+                name="y_sat"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Saturated Unit Weight <span className="font-semibold -ml-1">(kN/m³)</span></FormLabel>
@@ -293,7 +292,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
 
               <FormField
                 control={form.control}
-                name="nValue"
+                name="n_value"
                 render={({ field }) => (
                   <FormItem className="relative">
                     <FormLabel>SPT N-Value</FormLabel>

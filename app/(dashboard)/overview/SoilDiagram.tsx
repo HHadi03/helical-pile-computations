@@ -1,5 +1,5 @@
-import { TsoilProfileSchema } from "@/schemas/soilProfileSchema"
-import { TsoilSchema } from "@/schemas/soilSchema"
+import { TsoilProfileSchema } from "@/schemas/soilProfileSchemas"
+import { TsoilSchema } from "@/schemas/soilSchemas"
 import { ArrowUp, ArrowDown, Triangle } from "lucide-react"
 import { getLuminance } from "@/lib/Luminance"
 

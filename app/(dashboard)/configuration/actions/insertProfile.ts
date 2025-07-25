@@ -1,6 +1,5 @@
 "use server"
-import { camelToSnake } from "@/lib/caseConversion"
-import { TsoilProfileSchema } from "@/schemas/soilProfileSchema"
+import { TinsertSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
 
@@ -9,44 +8,35 @@ type ReturnType = {
   errors?: Record<string, string[]>
 }
   
-export async function insertProfile(profile: TsoilProfileSchema): Promise<ReturnType> {
+export async function insertProfile(profile: TinsertSoilProfileSchema): Promise<ReturnType> {
  
-  if (profile.profileName) {
-    profile = {...profile, profileName: profile. profileName.charAt(0).toUpperCase() + profile. profileName.slice(1)}
+  if (profile.profile_name) {
+    profile = {...profile, profile_name: profile. profile_name.charAt(0).toUpperCase() + profile. profile_name.slice(1)}
   }
 
-  let effectivePileLength: number
-  if (profile.pileLength < profile.pileStickOut) {
-    effectivePileLength = 0
-  } 
-
-  else {
-    effectivePileLength = profile.pileLength - profile.pileStickOut
-  }
-  
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     
-    const snakeCaseProfile = camelToSnake ({
+    const fullProfile = {
       ...profile,
       user_id: user!.id,
-      effective_pile_length: effectivePileLength
-    })
+      effective_pile_length: profile.pile_length - profile.pile_stick_out
+    }
     
     const { error } = await supabase
     .from('soil_profiles')
-    .insert(snakeCaseProfile)
+    .insert(fullProfile)
 
     if (error) {
-      return {message: `Failed to add  ${profile.profileName ? profile.profileName: `Soil Profile`}, please try again later.`, errors:{}}
+      return {message: `Failed to add  ${profile.profile_name ? profile.profile_name: `soil profile`}, please try again later.`, errors:{}}
     }
 
     revalidatePath('/configuration')
-    return { message: `${profile.profileName ? profile.profileName: `Soil Profile`} has been successfully added` }
+    return { message: `${profile.profile_name ? profile.profile_name: `Soil Profile`} has been successfully added` }
   }
   
   catch {
-    return { message: `Failed to add ${profile.profileName ? profile.profileName: `Soil Profile`}, please try again later.`, errors: {}}
+    return { message: `Failed to add ${profile.profile_name ? profile.profile_name: `soil profile`}, please try again later.`, errors: {}}
   }
 }

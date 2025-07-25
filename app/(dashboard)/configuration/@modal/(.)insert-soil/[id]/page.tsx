@@ -13,7 +13,7 @@ export default async function InsertSoilModal({params}:{params: Promise<{id: str
   .eq("soil_profile_id", id)
 
   let previousEndDepth: number | undefined
-  if (profileSoilsError || !profileSoils || profileSoils.length === 0){
+  if (profileSoilsError || profileSoils.length === 0){
     previousEndDepth = undefined
   }
 

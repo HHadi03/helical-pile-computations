@@ -1,5 +1,5 @@
 'use client'
-import { TsoilSchema } from "@/schemas/soilSchema";
+import { TsoilSchema } from "@/schemas/soilSchemas";
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 

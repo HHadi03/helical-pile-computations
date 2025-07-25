@@ -1,8 +1,8 @@
 "use client"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { TsoilSchema, soilSchema } from "@/schemas/soilSchema"
-import { updateSoil } from "@/app/(dashboard)/configuration/actions/updateSoil"
+import { TeditSoilParametersSchema, editSoilParametersSchema } from "@/schemas/soilSchemas"
+import { updateSoilParameters } from "../../actions/updateSoilParameters"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { useRouter } from "next/navigation"
@@ -10,22 +10,24 @@ import { NumberInput } from "@/components/NumberInput"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
-export function EditSoilParameters({ soil }: { soil: TsoilSchema }) {
+export function EditSoilParameters({ soil, soilId }: { soil: TeditSoilParametersSchema, soilId: string }) {
   const router = useRouter()
 
-  const form = useForm<TsoilSchema>({
-    resolver: zodResolver(soilSchema),
+  const form = useForm<TeditSoilParametersSchema>({
+    resolver: zodResolver(editSoilParametersSchema),
     defaultValues: { ...soil }
   })
+  
+  const { formState: { isDirty, isSubmitting, dirtyFields } } = form
+  
+  
 
-  const { formState: { isDirty, isSubmitting } } = form
-
-  async function onSubmit(values: TsoilSchema) {
+  async function onSubmit(values: TeditSoilParametersSchema) {
     try {
-      const result = await updateSoil(values)
+      const result = await updateSoilParameters(values, soilId, dirtyFields)
 
       if (result.errors) {
-        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TsoilSchema, {message: Array.isArray(value) ? value[0] : String(value)})})
+        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TeditSoilParametersSchema, {message: Array.isArray(value) ? value[0] : String(value)})})
         toast.error(result.message)
       } 
       
@@ -46,7 +48,7 @@ export function EditSoilParameters({ soil }: { soil: TsoilSchema }) {
           <div className="flex gap-4 items-start">
             <FormField
               control={form.control}
-              name="startDepth"
+              name="start_depth"
               render={({ field }) => (
                 <FormItem className="w-27 hover:cursor-not-allowed">
                   <FormLabel>Start Depth <span className="font-semibold -ml-1">(m)</span></FormLabel>
@@ -60,7 +62,7 @@ export function EditSoilParameters({ soil }: { soil: TsoilSchema }) {
 
             <FormField
               control={form.control}
-              name="endDepth"
+              name="end_depth"
               render={({ field }) => (
                 <FormItem className="flex-1">
                   <FormLabel>End Depth <span className="font-semibold -ml-1">(m)</span></FormLabel>
@@ -75,7 +77,7 @@ export function EditSoilParameters({ soil }: { soil: TsoilSchema }) {
 
           <FormField
             control={form.control}
-            name="yMoist"
+            name="y_moist"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Moist Unit Weight <span className="font-semibold -ml-1">(kN/m³)</span></FormLabel>
@@ -89,7 +91,7 @@ export function EditSoilParameters({ soil }: { soil: TsoilSchema }) {
 
           <FormField
             control={form.control}
-            name="ySat"
+            name="y_sat"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Saturated Unit Weight <span className="font-semibold -ml-1">(kN/m³)</span></FormLabel>
@@ -103,7 +105,7 @@ export function EditSoilParameters({ soil }: { soil: TsoilSchema }) {
 
           <FormField
             control={form.control}
-            name="nValue"
+            name="n_value"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>SPT N-Value</FormLabel>

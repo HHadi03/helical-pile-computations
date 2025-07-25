@@ -1,4 +1,4 @@
-import { TsoilSchema } from "@/schemas/soilSchema" 
+import { TsoilSchema } from "@/schemas/soilSchemas" 
 import { snakeToCamel } from "./caseConversion"
 import { createClient } from "@/utils/supabase/server"
 

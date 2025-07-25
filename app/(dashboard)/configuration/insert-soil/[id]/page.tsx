@@ -18,7 +18,7 @@ export default async function InsertSoilPage({params}:{params: Promise<{id: stri
   .eq("id", id)
   .single()
   
-  if (profileData?.id === id || profileError) {
+  if (profileData?.id !== id || profileError) {
     return <NotFound/>
   }
 
@@ -29,7 +29,7 @@ export default async function InsertSoilPage({params}:{params: Promise<{id: stri
   .eq("soil_profile_id", id)
 
   let previousEndDepth: number | undefined
-  if (profileSoilsError || !profileSoils || profileSoils.length === 0){
+  if (profileSoilsError || profileSoils.length === 0){
     previousEndDepth = undefined
   }
 

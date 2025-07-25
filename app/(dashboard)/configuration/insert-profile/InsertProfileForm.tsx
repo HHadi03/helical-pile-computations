@@ -2,7 +2,7 @@
 import { Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { soilProfileSchema, TsoilProfileSchema } from "@/schemas/soilProfileSchema"
+import { insertSoilProfileSchema, TinsertSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { insertProfile } from "../actions/insertProfile"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -17,13 +17,13 @@ export function ProfileForm() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("profile")
 
-  const form = useForm<TsoilProfileSchema>({
-    resolver: zodResolver(soilProfileSchema),
+  const form = useForm<TinsertSoilProfileSchema>({
+    resolver: zodResolver(insertSoilProfileSchema),
     defaultValues: {
-      profileName: "",
-      pileLength:"" as unknown as number,
-      pileStickOut: "" as unknown as number,
-      waterDepth:"" as unknown as number,
+      profile_name: "",
+      pile_length:"" as unknown as number,
+      pile_stick_out: "" as unknown as number,
+      water_depth:"" as unknown as number,
     }
   })
   
@@ -34,8 +34,8 @@ export function ProfileForm() {
 
     if (errorFields.length === 0) return
     
-    const profileTabFields = ["profileName", "waterDepth"]
-    const pileTabFields = ["pileLength", "pileStickOut"]
+    const profileTabFields = ["profile_name", "water_depth"]
+    const pileTabFields = ["pile_length", "pile_stick_out"]
 
     const hasProfileErrors = errorFields.some(field => profileTabFields.includes(field))
     const hasPileErrors = errorFields.some(field => pileTabFields.includes(field))
@@ -48,12 +48,11 @@ export function ProfileForm() {
     }
   }, [form.formState.errors])
 
-  async function onSubmit(values: TsoilProfileSchema) {
+  async function onSubmit(values: TinsertSoilProfileSchema) {
     try {
       const result = await insertProfile(values)
 
       if (result.errors) {
-        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TsoilProfileSchema, { message: Array.isArray(value) ? value[0] : (value as string)})})
         toast.error(result.message)
       }
 
@@ -80,7 +79,7 @@ export function ProfileForm() {
             <div className="space-y-6 border-y-2 py-3">
               <FormField
                 control={form.control}
-                name="profileName"
+                name="profile_name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Profile Name <span className="font-semibold -ml-1">(optional)</span></FormLabel>
@@ -94,7 +93,7 @@ export function ProfileForm() {
 
               <FormField
                 control={form.control}
-                name="waterDepth"
+                name="water_depth"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Water Depth <span className="font-semibold -ml-1">(m)</span></FormLabel>
@@ -117,7 +116,7 @@ export function ProfileForm() {
             <div className="space-y-6 border-y-2 py-3">
               <FormField
                 control={form.control}
-                name="pileLength"
+                name="pile_length"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Pile Length <span className="font-semibold -ml-1">(m)</span></FormLabel>
@@ -131,7 +130,7 @@ export function ProfileForm() {
 
               <FormField
                 control={form.control}
-                name="pileStickOut"
+                name="pile_stick_out"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Pile Stick Out <span className="font-semibold -ml-1">(m)</span></FormLabel>

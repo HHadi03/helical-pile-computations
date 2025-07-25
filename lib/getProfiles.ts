@@ -1,6 +1,6 @@
 import { createClient } from "@/utils/supabase/server"
 import { snakeToCamel } from "./caseConversion"
-import { TsoilProfileSchema } from "@/schemas/soilProfileSchema"
+import { TsoilProfileSchema } from "@/schemas/soilProfileSchemas"
 
 export async function getProfiles(): Promise<TsoilProfileSchema[]>{
   try {

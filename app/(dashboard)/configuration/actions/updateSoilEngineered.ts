@@ -1,74 +1,110 @@
 "use server"
-import { TEngineeredSoilSchema } from "@/schemas/engineeredSoilSchema"
+import { TeditSoilEngineeredSchema } from "@/schemas/soilSchemas"
 import { createClient } from "@/utils/supabase/server"
-import { camelToSnake } from "@/lib/caseConversion"
 import { revalidatePath } from "next/cache"
+import { roundToTwoDecimals, calculateSoilHeight } from "@/lib/equations"
 
 type ReturnType = {
   message: string
   errors?: Record<string, string[]>
 }
 
-export async function updateSoilEngineered(soil: TEngineeredSoilSchema): Promise<ReturnType> {
-  
+type SoilWithCalculations = TeditSoilEngineeredSchema & {
+  bearing_capacity60: number
+  bearing_capacity100: number
+  shaft_capacity60?: number
+  shaft_capacity100?: number
+  ko?: number
+  t?: number | null  
+}
+
+type DirtyFields = Partial<Record<keyof TeditSoilEngineeredSchema, boolean>>
+
+const pileDiameter60 = 0.1884
+const pileDiameter100 = 0.314
+const pileAreaDiameter60 = 0.001223
+const pileAreaDiameter100 = 0.002463
+
+export async function updateSoilEngineered(soil: TeditSoilEngineeredSchema, soilId: string, dirtyFields: DirtyFields = {}): Promise<ReturnType> {
   const supabase = await createClient()
-  const { data: soilData } = await supabase
+
+  const { data: soilData, error: soilError } = await supabase
   .from('soils')
-  .select("su, t, angle")
-  .eq('id', soil.id)
+  .select("soil, soil_name, soil_profile_id, start_depth, end_depth, po, h")
+  .eq('id', soilId)
   .single()
-  
-  const { data: pileData } = await supabase
-  .from('soils')
+
+  if (soilError) {
+    return { message: `Failed to fetch soil layer.`, errors: {}}
+  }
+
+  const { data: pileData, error: pileError } = await supabase
+  .from('soil_profiles')
   .select("effective_pile_length")
-  .eq('id', soil.soilProfileId)
+  .eq('id', soilData.soil_profile_id)
   .single()
-  
-  let soilHeight: number
-  if (soil.endDepth! <= pileData?.effective_pile_length) {
-    soilHeight = soil.h!
+
+  if (pileError) {
+    return { message: `Failed to fetch pile data.`, errors: {}}
   }
 
-  else if (soil.startDepth! < pileData?.effective_pile_length) {
-    soilHeight = pileData?.effective_pile_length - soil.startDepth!
-  }
+  const soilHeight = calculateSoilHeight(soilData.start_depth, soilData.end_depth, soilData.h, pileData.effective_pile_length)
 
-  else {
-    soilHeight = 0
-  }
-
+  const updatePayload: Partial<SoilWithCalculations> = { ...soil }
   if (soilHeight > 0) {
-  
-    if (soil.soilType !== 'fine' && soil.angle !== soilData?.angle) {
-      
-    }
     
-    else if (soil.soilType !== 'fine' && soil.t !== soilData?.t) {
-
+    if (dirtyFields.qult) {
+      updatePayload.bearing_capacity60 = roundToTwoDecimals(soil.qult * pileAreaDiameter60)
+      updatePayload.bearing_capacity100 = roundToTwoDecimals(soil.qult * pileAreaDiameter100)
     }
 
-    else (
+    if (soil.soil_type !== 'fine') {
+      if (dirtyFields.t) {
+        updatePayload.shaft_capacity60 = roundToTwoDecimals(soil.t! * soilHeight * pileDiameter60)
+        updatePayload.shaft_capacity100 = roundToTwoDecimals(soil.t! * soilHeight * pileDiameter100)
+      } 
       
-    )
+      else if (dirtyFields.angle) {
+        const Ko = 0.09 * Math.exp(0.08 * soil.angle!)
+        const newT = Ko * soilData.po * Math.tan(soil.angle! * (Math.PI / 180))
+        updatePayload.ko = roundToTwoDecimals(Ko)
+        updatePayload.t = roundToTwoDecimals(newT)
+        updatePayload.shaft_capacity60 = roundToTwoDecimals(newT * soilHeight * pileDiameter60)
+        updatePayload.shaft_capacity100 = roundToTwoDecimals(newT * soilHeight * pileDiameter100)
+      }
+    } 
+    
+    else {
+      if (dirtyFields.su) {
+        updatePayload.shaft_capacity60 = roundToTwoDecimals(soil.su! * soilHeight * pileDiameter60)
+        updatePayload.shaft_capacity100 = roundToTwoDecimals(soil.su! * soilHeight * pileDiameter100)
+      }
+    }
 
-  }
+  } 
   
+  else {
+    updatePayload.bearing_capacity60 = 0
+    updatePayload.bearing_capacity100 = 0
+    updatePayload.shaft_capacity60 = 0
+    updatePayload.shaft_capacity100 = 0
+  }
+
   try {
-    const snakeCaseSoil = camelToSnake(soil)
     const { error } = await supabase
     .from('soils')
-    .update(snakeCaseSoil)
-    .eq('id', soil.id)
+    .update(updatePayload)
+    .eq('id', soilId)
     
     if (error) {
-      return { message: `Failed to edit ${soil.soilName ? soil.soilName : soil.soil}, please try again later.`, errors: {}}
+      return { message: `Failed to edit ${soilData.soil_name ? soilData.soil_name: soilData.soil}, please try again later.`, errors: {}}
     }
 
     revalidatePath('/configuration')
-    return { message: `${soil.soilName ? soil.soilName : soil.soil} has been successfully edited` }
+    return { message: `${soilData.soil_name ? soilData.soil_name: soilData.soil} has been successfully edited` }
   } 
   
   catch {
-    return { message: `Failed to edit ${soil.soilName ? soil.soilName : soil.soil}, please try again later.`, errors: {}}
+    return { message: `Failed to edit ${soilData.soil_name ? soilData.soil_name: soilData.soil}, please try again later.`, errors: {}}
   }
 }
