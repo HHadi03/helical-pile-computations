@@ -13,7 +13,7 @@ import { toast } from "sonner"
 import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-export function ProfileForm() {
+export function InsertProfileForm() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("profile")
 

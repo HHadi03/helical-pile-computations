@@ -1,4 +1,4 @@
-import { ProfileForm } from "./InsertProfileForm"
+import { InsertProfileForm } from "./InsertProfileForm"
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 
@@ -11,7 +11,7 @@ export default async function InsertProfilePage() {
 
   return (
     <section className='p-5 rounded-lg border max-w-lg mx-auto'>
-      <ProfileForm/>
+      <InsertProfileForm/>
     </section>
   )
 }

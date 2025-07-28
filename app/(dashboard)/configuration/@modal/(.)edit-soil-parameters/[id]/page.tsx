@@ -14,7 +14,7 @@ export default async function EditSoilParametersModal({params}:{params: Promise<
 
   if (error) {
     return (
-      <Modal title="Edit Soil Parameters">
+      <Modal title="Error - Edit Soil Parameters">
         <div className="text-destructive text-sm flex justify-center">
           <p>Could not find soil data</p>
         </div>

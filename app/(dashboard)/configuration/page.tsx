@@ -77,7 +77,7 @@ export default async function ConfigurationPage() {
       
       <div className="mb-3 flex flex-col sm:flex-row sm:justify-end sm:gap-5">
         <Button asChild variant="outline" className="sm:w-58 hover:bg-blue-200 dark:hover:bg-blue-900/50 shadow-sm" size="lg">
-          <Link href="/configuration/design-methods" prefetch={false} scroll={false}><ShieldCheck className='size-5 text-blue-700'/>Determine Design Methods</Link>
+          <Link href="/configuration/design-method" prefetch={false} scroll={false}><ShieldCheck className='size-5 text-blue-700'/>Determine Design Method</Link>
         </Button>
 
         <Button asChild variant="outline" className="mt-2 sm:w-58 sm:mt-0 hover:bg-green-200 dark:hover:bg-green-900/50 shadow-sm" size="lg">
