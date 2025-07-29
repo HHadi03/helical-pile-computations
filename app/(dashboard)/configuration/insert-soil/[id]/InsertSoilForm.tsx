@@ -281,7 +281,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                 name="y_sat"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Saturated Unit Weight <span className="font-semibold -ml-1">(kN/m³)</span></FormLabel>
+                    <FormLabel>Sat Unit Weight <span className="font-semibold -ml-1">(kN/m³)</span></FormLabel>
                     <FormControl>
                       <NumberInput field={field} placeholder="0" className="text-sm"/>
                     </FormControl>

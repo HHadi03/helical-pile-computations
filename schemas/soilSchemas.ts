@@ -9,7 +9,7 @@ export const insertSoilSchema = z.object({
   description: z.string().optional(),
   colour: z.string(),
   start_depth: z.coerce.number().gte(0, { message: "Start Depth is required" }),
-  end_depth: z.coerce.number().gt(0,{ message: "End Depth is required"}),
+  end_depth: z.coerce.number().gt(0,{ message: "End Depth is required"}).transform((val) => Number(val.toFixed(1))),
   n_value: z.coerce.number().gt(0, { message: "SPT N-Value is required" }),
   y_moist: z.coerce.number().gt(0, { message: "Moist Unit Weight is required" }),
   y_sat: z.coerce.number().gt(0, { message: "Sat Unit Weight is required" }),
@@ -59,6 +59,7 @@ export const overviewSoilSchema = z.object({
   soil: z.string(),
   soil_name: z.string().optional(),
   description: z.string().optional(),
+  soil_type: z.enum(["coarse", "fine", "manmade"]),
   colour: z.string(),
   start_depth: z.number(),
   end_depth: z.number(),
@@ -102,7 +103,7 @@ export type TeditSoilInformationSchema = z.infer<typeof editSoilInformationSchem
 //edit soil parameters schema
 export const editSoilParametersSchema = z.object({
   start_depth: z.coerce.number().gte(0, { message: "Start Depth is required" }),
-  end_depth: z.coerce.number().gt(0,{ message: "End Depth is required"}),
+  end_depth: z.coerce.number().gt(0,{ message: "End Depth is required"}).transform((val) => Number(val.toFixed(1))),
   n_value: z.coerce.number().gt(0, { message: "SPT N-Value is required" }),
   y_moist: z.coerce.number().gt(0, { message: "Moist Unit Weight is required" }),
   y_sat: z.coerce.number().gt(0, { message: "Sat Unit Weight is required" }),
@@ -150,7 +151,7 @@ export const editSoilEngineeredSchema = z.object({
 )
 export type TeditSoilEngineeredSchema = z.infer<typeof editSoilEngineeredSchema>
 
-//calculations soil schema
+//calculations coarse soil schema
 export const soilCalculationsSchema = z.object({
   start_depth: z.number(),
   end_depth: z.number(),

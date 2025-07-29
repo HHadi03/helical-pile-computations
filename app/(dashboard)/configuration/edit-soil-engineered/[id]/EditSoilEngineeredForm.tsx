@@ -48,7 +48,7 @@ export function EditSoilEngineered({ soil, soilId }: { soil: TeditSoilEngineered
               name="su"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Undrained Shear Soil Strength <span className="font-semibold -ml-1">(kPa)</span></FormLabel>
+                  <FormLabel>Undrained Shear Strength <span className="font-semibold -ml-1">(kPa)</span></FormLabel>
                   <FormControl>
                     <NumberInput field={field} placeholder="0" className="text-sm"/>
                   </FormControl>
@@ -77,7 +77,7 @@ export function EditSoilEngineered({ soil, soilId }: { soil: TeditSoilEngineered
                 name="t"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Shear Soil Strength <span className="font-semibold -ml-1">(kPa)</span></FormLabel>
+                    <FormLabel>Shear Strength <span className="font-semibold -ml-1">(kPa)</span></FormLabel>
                     <FormControl>
                       <NumberInput field={field} placeholder="0" className="text-sm"/>
                     </FormControl>

@@ -4,8 +4,8 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { SoilGraph } from "./SoilGraph"
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 import { SoilDiagram } from "./SoilDiagram"
-import { ToggleButton } from "./ToggleButton"
 import { Fragment } from "react"
 import { ToverviewSoilSchema } from "@/schemas/soilSchemas"
 import { ToverviewSoilProfileSchema } from "@/schemas/soilProfileSchemas"
@@ -20,7 +20,7 @@ async function getProfiles(): Promise<ToverviewSoilProfileSchema[]>{
     const supabase = await createClient()
     const {data, error} = await supabase
     .from("soil_profiles")
-    .select("profile_name, id, water_depth, effective_pile_length, pile_stick_out, created_at")
+    .select("profile_name, id, water_depth, effective_pile_length, pile_stick_out")
     .order("created_at", { ascending: true })
 
     if (error) {
@@ -38,9 +38,9 @@ async function getSoils(): Promise<ToverviewSoilSchema[]> {
   try {
     const supabase = await createClient()
     const { data, error } = await supabase
-      .from('soils')
-      .select("id, soil, soil_name, description, colour, start_depth, end_depth, n_value, y_moist, y_sat, soil_profile_id, h, su, t, shaft_capacity60, shaft_capacity100, bearing_capacity60, bearing_capacity100")
-      .order('start_depth', { ascending: true })
+    .from('soils')
+    .select("id, soil_profile_id, soil, soil_name, soil_type, description, colour, start_depth, end_depth, n_value, y_moist, y_sat, h, su, t, shaft_capacity60, shaft_capacity100, bearing_capacity60, bearing_capacity100")
+    .order('start_depth', { ascending: true })
 
     if (error) {
       return []
@@ -68,7 +68,7 @@ export default async function OverviewPage() {
         <h3 className="text-2xl font-semibold mb-2">No Soil Profiles Found</h3>
         <p className="mb-4 text-muted-foreground">Head to the configuration page to add your first soil profile</p>
         <Button asChild className="w-80">
-          <Link href="/configuration" prefetch={true} scroll={false}><ArrowBigRight className="size-6"/>Go to Configuration</Link>
+          <Link href="/configuration"><ArrowBigRight className="size-6"/>Go to Configuration</Link>
         </Button>
       </section>
     )
@@ -77,18 +77,20 @@ export default async function OverviewPage() {
   const soilsData = await getSoils()
   const soilsByProfile = Object.groupBy(soilsData, soil => soil.soil_profile_id)
   return (
-    <>
-      {profilesData.map((profile, index) => {
-        const profileSoils = soilsByProfile[profile.id] || []
-        return (
-          <Fragment key={profile.id}>
-            <ToggleButton>
-              <SoilDiagram profile={profile} profileSoils={profileSoils} index={index}/>
-              <SoilGraph profileSoils={profileSoils}/>
-            </ToggleButton>
-          </Fragment>
-        )
-      })}
-    </>
+    <Carousel className="w-full max-w-4xl mx-auto border">
+      <CarouselContent>
+        {profilesData.map((profile, index) => {
+          const profileSoils = soilsByProfile[profile.id] || []
+          return (
+            <CarouselItem key={profile.id}>
+              
+              <SoilDiagram profile={profile} profileSoils={profileSoils} profileIndex={index}/>
+            </CarouselItem>
+          )
+        })}
+      </CarouselContent>
+      <CarouselPrevious/>
+      <CarouselNext/>
+    </Carousel>
   )
 }

@@ -16,3 +16,5 @@ export const insertDesignMethodSchema = z.object({
 })
 
 export type TinsertDesignMethodSchema = z.infer<typeof insertDesignMethodSchema>
+
+// 12 factors for Uk, 6 for poland, 6 for netherlands. for method 2 and 3. method 1 only 1 safety factor

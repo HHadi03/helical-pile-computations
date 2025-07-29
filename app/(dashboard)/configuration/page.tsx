@@ -17,7 +17,7 @@ async function getProfiles(): Promise<TconfigSoilProfileSchema[]>{
     const supabase = await createClient()
     const {data, error} = await supabase
     .from("soil_profiles")
-    .select("profile_name, id, created_at")
+    .select("profile_name, id")
     .order("created_at", { ascending: true })
 
     if (error) {
@@ -65,7 +65,7 @@ export default async function ConfigurationPage() {
         <h3 className="text-2xl font-semibold mb-2">No Soil Profiles Found</h3>
         <p className="mb-4 text-muted-foreground">Start by adding a new soil profile to configure soil layers for analysis</p>
         <Button asChild className="w-80">
-          <Link href="/configuration/insert-profile" prefetch={true} scroll={false}><Plus className="size-6"/>Add Soil Profile</Link>
+          <Link href="/configuration/insert-profile" scroll={false}><Plus className="size-6"/>Add Soil Profile</Link>
         </Button>
       </section>
     )
@@ -81,7 +81,7 @@ export default async function ConfigurationPage() {
         </Button>
 
         <Button asChild variant="outline" className="mt-2 sm:w-58 sm:mt-0 hover:bg-green-200 dark:hover:bg-green-900/50 shadow-sm" size="lg">
-          <Link href="/configuration/insert-profile" prefetch={true} scroll={false}><PlusCircle className="size-5 text-green-700"/>Add Soil Profile</Link>
+          <Link href="/configuration/insert-profile" scroll={false}><PlusCircle className="size-5 text-green-700"/>Add Soil Profile</Link>
         </Button>
       </div>
 
