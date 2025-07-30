@@ -27,7 +27,7 @@ const soilDensityCapitalisation = {
   'dense' : 'Dense'
 }
 
-export function ConfigAccordion({ soilsData, profilesData}: { soilsData: TconfigSoilSchema[], profilesData: TconfigSoilProfileSchema[] }) {
+export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: TconfigSoilSchema[], profilesData: TconfigSoilProfileSchema[] }) {
   const router = useRouter()
   const [selectedSoil, setSelectedSoil] = useState<{ id: string; name: string; profileId: string} | null>(null)
   const [selectedProfile, setSelectedProfile] = useState<{ id: string; name: string } | null>(null)

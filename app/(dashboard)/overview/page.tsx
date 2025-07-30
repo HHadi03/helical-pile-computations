@@ -3,12 +3,9 @@ import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { SoilGraph } from "./SoilGraph"
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
-import { SoilDiagram } from "./SoilDiagram"
-import { Fragment } from "react"
 import { ToverviewSoilSchema } from "@/schemas/soilSchemas"
 import { ToverviewSoilProfileSchema } from "@/schemas/soilProfileSchemas"
+import { OverviewComponent } from "./OverviewComponent"
 
 export const metadata = {
   title: "Overview | Helical Pile Computations",
@@ -75,22 +72,7 @@ export default async function OverviewPage() {
   }
   
   const soilsData = await getSoils()
-  const soilsByProfile = Object.groupBy(soilsData, soil => soil.soil_profile_id)
   return (
-    <Carousel className="w-full max-w-4xl mx-auto border">
-      <CarouselContent>
-        {profilesData.map((profile, index) => {
-          const profileSoils = soilsByProfile[profile.id] || []
-          return (
-            <CarouselItem key={profile.id}>
-              
-              <SoilDiagram profile={profile} profileSoils={profileSoils} profileIndex={index}/>
-            </CarouselItem>
-          )
-        })}
-      </CarouselContent>
-      <CarouselPrevious/>
-      <CarouselNext/>
-    </Carousel>
+    <OverviewComponent profilesData={profilesData} soilsData={soilsData}/>
   )
 }

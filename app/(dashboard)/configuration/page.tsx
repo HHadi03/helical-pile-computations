@@ -1,7 +1,7 @@
 import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
 import { TconfigSoilSchema } from "@/schemas/soilSchemas"
-import { ConfigAccordion } from "./ConfigAccordion"
+import { ConfigurationComponent } from "./ConfigurationComponent"
 import { Plus, FolderX, ShieldCheck, PlusCircle } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
@@ -85,7 +85,7 @@ export default async function ConfigurationPage() {
         </Button>
       </div>
 
-      <ConfigAccordion soilsData={soilsData} profilesData={profilesData}/>
+      <ConfigurationComponent soilsData={soilsData} profilesData={profilesData}/>
     </section>
   )
 }
