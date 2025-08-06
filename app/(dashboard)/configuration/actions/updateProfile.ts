@@ -18,6 +18,7 @@ export async function updateProfile(profile: TinsertSoilProfileSchema, profileId
   }
 
   const effectivePileLength = profile.pile_length - profile.pile_stick_out
+  const roundedEffectivePileLength = parseFloat(effectivePileLength.toFixed(1))
   
   if (dirtyFields.water_depth || dirtyFields.pile_length || dirtyFields.pile_stick_out) {
     const supabase = await createClient()
@@ -40,11 +41,11 @@ export async function updateProfile(profile: TinsertSoilProfileSchema, profileId
         }
         
         if (soil.soil_type !== "fine") {
-          result = await calculateResultsForSoilsNoFetch(soil, effectivePileLength, profile.water_depth)
+          result = await calculateResultsForSoilsNoFetch(soil, roundedEffectivePileLength, profile.water_depth)
         } 
         
         else {
-          result = await calculateResultsForFineSoilNoFetch(soil, effectivePileLength)
+          result = await calculateResultsForFineSoilNoFetch(soil, roundedEffectivePileLength)
         }
 
         const { error } = await supabase
@@ -67,7 +68,7 @@ export async function updateProfile(profile: TinsertSoilProfileSchema, profileId
   }
 
   try {
-    const fullProfile = {...profile, effective_pile_length: effectivePileLength}
+    const fullProfile = {...profile, effective_pile_length: roundedEffectivePileLength}
     const supabase = await createClient()
     const { error } = await supabase
     .from("soil_profiles")

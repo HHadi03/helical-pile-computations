@@ -1,7 +1,6 @@
 import { ToverviewSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { ToverviewSoilSchema } from "@/schemas/soilSchemas"
 import { Triangle } from "lucide-react"
-import Image from "next/image"
 
 function getLuminance (color: string) {
   const hex = color.replace("#", "")
@@ -15,11 +14,8 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
 
   if (profileSoils.length === 0) {
     return (
-      <div className="border-x border-t border-b-2 p-2 bg-secondary">
-        <div className="flex items-center justify-between mb-2">
-        <h1 className="text-xl font-semibold">{profile.profile_name || `Soil Profile ${profileIndex + 1}`}</h1>
-        <p className="text-sm"><span className="font-semibold">Effective Pile Length:</span> {profile.effective_pile_length} m</p>
-       </div>
+      <div className="border-2 p-2 bg-sky-50 dark:bg-sky-900/50">
+        <h1 className="text-xl font-semibold mb-2">{profile.profile_name || `Soil Profile ${profileIndex + 1}`}</h1>
         <p className="text-sm text-muted-foreground">No soil layers detected, add soil layers in configuration to begin analysis.</p>
       </div>
     )
@@ -33,13 +29,14 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
 
   const ultimateBearingCapacity = ultimatePulloutCapacity + bearingCapacity
 
+  let pileHeight = 0
   return (
     <>
-      <div className="border-x border-t border-b-2 p-2 bg-secondary">
+      <div className="border-2 p-2 bg-sky-50 dark:bg-sky-900/50"> 
         <div className="flex justify-between">
           
           <h1 className="text-xl font-semibold">{profile.profile_name || `Soil Profile ${profileIndex + 1}`}</h1>
-        
+         
           <div className="text-right text-sm">
             <p><span className="font-semibold">Effective Pile Length:</span> {profile.effective_pile_length} m</p>
             <p><span className="font-semibold">Ultimate Pullout Capacity:</span> {ultimatePulloutCapacity.toFixed(2)} kN</p> 
@@ -48,60 +45,72 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
 
         </div>
       </div>
-    
-      {profileSoils.map((soil, index) => {
-        const isDefaultColour = soil.colour === "#000000"
-        const isDark = getLuminance(soil.colour) < 0.5
-        const textColor = isDark ? "text-white" : "text-black"
 
-        const isLayerBeyondPile = soil.start_depth >= profile.effective_pile_length
-        
-        const isWaterInLayer = soil.start_depth <= profile.water_depth && profile.water_depth <= soil.end_depth
+      <div className="border-b border-x relative">
+        {profileSoils.map((soil, index) => {
+          const isDefaultColour = soil.colour === "#000000"
+          const isDark = getLuminance(soil.colour) < 0.5
+          const textColor = isDark ? "text-white" : "text-black"
 
-        const isPileEndingInLayer = soil.start_depth <= profile.effective_pile_length && profile.effective_pile_length <= soil.end_depth
-        // <Image src="/100mm-pile.png" alt="100mm pile" width={40} height={663}/>
-            
-        return (
-          <div key={soil.id} className="relative px-2 border-b flex whitespace-nowrap" style={{ backgroundColor: isDefaultColour ? "transparent" : soil.colour }}>
-           
-            <div className={`w-[20%] space-y-2 py-2 text-sm leading-snug ${isDefaultColour ? 'text-foreground' : textColor}`}>
-              {!isLayerBeyondPile && (
-                <>
-                  <p><span className="font-semibold">Shaft Capacity:</span> {pileDiameter === 60 ? soil.shaft_capacity60 : soil.shaft_capacity100} kN</p>
-                  {lastLayer && soil.id === lastLayer.id && (
-                    <p><span className="font-semibold">Bearing Capacity:</span> {pileDiameter === 60 ? lastLayer.bearing_capacity60 : lastLayer.bearing_capacity100} kN</p>
-                  )}
-                </>
+          const isLayerBeyondPile = soil.start_depth >= profile.effective_pile_length
+          
+          const isWaterInLayer = soil.start_depth <= profile.water_depth && profile.water_depth < soil.end_depth
+          
+          if (lastLayer && soil.id === lastLayer.id) {
+            const portionOfLayer = (profile.effective_pile_length - soil.start_depth) / soil.h
+            pileHeight = (index * 171.5) + (portionOfLayer * 171.5)
+          }
+
+          return (
+            <div key={soil.id} className={`relative p-2 flex  ${isDefaultColour && index < profileSoils.length - 1 ? 'border-b' : ''}`} style={{ backgroundColor: isDefaultColour ? "transparent" : soil.colour}}>
+              
+              <div className={`w-[25%] flex flex-col space-y-2 text-sm leading-snug ${isDefaultColour ? 'text-foreground' : textColor}`}>
+                {!isLayerBeyondPile && (
+                  <>
+                    <p><span className="font-semibold">Shaft Capacity:</span> {pileDiameter === 60 ? soil.shaft_capacity60 : soil.shaft_capacity100} kN</p>
+                    {lastLayer && soil.id === lastLayer.id && (<p><span className="font-semibold">Bearing Capacity:</span> {pileDiameter === 60 ? lastLayer.bearing_capacity60 : lastLayer.bearing_capacity100} kN</p>)}
+                  </>
+                )}
+                <div className={`mt-auto text-xs ${isDefaultColour ? 'text-foreground/70' : textColor}`}><span className="font-semibold">Depth:</span> {soil.start_depth} – {soil.end_depth} m</div>
+              </div>
+
+              <div className="w-[8%]"></div>
+                
+              <div className={`w-[67%] space-y-2 text-sm leading-snug ${isDefaultColour ? 'text-foreground' : textColor}`}>
+                <p className="font-semibold">{soil.soil_name || soil.soil}</p>
+                <p><span className="font-semibold">SPT N-Value:</span> {soil.n_value}</p>
+                <p><span className="font-semibold">Moist Unit Weight:</span> {soil.y_moist} kN/m³</p>
+                <p><span className="font-semibold">Sat Unit Weight:</span> {soil.y_sat} kN/m³</p>
+                <p><span className="font-semibold">{soil.soil_type === 'fine' ? 'Undrained Shear Strength:' : 'Shear Strength:'}</span> {soil.soil_type === 'fine' ? soil.su : soil.t} kPa</p>
+                <p className="max-w-[500px] overflow-clip"><span className="font-semibold">Description:</span> {soil.description || "N/A"}</p>
+              </div>
+
+              <div className={`absolute right-2 top-2 text-xs px-2 py-1 rounded-sm border ${isDefaultColour ? 'border-black dark:border-white' : isDark ? 'bg-black text-white border-white' : 'bg-white text-black border-black'}`}><span className="font-semibold">Layer No:</span> {index + 1}</div>
+
+              {isWaterInLayer && (
+                <div className={`absolute left-0 right-0 z-10 border-b-2 border-dashed ${isDefaultColour ? 'border-blue-400 dark:border-blue-800' :  isDark ? 'border-blue-400' : 'border-blue-800'}`} style={{ top: `${Math.max(33, Math.min(100, ((profile.water_depth - soil.start_depth) / (soil.end_depth - soil.start_depth)) * 94))}%`}}>
+                  <div className={`absolute bottom-0.5 right-2 flex flex-row text-xs gap-2 ${isDefaultColour ? 'text-foreground' : textColor}`}>
+                    <Triangle className={`text-muted-foreground rotate-180 size-4 ${isDefaultColour ? 'fill-blue-400 dark:fill-blue-800' : isDark ? 'fill-blue-400' : 'fill-blue-800'}`}/><span className="-ml-1 -mr-1 font-semibold">Water Table:</span>{profile.water_depth} m
+                  </div>
+                </div>
               )}
             </div>
+          )
+        })}
 
-            <div className="w-[15%] z-20 relative"></div> 
-              
-            <div className={`w-[65%] space-y-2 py-2 text-sm leading-snug ${isDefaultColour ? 'text-foreground' : textColor}`}>
-              <p className="font-semibold">{soil.soil_name || soil.soil}</p>
-              <p><span className="font-semibold">SPT N-Value:</span> {soil.n_value}</p>
-              <p><span className="font-semibold">Moist Unit Weight:</span> {soil.y_moist} kN/m³</p>
-              <p><span className="font-semibold">Sat Unit Weight:</span> {soil.y_sat} kN/m³</p>
-              <p><span className="font-semibold">{soil.soil_type === 'fine' ? 'Undrained Shear Strength:' : 'Shear Strength:'}</span> {soil.soil_type === 'fine' ? soil.su : soil.t} kPa</p>
-              <p><span className="font-semibold">Description:</span> {soil.description || "N/A"}</p>
-            </div>
-
-          {/* Absolute positioned elements*/}
-          <div className={`absolute right-2 top-2 text-xs px-2 py-1 rounded-sm border ${isDefaultColour ? 'bg-secondary border-secondary-foreground' : isDark ? 'bg-black text-white border-white' : 'bg-white text-black border-black'}`}><span className="font-semibold">Layer No:</span> {index + 1}</div>
-          
-          <div className={`absolute left-2 bottom-1 text-xs ${isDefaultColour ? 'text-foreground/70' : textColor}`}><span className="font-semibold">Depth:</span> {soil.start_depth} – {soil.end_depth} m</div>
-          
-          {isWaterInLayer && (
-            <div className="absolute left-0 right-0 z-10 border-b-2 border-blue-300 dark:border-blue-800 border-dashed" style={{ top: `${Math.max(0, Math.min(100, ((profile.water_depth - soil.start_depth) / (soil.end_depth - soil.start_depth)) * 100))}%`}}>
-              <div className={`absolute bottom-0.5 right-2 flex flex-row gap-2 text-xs ${isDefaultColour ? 'text-foreground' : textColor}`}>
-                <Triangle className="fill-blue-300 dark:fill-blue-800 text-muted-foreground rotate-180 size-4"/>Water Table: {profile.water_depth} m
-              </div>
-            </div>
-          )}
-
-        </div>
-        )
-      })}
+        <div 
+          className="absolute top-0 z-20"
+          style={{
+            top: "-25px",
+            left: "29%",
+            transform: "translateX(-50%)",
+            height: `${pileHeight + 25}px`,
+            width: "40px", 
+            backgroundImage: `url(/${pileDiameter}mm-pile.png)`,
+            backgroundSize: "40px auto",
+          }}
+        />
+      </div>
     </>
   )
 }

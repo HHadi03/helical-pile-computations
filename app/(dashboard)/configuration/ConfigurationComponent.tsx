@@ -10,7 +10,7 @@ import type { TconfigSoilSchema } from "@/schemas/soilSchemas"
 import { TconfigSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { toast } from "sonner"
 import { deleteSoil } from "./actions/deleteSoil"
-import { Trash2, Copy, Pencil, Layers, EllipsisVertical, Ellipsis, ArrowDown, RotateCcw } from 'lucide-react'
+import { Trash2, Copy, Pencil, Layers, EllipsisVertical, Ellipsis, ArrowDown, RotateCcw, PlusCircle } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { deleteProfile } from "./actions/deleteProfile"
 import { duplicateProfile } from './actions/duplicateProfile'
@@ -108,7 +108,14 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
 
   const soilsByProfile = Object.groupBy(soilsData, soil => soil.soil_profile_id)
   return (
-    <>
+    <section className='min-h-full flex flex-col'>
+
+      <div className="mb-3 flex justify-end">
+        <Button asChild variant="outline" className="w-50 hover:bg-green-200 dark:hover:bg-green-900/50 shadow-sm" size="lg">
+          <Link href="/configuration/insert-profile" scroll={false}><PlusCircle className="size-5 text-green-700"/>Add Soil Profile</Link>
+        </Button>
+      </div>
+
       <Accordion type="multiple" className="space-y-6">
         {profilesData.map((profile, index) => {
           const profileSoils = soilsByProfile[profile.id] || []
@@ -254,6 +261,6 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </section>
   ) 
 }

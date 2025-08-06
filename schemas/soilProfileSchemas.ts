@@ -3,7 +3,7 @@ import { z } from 'zod'
 //insert soil profile schema
 export const insertSoilProfileSchema = z.object({
   profile_name: z.string().optional(),
-  pile_stick_out: z.coerce.number().gte(0, { message: "Pile Stick Out is required" }).transform((val) => Number(val.toFixed(1))),
+  pile_stick_out: z.coerce.number().gt(0, { message: "Pile Stick Out is required" }).transform((val) => Number(val.toFixed(1))),
   pile_length: z.coerce.number().gt(0, { message: "Pile Length is required" }).transform((val) => Number(val.toFixed(1))),
   water_depth: z.coerce.number().gt(0, { message: "Water Depth is required" }).transform((val) => Number(val.toFixed(1))),
 }).refine(
@@ -15,8 +15,8 @@ export const insertSoilProfileSchema = z.object({
   ).refine(
     (data) => data.pile_stick_out < data.pile_length,
     {
-      path: ['pile_stick_out'], 
-      message: "Pile stick out must be less than pile length",
+      path: ['pile_stick_out'],
+      message: "Pile Stick Out must be less than Pile Length",
     }
   )
 export type TinsertSoilProfileSchema = z.infer<typeof insertSoilProfileSchema>

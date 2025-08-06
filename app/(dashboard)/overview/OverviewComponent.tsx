@@ -14,10 +14,9 @@ export function OverviewComponent({ soilsData, profilesData}: { soilsData: Tover
   const [pileDiameter, setPileDiameter] = useState<60 | 100>(100)
   
   const soilsByProfile = Object.groupBy(soilsData, soil => soil.soil_profile_id)
-  
   return (
     <>
-      <div className="flex mb-2 gap-2 mx-auto justify-end max-w-4xl">
+      <div className="flex mb-2 gap-2 mx-auto justify-end max-w-3xl">
         <Toggle variant="outline" pressed={showGraph} onPressedChange={setShowGraph} aria-label="Toggle view type" className="w-36">
           <ChartArea className="size-4 text-muted-foreground"/> View Graph
         </Toggle>
@@ -27,16 +26,17 @@ export function OverviewComponent({ soilsData, profilesData}: { soilsData: Tover
         </Toggle>
       </div>
       
-      <Carousel className="max-w-4xl mx-auto border">
+      <Carousel className="max-w-3xl mx-auto">
         <CarouselContent>
           {profilesData.map((profile, index) => {
             const profileSoils = soilsByProfile[profile.id] || []
             return (
               <CarouselItem key={profile.id}>
-                {showGraph ? (<SoilGraph profileSoils={profileSoils} profile={profile} pileDiameter={pileDiameter}/>) : (<SoilDiagram profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter}/>)}
+                {showGraph ? (<SoilGraph profileSoils={profileSoils} pileLength={profile.effective_pile_length} pileDiameter={pileDiameter} profileIndex={index} profileName={profile.profile_name} />)
+                : (<SoilDiagram profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter}/>)}
               </CarouselItem>
             )
-          })}
+          })} 
         </CarouselContent>
         <CarouselPrevious/>
         <CarouselNext/>
@@ -44,3 +44,4 @@ export function OverviewComponent({ soilsData, profilesData}: { soilsData: Tover
     </>
   )
 }
+

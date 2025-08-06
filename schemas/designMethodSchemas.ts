@@ -13,6 +13,7 @@ export const insertDesignMethodSchema = z.object({
 	mean_rcal: z.coerce.number().optional(),
 	min_rcal: z.coerce.number().optional(),
 	country: z.enum(["uk", "pl", "nl"]).optional(),
+	safety_factor_1: z.coerce.number().optional(),
 })
 
 export type TinsertDesignMethodSchema = z.infer<typeof insertDesignMethodSchema>

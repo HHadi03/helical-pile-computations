@@ -14,6 +14,9 @@ export async function insertProfile(profile: TinsertSoilProfileSchema): Promise<
     profile = {...profile, profile_name: profile. profile_name.charAt(0).toUpperCase() + profile. profile_name.slice(1)}
   }
 
+  const effectivePileLength = profile.pile_length - profile.pile_stick_out
+  const roundedEffectivePileLength = parseFloat(effectivePileLength.toFixed(1))
+
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -21,7 +24,7 @@ export async function insertProfile(profile: TinsertSoilProfileSchema): Promise<
     const fullProfile = {
       ...profile,
       user_id: user!.id,
-      effective_pile_length: profile.pile_length - profile.pile_stick_out
+      effective_pile_length: roundedEffectivePileLength
     }
     
     const { error } = await supabase

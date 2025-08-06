@@ -2,6 +2,29 @@ import { Modal } from '@/components/Modal'
 import { InsertDesignMethodForm } from "../../design-method/InsertDesignMethodForm"
 import { createClient } from "@/utils/supabase/server"
 
+type SoilProfile = {
+  id: string
+  profile_name: string
+  effective_pile_length: number
+}
+
+async function getSoilProfiles(): Promise<SoilProfile[]> {
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from("soil_profiles")
+      .select("profile_name, id, effective_pile_length")
+      .order("created_at", { ascending: true })
+
+    if (error) {
+      return []
+    }
+    return data
+  } catch {
+    return []
+  }
+}
+
 export default async function DesignMethodModal() {
 
   const supabase = await createClient()
@@ -10,10 +33,11 @@ export default async function DesignMethodModal() {
   .select("*")
   .single()
   
+  const soilProfiles = await getSoilProfiles()
   if (!designMethodData) {
     return (
       <Modal title="Determine Design Method">
-        <InsertDesignMethodForm/>
+        <InsertDesignMethodForm soilProfiles={soilProfiles}/>
       </Modal>
     )
   }
