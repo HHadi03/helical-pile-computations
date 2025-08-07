@@ -1,4 +1,10 @@
 import { Toaster } from "@/components/ui/sonner"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Configuration | Helical Pile Computations",
+  description: "Set up soil profiles and piles for analysis.",
+}
 
 export default function ConfigurationLayout({children, modal}: {children: React.ReactNode, modal: React.ReactNode}) {
   return (

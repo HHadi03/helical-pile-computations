@@ -7,11 +7,6 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { TconfigSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 
-export const metadata = {
-  title: "Configuration | Helical Pile Computations",
-  description: "Set up soil profiles and piles for analysis",
-}
-
 async function getProfiles(): Promise<TconfigSoilProfileSchema[]>{
   try {
     const supabase = await createClient()

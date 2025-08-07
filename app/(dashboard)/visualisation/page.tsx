@@ -1,10 +1,11 @@
 import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
 import { VisulisationComponent } from "./VisulisationComponent"
+import { Metadata } from "next"
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Visualisation | Helical Pile Computations",
-  description: "View and compare your computed results as graphs",
+  description: "View and compare your computed results as graphs.",
 }
 
 async function getProfiles(): Promise<any[]> {

@@ -3,11 +3,11 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {
-  title: "Export | Helical Pile Computations",
-  description: "Export your data and configurations.",
+  title: "Load | Helical Pile Computations",
+  description: "Load your data and configurations.",
 }
 
-export default async function ExportPage() {
+export default async function LoadPage() {
   const supabase = await createClient()
   const { data, error } = await supabase.auth.getUser()
   if (error || !data?.user) {
@@ -16,7 +16,7 @@ export default async function ExportPage() {
 
   return (
     <div>
-      Export Page
+      Load Page
     </div>
   )
 }

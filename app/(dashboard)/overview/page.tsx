@@ -6,10 +6,11 @@ import { Button } from "@/components/ui/button"
 import { ToverviewSoilSchema } from "@/schemas/soilSchemas"
 import { ToverviewSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { OverviewComponent } from "./OverviewComponent"
+import { Metadata } from "next"
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Overview | Helical Pile Computations",
-  description: "Summary of your soil profiles and pile settings",
+  description: "Summary of your soil profiles and pile settings.",
 }
 
 async function getProfiles(): Promise<ToverviewSoilProfileSchema[]>{

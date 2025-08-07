@@ -1,13 +1,7 @@
 import { Topbar } from "@/components/Topbar"
 import { Sidebar } from "@/components/Sidebar"
-import { Metadata } from "next"
 
-export const metadata: Metadata = {
-  title: "Dashboard | Helical Pile Computations",
-  description: "Dashboard providing configuration, overview, and visualisation features",
-}
-
-export default function DashboardLayout({children}: {children: React.ReactNode}) {
+export default function DashboardLayout({children, modal}: {children: React.ReactNode, modal: React.ReactNode}) {
   return (
     <div className="flex h-screen overflow-clip">
       <Sidebar/>
@@ -18,7 +12,8 @@ export default function DashboardLayout({children}: {children: React.ReactNode})
           {children}
         </main>
       </div>
-
+      
+      {modal}
     </div>
   )
 }
