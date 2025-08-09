@@ -1,6 +1,6 @@
 import { ToverviewSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { ToverviewSoilSchema } from "@/schemas/soilSchemas"
-import { Triangle } from "lucide-react"
+import { Triangle, MoveLeft } from "lucide-react"
 
 function getLuminance (color: string) {
   const hex = color.replace("#", "")
@@ -32,10 +32,13 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
   let pileHeight = 0
   return (
     <>
-      <div className="border-2 p-2 bg-sky-50 dark:bg-sky-900/50"> 
+      <div className="border-2 p-2 bg-sky-50 dark:bg-sky-900/50 relative"> 
         <div className="flex justify-between">
           
-          <h1 className="text-xl font-semibold">{profile.profile_name || `Soil Profile ${profileIndex + 1}`}</h1>
+          <div className="flex flex-col">
+            <h1 className="text-xl font-semibold">{profile.profile_name || `Soil Profile ${profileIndex + 1}`}</h1>
+            <p className="text-sm mt-auto text-muted-foreground">Pile Diameter: {pileDiameter} mm</p>
+          </div>
          
           <div className="text-right text-sm">
             <p><span className="font-semibold">Effective Pile Length:</span> {profile.effective_pile_length} m</p>
@@ -43,6 +46,12 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
             <p><span className="font-semibold">Ultimate Bearing Capacity:</span> {ultimateBearingCapacity.toFixed(2)} kN</p>
           </div>
 
+          <div className="absolute bottom-3.5 left-[32%]">
+            <div className="flex flex-row text-xs gap-2">
+              <MoveLeft className="size-4"/><span className="font-semibold -ml-1 -mr-1">Stickout: </span> {profile.pile_stick_out} m
+            </div>
+          </div>
+          
         </div>
       </div>
 
@@ -62,8 +71,8 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
           }
 
           return (
-            <div key={soil.id} className={`relative p-2 flex  ${isDefaultColour && index < profileSoils.length - 1 ? 'border-b' : ''}`} style={{ backgroundColor: isDefaultColour ? "transparent" : soil.colour}}>
-              
+            <div key={soil.id} className={`relative p-2 flex ${isDefaultColour && index < profileSoils.length - 1 ? 'after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-[oklch(0.87_0.01_258)] dark:after:bg-[oklch(1_0_0_/_25%)]' : ''}`} style={{ backgroundColor: isDefaultColour ? "transparent" : soil.colour}}>
+
               <div className={`w-[25%] flex flex-col space-y-2 text-sm leading-snug ${isDefaultColour ? 'text-foreground' : textColor}`}>
                 {!isLayerBeyondPile && (
                   <>

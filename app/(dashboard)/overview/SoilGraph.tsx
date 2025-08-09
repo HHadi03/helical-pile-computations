@@ -25,7 +25,10 @@ export function SoilGraph({profileSoils, pileLength, pileDiameter, profileIndex,
       <div className="border-2 p-2 bg-sky-50 dark:bg-sky-900/50">
         <div className="flex justify-between">
 
-          <h1 className="text-xl font-semibold">{profileName || `Soil Profile ${profileIndex + 1}`}</h1>
+          <div className="flex flex-col">
+            <h1 className="text-xl font-semibold">{profileName || `Soil Profile ${profileIndex + 1}`}</h1>
+            <p className="text-sm mt-auto text-muted-foreground">Pile Diameter: {pileDiameter} mm</p>
+          </div>
 
           <div className="text-right text-sm">
             <p><span className="font-semibold">Maximum Depth:</span> {Math.max(...filteredSoils.map(s => s.end_depth))} m</p>
