@@ -56,7 +56,7 @@ export function OverviewComponent({ soilsData, profilesData}: { soilsData: Tover
                 </Toggle>
               </div>
             </TooltipTrigger>
-            <TooltipContent>{showGraph ? "Toggle Diagram Overview" : "Toggle Graph Overview"}</TooltipContent>
+            <TooltipContent>{showGraph ? "Toggle Diagram Analysis" : "Toggle Graph Analysis"}</TooltipContent>
           </Tooltip>
         </div>
         

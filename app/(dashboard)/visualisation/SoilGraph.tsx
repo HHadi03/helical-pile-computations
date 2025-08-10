@@ -1,5 +1,6 @@
 'use client'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import { ToverviewSoilSchema } from "@/schemas/soilSchemas"
 
 interface Profile {
   id: string
@@ -8,7 +9,7 @@ interface Profile {
 }
 
 interface SoilGraphProps {
-  profileSoils: any[]
+  profileSoils: ToverviewSoilSchema[]
   pileDiameter: 60 | 100
   profile: Profile
 }
