@@ -100,7 +100,7 @@ export const Sidebar = () => {
                   {section.items.map((item) => (
                     <li key={item.href} className='my-3 animate-in fade-in slide-in-from-top-8 duration-700'>
                       <Button asChild variant="ghost" className='hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7'>
-                        <Link prefetch={false} href={item.href} className="flex gap-3 w-full justify-start"  onClick={handleNavClick}><item.icon className='size-6'/>{item.text}</Link>
+                        <Link prefetch={true} href={item.href} className="flex gap-3 w-full justify-start"  onClick={handleNavClick}><item.icon className='size-6'/>{item.text}</Link>
                       </Button>
                     </li>
                   ))}
@@ -112,7 +112,7 @@ export const Sidebar = () => {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button asChild variant="ghost" className='hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7'>
-                        <Link prefetch={false} href={item.href}> <item.icon className='size-6'/></Link>
+                        <Link prefetch={true} href={item.href}> <item.icon className='size-6'/></Link>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent side="right" className='p-2 text-sm'>{item.text}</TooltipContent>

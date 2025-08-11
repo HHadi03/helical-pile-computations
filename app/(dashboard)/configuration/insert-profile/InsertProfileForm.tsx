@@ -17,17 +17,25 @@ export function InsertProfileForm() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("profile")
 
-  const form = useForm<TinsertSoilProfileSchema>({
+  const form = useForm({
     resolver: zodResolver(insertSoilProfileSchema),
     defaultValues: {
       profile_name: "",
-      pile_length:"" as unknown as number,
-      pile_stick_out: "" as unknown as number,
-      water_depth:"" as unknown as number,
+      pile_length: "",
+      pile_stick_out: "",
+      water_depth:"",
     }
   })
   
   const { formState: { isSubmitting } } = form
+
+  const handleClose = () => {
+    if (window.history.length > 1) {
+      router.back()
+    } else {
+      router.replace('/configuration') 
+    }
+  }
 
   useEffect(() => {
     const errorFields = Object.keys(form.formState.errors)
@@ -57,7 +65,7 @@ export function InsertProfileForm() {
       }
 
       else {
-        router.back()
+        handleClose()
         toast.success(result.message)
       }
 
@@ -108,7 +116,7 @@ export function InsertProfileForm() {
 
             <div className="pt-2 flex justify-between">
               <Button type="button" className="w-32" onClick={() => {setActiveTab("pile")}}>Next</Button>
-              <Button type="button" variant="outline" onClick={router.back}>Close</Button>
+              <Button type="button" variant="outline" onClick={handleClose}>Close</Button>
             </div>
           </TabsContent>
           
@@ -145,7 +153,7 @@ export function InsertProfileForm() {
             
             <div className="pt-2 flex justify-between">
               <Button type="submit" className="w-32" disabled={isSubmitting}> {isSubmitting ? (<> <Loader2 className="mr-2 size-4 animate-spin"/> Submitting... </>) : ("Submit")}</Button>
-              <Button type="button" variant="outline" disabled={isSubmitting} onClick={router.back}>Close</Button>
+              <Button type="button" variant="outline" disabled={isSubmitting} onClick={handleClose}>Close</Button>
             </div>
           </TabsContent>
 

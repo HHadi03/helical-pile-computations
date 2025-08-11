@@ -17,12 +17,20 @@ export function EditProfileForm({ profile, profileId }: { profile: TinsertSoilPr
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("profile")
 
-  const form = useForm<TinsertSoilProfileSchema>({
+  const form = useForm({
     resolver: zodResolver(insertSoilProfileSchema),
     defaultValues: { ...profile }
   })
 
   const { formState: { isDirty, isSubmitting, dirtyFields } } = form
+
+  const handleClose = () => {
+    if (window.history.length > 1) {
+      router.back()
+    } else {
+      router.replace('/configuration') 
+    }
+  }
 
   useEffect(() => {
     const errorFields = Object.keys(form.formState.errors)
@@ -52,7 +60,7 @@ export function EditProfileForm({ profile, profileId }: { profile: TinsertSoilPr
       }
 
       else {
-        router.back()
+        handleClose()
         toast.success(result.message)
       }
 
@@ -103,7 +111,7 @@ export function EditProfileForm({ profile, profileId }: { profile: TinsertSoilPr
 
             <div className="pt-2 flex justify-between">
               <Button type="submit" className="w-28" disabled={!isDirty || isSubmitting}>{isSubmitting ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</>) : ("Save")}</Button>
-              <Button type="button" variant="outline" disabled={isSubmitting} onClick={router.back}>Close</Button>
+              <Button type="button" variant="outline" disabled={isSubmitting} onClick={handleClose}>Close</Button>
             </div>
           </TabsContent>
 
@@ -140,7 +148,7 @@ export function EditProfileForm({ profile, profileId }: { profile: TinsertSoilPr
 
             <div className="pt-2 flex justify-between">
               <Button type="submit" className="w-28" disabled={!isDirty || isSubmitting}> {isSubmitting ? (<><Loader2 className="mr-2 size-4 animate-spin" />Saving...</>) : ("Save")}</Button>
-              <Button type="button" variant="outline" disabled={isSubmitting} onClick={router.back}>Close</Button>
+              <Button type="button" variant="outline" disabled={isSubmitting} onClick={handleClose}>Close</Button>
             </div>
           </TabsContent>
         </Tabs>

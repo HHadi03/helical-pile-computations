@@ -17,13 +17,22 @@ import { soilOptions } from "../../insert-soil/[id]/soilData"
 export function EditSoilInformation({ soil, soilId }: { soil: TeditSoilInformationSchema, soilId: string }) {
   const router = useRouter()
 
-  const form = useForm<TeditSoilInformationSchema>({ 
+  const form = useForm({ 
     resolver: zodResolver(editSoilInformationSchema),
     defaultValues: { ...soil }
   })
   
   const { formState: { isDirty, isSubmitting, dirtyFields } } = form
+  
   const soilType = form.watch("soil_type")
+
+  const handleClose = () => {
+    if (window.history.length > 1) {
+      router.back()
+    } else {
+      router.replace('/configuration') 
+    }
+  }
 
   async function onSubmit(values: TeditSoilInformationSchema) {
     try {
@@ -34,7 +43,7 @@ export function EditSoilInformation({ soil, soilId }: { soil: TeditSoilInformati
       } 
       
       else {
-        router.back()
+        handleClose()
         toast.success(result.message)
       }
 
@@ -170,7 +179,7 @@ export function EditSoilInformation({ soil, soilId }: { soil: TeditSoilInformati
 
         <div className="pt-2 flex justify-between">
           <Button type="submit" className="w-28" disabled={!isDirty || isSubmitting}>{isSubmitting ? (<><Loader2 className="mr-2 size-4 animate-spin" />Saving...</>) : ("Save")}</Button>
-          <Button type="button" variant="outline" disabled={isSubmitting} onClick={router.back}>Close</Button>
+          <Button type="button" variant="outline" disabled={isSubmitting} onClick={handleClose}>Close</Button>
         </div>
       </form>
     </Form>

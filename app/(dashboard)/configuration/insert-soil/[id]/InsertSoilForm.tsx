@@ -26,12 +26,12 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
   const [activeTab, setActiveTab] = useState("soil")
   const { theme } = useTheme()
   
-  const form = useForm<TinsertSoilSchema>({
+  const form = useForm({
     resolver: zodResolver(insertSoilSchema),
     defaultValues: {
-      start_depth: previousEndDepth || 0,
-      end_depth: "" as unknown as number,
-      n_value: "" as unknown as number,
+      start_depth: previousEndDepth || "",
+      end_depth: "",
+      n_value: "",
       y_moist: undefined,
       y_sat: undefined,
       soil_name: "",
@@ -41,11 +41,20 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
   })
   
   const { formState: { isSubmitting } } = form
+  
   const soilType = form.watch("soil_type")
   const soil = form.watch("soil")
   const density = form.watch("density")
   const showParametersTab = Boolean(soilType && soil && density)
   
+  const handleClose = () => {
+    if (window.history.length > 1) {
+      router.back()
+    } else {
+      router.replace('/configuration') 
+    }
+  }
+
   useEffect(() => {
     const errorFields = Object.keys(form.formState.errors)
 
@@ -82,7 +91,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
       }
 
       else {
-        router.back()
+        handleClose()
         toast.success(result.message)
       }
 
@@ -226,7 +235,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
 
             <div className="pt-2 flex justify-between">
               <Button type="button" className="w-32" onClick={() => showParametersTab && setActiveTab("parameters")} disabled={!showParametersTab}>Next</Button>
-              <Button type="button" variant="outline" onClick={router.back}>Close</Button>
+              <Button type="button" variant="outline" onClick={handleClose}>Close</Button>
             </div>
           </TabsContent>
 
@@ -315,7 +324,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
 
             <div className="pt-2 flex justify-between">
               <Button type="submit" className="w-32" disabled={isSubmitting}> {isSubmitting ? (<> <Loader2 className="mr-2 size-4 animate-spin"/> Submitting... </>) : ("Submit")}</Button>
-              <Button type="button" variant="outline" disabled={isSubmitting} onClick={router.back}>Close</Button>
+              <Button type="button" variant="outline" disabled={isSubmitting} onClick={handleClose}>Close</Button>
             </div>
           </TabsContent>)}
 

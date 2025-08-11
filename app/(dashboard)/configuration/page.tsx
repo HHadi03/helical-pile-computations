@@ -60,7 +60,7 @@ export default async function ConfigurationPage() {
         <h3 className="text-2xl font-semibold mb-2">No Soil Profiles Found</h3>
         <p className="mb-4 text-muted-foreground">Start by adding a new soil profile to configure soil layers for analysis</p>
         <Button asChild className="w-80">
-          <Link href="/configuration/insert-profile" scroll={false}><Plus className="size-6"/>Add Soil Profile</Link>
+          <Link href="/configuration/insert-profile" prefetch={true} scroll={false}><Plus className="size-6"/>Add Soil Profile</Link>
         </Button>
       </section>
     )

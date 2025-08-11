@@ -25,7 +25,7 @@ interface InsertDesignMethodFormProps {
 export function InsertDesignMethodForm({ soilProfiles }: InsertDesignMethodFormProps) {
   const router = useRouter()
   
-  const form = useForm<TinsertDesignMethodSchema>({
+  const form = useForm({
     resolver: zodResolver(insertDesignMethodSchema),
     defaultValues: {}
   })

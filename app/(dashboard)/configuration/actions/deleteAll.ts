@@ -17,14 +17,14 @@ export async function deleteAll(): Promise<ReturnType> {
     .not('id', 'is', null)
 
     if (error) {
-      return { message: `Failed to delete all soil profiles, please try again later.`, errors: {}}
+      return { message: `Failed to delete soil profiles, please try again later.`, errors: {}}
     }
 
     revalidatePath('/configuration')
-    return { message: `All soil profiles have been successfully deleted`}
+    return { message: `Soil Profiles have been successfully deleted`}
   }
   
   catch {
-    return { message: `Failed to delete all soil profiles, please try again later.`, errors: {}}
+    return { message: `Failed to delete soil profiles, please try again later.`, errors: {}}
   }
 }

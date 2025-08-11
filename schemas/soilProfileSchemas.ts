@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import * as z from "zod"
 
 //insert soil profile schema
 export const insertSoilProfileSchema = z.object({
