@@ -26,12 +26,12 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
   const [activeTab, setActiveTab] = useState("soil")
   const { theme } = useTheme()
   
-  const form = useForm<TinsertSoilSchema>({
+  const form = useForm({
     resolver: zodResolver(insertSoilSchema),
     defaultValues: {
-      start_depth: previousEndDepth || 0,
-      end_depth: "" as unknown as number,
-      n_value: "" as unknown as number,
+      start_depth: previousEndDepth || "",
+      end_depth: "",
+      n_value: "",
       y_moist: undefined,
       y_sat: undefined,
       soil_name: "",
@@ -41,11 +41,20 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
   })
   
   const { formState: { isSubmitting } } = form
+  
   const soilType = form.watch("soil_type")
   const soil = form.watch("soil")
   const density = form.watch("density")
   const showParametersTab = Boolean(soilType && soil && density)
   
+  const handleClose = () => {
+    if (window.history.length > 1) {
+      router.back()
+    } else {
+      router.replace('/configuration') 
+    }
+  }
+
   useEffect(() => {
     const errorFields = Object.keys(form.formState.errors)
 
@@ -82,7 +91,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
       }
 
       else {
-        router.back()
+        handleClose()
         toast.success(result.message)
       }
 
@@ -96,13 +105,13 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="soil">Soil</TabsTrigger>
+            <TabsTrigger value="soil">Information</TabsTrigger>
             {showParametersTab && <TabsTrigger value="parameters">Parameters</TabsTrigger>}
           </TabsList>
       
           <TabsContent value="soil" className="focus-visible:ring-transparent">
             <div className="space-y-6 border-y-2 py-3">
-              <div className="flex gap-4 items-start">
+              <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
                 <FormField
                   control={form.control}
                   name="soil_type"
@@ -185,7 +194,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                 )}
               />
 
-              <div className="flex gap-4 items-start">
+              <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
                 <FormField
                   control={form.control}
                   name="soil_name"
@@ -204,7 +213,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                   control={form.control}
                   name="colour"
                   render={({ field }) => (
-                    <FormItem className="w-32">
+                    <FormItem className="w-full sm:w-32">
                       <FormLabel htmlFor="colour">Colour <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                       <FormControl>
                         <Popover>
@@ -226,21 +235,21 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
 
             <div className="pt-2 flex justify-between">
               <Button type="button" className="w-32" onClick={() => showParametersTab && setActiveTab("parameters")} disabled={!showParametersTab}>Next</Button>
-              <Button type="button" variant="outline" onClick={router.back}>Close</Button>
+              <Button type="button" variant="outline" onClick={handleClose}>Close</Button>
             </div>
           </TabsContent>
 
           {showParametersTab && (<TabsContent value="parameters" className="focus-visible:ring-transparent">
             <div className="space-y-6 border-y-2 py-3">
-              <div className="flex gap-4 items-start">
+              <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
                 <FormField
                   control={form.control}
                   name="start_depth"
                   render={({ field }) => (
-                    <FormItem className="w-27 hover:cursor-not-allowed">
+                    <FormItem className="sm:w-27 hover:cursor-not-allowed">
                       <FormLabel>Start Depth <span className="font-semibold -ml-1">(m)</span></FormLabel>
                       <FormControl>
-                        <NumberInput field={field} placeholder="0" disabled/>
+                        <NumberInput field={field} placeholder="0" disabled className="text-sm"/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -298,9 +307,9 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                     <FormLabel>SPT N-Value</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
-                          <Button variant="link" className="absolute -top-3 -right-2 text-blue-500">I dont know SPT N-Value</Button>
+                          <Button variant="link" className="absolute -top-3 -right-2 text-blue-500 text-xs">I dont have SPT N-Value</Button>
                         </PopoverTrigger>
-                        <PopoverContent align="end" side="top" sideOffset={-2} className="w-sm sm:w-lg md:w-xl lg:w-2xl dark:bg-black rounded-none p-1">
+                        <PopoverContent align="end" side="top" sideOffset={-2} className="w-sm m:w-lg md:w-xl lg:w-2xl dark:bg-black rounded-none p-1">
                           <Image src={theme === "light" ? lightSPTImage : darkSPTImage} placeholder="blur" alt="SPT N-Value Guide Picture"/>
                         </PopoverContent>
                       </Popover>
@@ -315,7 +324,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
 
             <div className="pt-2 flex justify-between">
               <Button type="submit" className="w-32" disabled={isSubmitting}> {isSubmitting ? (<> <Loader2 className="mr-2 size-4 animate-spin"/> Submitting... </>) : ("Submit")}</Button>
-              <Button type="button" variant="outline" disabled={isSubmitting} onClick={router.back}>Close</Button>
+              <Button type="button" variant="outline" disabled={isSubmitting} onClick={handleClose}>Close</Button>
             </div>
           </TabsContent>)}
 

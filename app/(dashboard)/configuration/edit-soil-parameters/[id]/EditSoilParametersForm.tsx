@@ -13,14 +13,20 @@ import { toast } from "sonner"
 export function EditSoilParameters({ soil, soilId }: { soil: TeditSoilParametersSchema, soilId: string }) {
   const router = useRouter()
 
-  const form = useForm<TeditSoilParametersSchema>({
+  const form = useForm({
     resolver: zodResolver(editSoilParametersSchema),
     defaultValues: { ...soil }
   })
   
   const { formState: { isDirty, isSubmitting, dirtyFields } } = form
   
-  
+  const handleClose = () => {
+    if (window.history.length > 1) {
+      router.back()
+    } else {
+      router.replace('/configuration') 
+    }
+  }
 
   async function onSubmit(values: TeditSoilParametersSchema) {
     try {
@@ -32,7 +38,7 @@ export function EditSoilParameters({ soil, soilId }: { soil: TeditSoilParameters
       } 
       
       else {
-        router.back()
+        handleClose()
         toast.success(result.message)
       }
 
@@ -45,15 +51,15 @@ export function EditSoilParameters({ soil, soilId }: { soil: TeditSoilParameters
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
         <div className="space-y-6 border-y-2 py-3">
-          <div className="flex gap-4 items-start">
+          <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
             <FormField
               control={form.control}
               name="start_depth"
               render={({ field }) => (
-                <FormItem className="w-27 hover:cursor-not-allowed">
+                <FormItem className="sm:w-27 hover:cursor-not-allowed">
                   <FormLabel>Start Depth <span className="font-semibold -ml-1">(m)</span></FormLabel>
                   <FormControl>
-                    <NumberInput field={field} placeholder="0" disabled/>
+                    <NumberInput field={field} placeholder="0" disabled className="text-sm"/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -120,7 +126,7 @@ export function EditSoilParameters({ soil, soilId }: { soil: TeditSoilParameters
 
         <div className="pt-2 flex justify-between">
           <Button type="submit" className="w-28" disabled={!isDirty || isSubmitting}>{isSubmitting ? (<><Loader2 className="mr-2 size-4 animate-spin" />Saving...</>) : ("Save")}</Button>
-          <Button type="button" variant="outline" disabled={isSubmitting} onClick={router.back}>Close</Button>
+          <Button type="button" variant="outline" disabled={isSubmitting} onClick={handleClose}>Close</Button>
         </div>
       </form>
     </Form>

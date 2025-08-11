@@ -13,12 +13,20 @@ import { editSoilEngineeredSchema, TeditSoilEngineeredSchema } from "@/schemas/s
 export function EditSoilEngineered({ soil, soilId }: { soil: TeditSoilEngineeredSchema, soilId: string }) {
   const router = useRouter()
 
-  const form = useForm<TeditSoilEngineeredSchema>({
+  const form = useForm({
     resolver: zodResolver(editSoilEngineeredSchema),
     defaultValues: { ...soil }
   })
 
   const { formState: { isDirty, isSubmitting, dirtyFields } } = form
+
+  const handleClose = () => {
+    if (window.history.length > 1) {
+      router.back()
+    } else {
+      router.replace('/configuration') 
+    }
+  }
 
   async function onSubmit(values: TeditSoilEngineeredSchema) {
     try {
@@ -29,7 +37,7 @@ export function EditSoilEngineered({ soil, soilId }: { soil: TeditSoilEngineered
       } 
       
       else {
-        router.back()
+        handleClose()
         toast.success(result.message)
       }
 
@@ -105,7 +113,7 @@ export function EditSoilEngineered({ soil, soilId }: { soil: TeditSoilEngineered
 
         <div className="pt-2 flex justify-between">
           <Button type="submit" className="w-28" disabled={!isDirty || isSubmitting}>{isSubmitting ? (<><Loader2 className="mr-2 size-4 animate-spin" />Saving...</>) : ("Save")}</Button>
-          <Button type="button" variant="outline" disabled={isSubmitting} onClick={router.back}>Close</Button>
+          <Button type="button" variant="outline" disabled={isSubmitting} onClick={handleClose}>Close</Button>
         </div>
       </form>
     </Form>

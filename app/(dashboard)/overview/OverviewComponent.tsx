@@ -17,6 +17,7 @@ export function OverviewComponent({ soilsData, profilesData}: { soilsData: Tover
   const [api, setApi] = useState<CarouselApi>()
   const [current, setCurrent] = useState(0)
   const [count, setCount] = useState(0)
+  const [windowWidth, setWindowWidth] = useState(0)
 
   useEffect(() => {
     if (!api) {
@@ -31,11 +32,22 @@ export function OverviewComponent({ soilsData, profilesData}: { soilsData: Tover
     })
   }, [api])
 
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth)
+    }
+    
+    handleResize()
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+ 
   const soilsByProfile = Object.groupBy(soilsData, soil => soil.soil_profile_id)
+  const displayCarousel = windowWidth > 950
   return (
     <>
       <div className="flex mx-auto justify-between max-w-3xl mb-2">
-        
         <div className="flex gap-2">
           <Tooltip>
             <TooltipTrigger asChild>
@@ -60,24 +72,42 @@ export function OverviewComponent({ soilsData, profilesData}: { soilsData: Tover
           </Tooltip>
         </div>
         
-        <div className="text-muted-foreground text-sm flex items-end mr-1">Soil Profile {current} of {count}</div>
+        {displayCarousel && (
+          <div className="text-muted-foreground text-sm flex items-end mr-1">Soil Profile {current} of {count}</div>
+        )}
       </div>
       
-      <Carousel className="max-w-3xl mx-auto" setApi={setApi}>
-        <CarouselContent>
+      {displayCarousel ? (
+        <Carousel className="max-w-3xl mx-auto" setApi={setApi}>
+          <CarouselContent>
+            {profilesData.map((profile, index) => {
+              const profileSoils = soilsByProfile[profile.id] || []
+              return (
+                <CarouselItem key={profile.id}>
+                  {showGraph ? (<SoilGraph profileSoils={profileSoils} pileLength={profile.effective_pile_length} pileDiameter={pileDiameter} profileIndex={index} profileName={profile.profile_name}/>)
+                  : (<SoilDiagram profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter}/>)}
+                </CarouselItem>
+              )
+            })} 
+          </CarouselContent>
+          <CarouselPrevious/>
+          <CarouselNext/>
+        </Carousel>
+      ) : (
+        <div className="max-w-3xl mx-auto space-y-6">
           {profilesData.map((profile, index) => {
             const profileSoils = soilsByProfile[profile.id] || []
             return (
-              <CarouselItem key={profile.id}>
-                {showGraph ? (<SoilGraph profileSoils={profileSoils} pileLength={profile.effective_pile_length} pileDiameter={pileDiameter} profileIndex={index} profileName={profile.profile_name} />)
-                : (<SoilDiagram profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter}/>)}
-              </CarouselItem>
+              <div key={profile.id}>
+                {showGraph ? (
+                  <SoilGraph profileSoils={profileSoils} pileLength={profile.effective_pile_length} pileDiameter={pileDiameter} profileIndex={index} profileName={profile.profile_name} windowWidth={windowWidth}/>)
+                  : (<SoilDiagram profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter} windowWidth={windowWidth}/>
+                )}
+              </div>
             )
-          })} 
-        </CarouselContent>
-        <CarouselPrevious/>
-        <CarouselNext/>
-      </Carousel>
+          })}
+        </div>
+      )}
     </>
   )
 }

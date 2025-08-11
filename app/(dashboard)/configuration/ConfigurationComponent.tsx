@@ -4,7 +4,6 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from "@/components/ui/alert-dialog"
 import {DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel} from "@/components/ui/dropdown-menu"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { useRouter } from "next/navigation"
 import { useState } from "react"
 import type { TconfigSoilSchema } from "@/schemas/soilSchemas"
 import { TconfigSoilProfileSchema } from "@/schemas/soilProfileSchemas"
@@ -28,7 +27,6 @@ const soilDensityCapitalisation = {
 }
 
 export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: TconfigSoilSchema[], profilesData: TconfigSoilProfileSchema[] }) {
-  const router = useRouter()
   const [selectedSoil, setSelectedSoil] = useState<{ id: string; name: string; profileId: string} | null>(null)
   const [selectedProfile, setSelectedProfile] = useState<{ id: string; name: string } | null>(null)
   const [isSoilDeleteDialogOpen, setisSoilDeleteDialogOpen] = useState(false)
@@ -111,8 +109,8 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
     <section className='min-h-full flex flex-col'>
 
       <div className="mb-3 flex justify-end">
-        <Button asChild variant="outline" className="w-50 hover:bg-green-200 dark:hover:bg-green-900/50 shadow-sm" size="lg">
-          <Link href="/configuration/insert-profile" scroll={false}><PlusCircle className="size-5 text-green-700"/>Add Soil Profile</Link>
+        <Button asChild variant="outline" className="w-42 hover:bg-green-200 dark:hover:bg-green-900/50 shadow-sm" size="lg">
+          <Link href="/configuration/insert-profile" prefetch={true} scroll={false}><PlusCircle className="size-5 text-green-700"/>Add Soil Profile</Link>
         </Button>
       </div>
 
@@ -123,22 +121,31 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
             <AccordionItem key={profile.id} value={profile.id}>
             
               <div className="relative">
-                <AccordionTrigger className="border-2 pl-2 pr-16 shadow-inner bg-secondary">
+                <AccordionTrigger className="border-2 pl-2 pr-16 shadow-inner bg-secondary whitespace-nowrap">
                   <h2 className="text-xl font-semibold"> {profile.profile_name ? profile.profile_name : `Soil Profile ${index + 1}`}</h2>
                 </AccordionTrigger>
 
                 <div className="absolute top-0 right-0 mt-1.5 border-l-2">
                   <DropdownMenu>
+                    
                     <DropdownMenuTrigger asChild>
                       <Button title='Profile Menu' variant="ghost" size="icon" className="mx-2 hover:bg-foreground/7 dark:hover:bg-foreground/7"><EllipsisVertical className='size-6 text-muted-foreground'/></Button>
                     </DropdownMenuTrigger>
+
                     <DropdownMenuContent align="end" className="w-42" sideOffset={-2}>
                       <DropdownMenuLabel className='font-semibold'>{profile.profile_name ? profile.profile_name : `Soil Profile ${index + 1}`}</DropdownMenuLabel>
                       <DropdownMenuSeparator/>
-                      <DropdownMenuItem onClick={() => router.push(`/configuration/edit-profile/${profile.id}`, { scroll: false })} className='hover:cursor-pointer'><Pencil className='text-muted-foreground'/>Edit</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleDuplicateProfile(profile.id)} className='hover:cursor-pointer'><Copy className='text-muted-foreground'/>Duplicate</DropdownMenuItem>
-                      <DropdownMenuItem variant='destructive' onClick={() => {setSelectedProfile({id: profile.id, name: profile.profile_name || `Soil Profile ${index + 1}`}); setIsProfileDeleteDialogOpen(true)}} className='hover:cursor-pointer'><Trash2/>Delete</DropdownMenuItem>
+                      <DropdownMenuItem asChild className='hover:cursor-pointer'>
+                        <Link href={`/configuration/edit-profile/${profile.id}`} prefetch={true} scroll={false}><Pencil className='text-muted-foreground'/>Edit</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleDuplicateProfile(profile.id)} className='hover:cursor-pointer'>
+                        <Copy className='text-muted-foreground'/>Duplicate
+                      </DropdownMenuItem>
+                      <DropdownMenuItem variant='destructive' onClick={() => {setSelectedProfile({id: profile.id, name: profile.profile_name || `Soil Profile ${index + 1}`}); setIsProfileDeleteDialogOpen(true)}} className='hover:cursor-pointer'>
+                        <Trash2/>Delete
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
+
                   </DropdownMenu>
                 </div>
               </div>
@@ -150,7 +157,7 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
                     <h3>No soil layers detected</h3>
                     <p className="mt-1 text-muted-foreground">Add soil layers to begin analysis</p>
                     <Button asChild variant="outline" className="mt-2">
-                      <Link href={`/configuration/insert-soil/${profile.id}`} prefetch={false} scroll={false}>Add Soil Layer</Link>
+                      <Link href={`/configuration/insert-soil/${profile.id}`} prefetch={true} scroll={false}>Add Soil Layer</Link>
                     </Button>
                   </div>
                 ) : (
@@ -186,17 +193,26 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
                             <TableCell className='hidden 2xl:table-cell'>{soil.description}</TableCell>
                             <TableCell className="text-right">
                               <DropdownMenu>
+                                
                                 <DropdownMenuTrigger asChild>
                                   <Button title='Soil Menu' variant="outline" size="sm" className='hover:bg-foreground/7 dark:hover:bg-foreground/15'><Ellipsis className='size-5 text-muted-foreground'/></Button>
                                 </DropdownMenuTrigger>
+
                                 <DropdownMenuContent align="end" className="w-40">
                                   <DropdownMenuLabel className='text-foreground/70'>Edit Soil...</DropdownMenuLabel>
-                                  <DropdownMenuItem onClick={() => router.push(`/configuration/edit-soil-information/${soil.id}`, { scroll: false })} className='hover:cursor-pointer'>Information</DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => router.push(`/configuration/edit-soil-parameters/${soil.id}`, { scroll: false })} className='hover:cursor-pointer'>Parameters</DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() =>router.push(`/configuration/edit-soil-engineered/${soil.id}`, { scroll: false })} className='hover:cursor-pointer'>Engineered</DropdownMenuItem>
+                                  <DropdownMenuItem asChild className='hover:cursor-pointer'>
+                                    <Link href={`/configuration/edit-soil-information/${soil.id}`} prefetch={true} scroll={false}>Information</Link>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem asChild className='hover:cursor-pointer'>
+                                    <Link href={`/configuration/edit-soil-parameters/${soil.id}`} prefetch={true} scroll={false}>Parameters</Link>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem asChild className='hover:cursor-pointer'>
+                                    <Link href={`/configuration/edit-soil-engineered/${soil.id}`} prefetch={true} scroll={false}>Engineered</Link>
+                                  </DropdownMenuItem>
                                   <DropdownMenuSeparator/>
                                   <DropdownMenuItem variant='destructive' onClick={() => {setSelectedSoil({ id: soil.id, name: soil.soil_name || soil.soil, profileId: profile.id }); setisSoilDeleteDialogOpen(true)}} className='hover:cursor-pointer'><Trash2/>Delete</DropdownMenuItem>
                                 </DropdownMenuContent>
+
                               </DropdownMenu>
                             </TableCell>
                           </TableRow>
@@ -206,7 +222,7 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
                     
                     <div className='border-t p-2'>
                       <Button asChild variant="outline" className="w-full rounded-lg shadow-sm" size="lg">
-                        <Link href={`/configuration/insert-soil/${profile.id}`} prefetch={false} scroll={false}>Add Soil Layer<ArrowDown className="text-muted-foreground size-5"/></Link>
+                        <Link href={`/configuration/insert-soil/${profile.id}`} prefetch={true} scroll={false}>Add Soil Layer<ArrowDown className="text-muted-foreground size-5"/></Link>
                       </Button>
                     </div>
                   </>

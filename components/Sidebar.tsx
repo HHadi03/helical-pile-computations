@@ -56,8 +56,8 @@ export const Sidebar = () => {
     <>
        {!mobileMenuOpen && (
         <div className="sm:hidden fixed top-5 left-4 z-40">
-          <Button variant="outline" size="icon" onClick={() => setMobileMenuOpen(true)}>
-            <Menu className="size-6"/>
+          <Button variant="outline" size="icon" className='size-8' onClick={() => setMobileMenuOpen(true)} title='Toggle Sidebar'>
+            <Menu className="size-[1.2rem]"/>
           </Button>
         </div>
       )}
@@ -85,7 +85,7 @@ export const Sidebar = () => {
         
         <div className="sm:hidden flex flex-row items-center justify-between mt-2 mb-10">
           <Image src='/logo.png' alt='Company Logo' width={195} height={40}/>
-          <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)}>
+          <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)} className='hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7'>
             <X className="size-6 text-muted-foreground"/>
           </Button>
         </div>
@@ -100,7 +100,7 @@ export const Sidebar = () => {
                   {section.items.map((item) => (
                     <li key={item.href} className='my-3 animate-in fade-in slide-in-from-top-8 duration-700'>
                       <Button asChild variant="ghost" className='hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7'>
-                        <Link prefetch={false} href={item.href} className="flex gap-3 w-full justify-start"  onClick={handleNavClick}><item.icon className='size-6'/>{item.text}</Link>
+                        <Link prefetch={true} href={item.href} className="flex gap-3 w-full justify-start"  onClick={handleNavClick}><item.icon className='size-6'/>{item.text}</Link>
                       </Button>
                     </li>
                   ))}
@@ -112,7 +112,7 @@ export const Sidebar = () => {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button asChild variant="ghost" className='hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7'>
-                        <Link prefetch={false} href={item.href}> <item.icon className='size-6'/></Link>
+                        <Link prefetch={true} href={item.href}> <item.icon className='size-6'/></Link>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent side="right" className='p-2 text-sm'>{item.text}</TooltipContent>
