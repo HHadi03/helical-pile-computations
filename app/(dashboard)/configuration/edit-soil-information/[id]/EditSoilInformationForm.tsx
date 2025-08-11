@@ -47,7 +47,7 @@ export function EditSoilInformation({ soil, soilId }: { soil: TeditSoilInformati
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
         <div className="space-y-6 border-y-2 py-3">
-          <div className="flex gap-4 items-start">
+          <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
             <FormField
               control={form.control}
               name="soil_type"
@@ -129,7 +129,7 @@ export function EditSoilInformation({ soil, soilId }: { soil: TeditSoilInformati
             )}
           />
 
-          <div className="flex gap-4 items-start">
+          <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
             <FormField
               control={form.control}
               name="soil_name"
@@ -148,7 +148,7 @@ export function EditSoilInformation({ soil, soilId }: { soil: TeditSoilInformati
               control={form.control}
               name="colour"
               render={({ field }) => (
-                <FormItem className="w-32">
+                <FormItem className="w-full sm:w-32">
                   <FormLabel htmlFor="colour">Colour <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                   <FormControl>
                     <Popover>

@@ -56,8 +56,8 @@ export const Sidebar = () => {
     <>
        {!mobileMenuOpen && (
         <div className="sm:hidden fixed top-5 left-4 z-40">
-          <Button variant="outline" size="icon" onClick={() => setMobileMenuOpen(true)}>
-            <Menu className="size-6"/>
+          <Button variant="outline" size="icon" className='size-8' onClick={() => setMobileMenuOpen(true)} title='Toggle Sidebar'>
+            <Menu className="size-[1.2rem]"/>
           </Button>
         </div>
       )}
@@ -85,7 +85,7 @@ export const Sidebar = () => {
         
         <div className="sm:hidden flex flex-row items-center justify-between mt-2 mb-10">
           <Image src='/logo.png' alt='Company Logo' width={195} height={40}/>
-          <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)}>
+          <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)} className='hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7'>
             <X className="size-6 text-muted-foreground"/>
           </Button>
         </div>

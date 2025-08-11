@@ -22,7 +22,7 @@ export function SoilGraph({profileSoils, pileLength, pileDiameter, profileIndex,
   
   return (
     <>
-      <div className="border-2 p-2 bg-sky-50 dark:bg-sky-900/50">
+      <div className="border-2 p-2 bg-sky-50 dark:bg-sky-900/50 whitespace-nowrap">
         <div className="flex justify-between">
 
           <div className="flex flex-col">
@@ -39,7 +39,7 @@ export function SoilGraph({profileSoils, pileLength, pileDiameter, profileIndex,
         </div>
       </div>
 
-      <div className="h-100 w-full border-b border-x">
+      <div className="h-100 border-b border-x">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={filteredSoils} margin={{ top: 15, right: 40, left: 20, bottom: 20 }}>
             <CartesianGrid vertical={false}/>

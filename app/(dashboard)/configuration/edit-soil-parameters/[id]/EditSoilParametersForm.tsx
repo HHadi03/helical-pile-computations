@@ -45,15 +45,15 @@ export function EditSoilParameters({ soil, soilId }: { soil: TeditSoilParameters
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
         <div className="space-y-6 border-y-2 py-3">
-          <div className="flex gap-4 items-start">
+          <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
             <FormField
               control={form.control}
               name="start_depth"
               render={({ field }) => (
-                <FormItem className="w-27 hover:cursor-not-allowed">
+                <FormItem className="sm:w-27 hover:cursor-not-allowed">
                   <FormLabel>Start Depth <span className="font-semibold -ml-1">(m)</span></FormLabel>
                   <FormControl>
-                    <NumberInput field={field} placeholder="0" disabled/>
+                    <NumberInput field={field} placeholder="0" disabled className="text-sm"/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

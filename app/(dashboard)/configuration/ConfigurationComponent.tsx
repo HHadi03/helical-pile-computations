@@ -111,7 +111,7 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
     <section className='min-h-full flex flex-col'>
 
       <div className="mb-3 flex justify-end">
-        <Button asChild variant="outline" className="w-50 hover:bg-green-200 dark:hover:bg-green-900/50 shadow-sm" size="lg">
+        <Button asChild variant="outline" className="w-42 hover:bg-green-200 dark:hover:bg-green-900/50 shadow-sm" size="lg">
           <Link href="/configuration/insert-profile" scroll={false}><PlusCircle className="size-5 text-green-700"/>Add Soil Profile</Link>
         </Button>
       </div>
@@ -123,7 +123,7 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
             <AccordionItem key={profile.id} value={profile.id}>
             
               <div className="relative">
-                <AccordionTrigger className="border-2 pl-2 pr-16 shadow-inner bg-secondary">
+                <AccordionTrigger className="border-2 pl-2 pr-16 shadow-inner bg-secondary whitespace-nowrap">
                   <h2 className="text-xl font-semibold"> {profile.profile_name ? profile.profile_name : `Soil Profile ${index + 1}`}</h2>
                 </AccordionTrigger>
 
