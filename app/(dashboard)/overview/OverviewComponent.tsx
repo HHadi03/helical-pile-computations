@@ -100,7 +100,7 @@ export function OverviewComponent({ soilsData, profilesData}: { soilsData: Tover
             return (
               <div key={profile.id}>
                 {showGraph ? (
-                  <SoilGraph profileSoils={profileSoils} pileLength={profile.effective_pile_length} pileDiameter={pileDiameter} profileIndex={index} profileName={profile.profile_name} />)
+                  <SoilGraph profileSoils={profileSoils} pileLength={profile.effective_pile_length} pileDiameter={pileDiameter} profileIndex={index} profileName={profile.profile_name} windowWidth={windowWidth}/>)
                   : (<SoilDiagram profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter} windowWidth={windowWidth}/>
                 )}
               </div>

@@ -17,10 +17,13 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
   
   if (profileSoils.length === 0) {
     return (
-      <div className="border-2 p-2 bg-sky-50 dark:bg-sky-900/50 whitespace-nowrap">
-        <h1 className="text-xl font-semibold mb-2">{profile.profile_name || `Soil Profile ${profileIndex + 1}`}</h1>
-        <p className="text-sm text-muted-foreground">No soil layers detected, add soil layers in configuration to begin analysis.</p>
-      </div>
+      <ScrollArea className="overflow-auto grid grid-cols-1 border-2">
+        <div className="p-2 bg-sky-50 dark:bg-sky-900/50 whitespace-nowrap"> 
+          <h1 className="text-xl font-semibold mb-2">{profile.profile_name || `Soil Profile ${profileIndex + 1}`}</h1>
+          <p className="text-sm text-muted-foreground">No soil layers detected, add soil layers in configuration to begin analysis.</p>
+        </div>
+        <ScrollBar orientation="horizontal" className="h-2"/>
+      </ScrollArea>
     )
   }
 
@@ -79,7 +82,7 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
             }
 
             return (
-              <div key={soil.id} className={`relative p-2 grid grid-cols-[190px_60px_1fr] whitespace-nowrap ${isDefaultColour && index < profileSoils.length - 1 ? 'after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-[oklch(0.87_0.01_258)] dark:after:bg-[oklch(1_0_0_/_25%)]' : ''} ${isDefaultColour && index === 0 && needsHorizontalScroll ? 'before:absolute before:top-0 before:left-0 before:right-0 before:h-px before:bg-[oklch(0.87_0.01_258)] dark:before:bg-[oklch(1_0_0_/_25%)]' : ''}`} style={{ backgroundColor: isDefaultColour ? "transparent" : soil.colour}}>
+              <div key={soil.id} className={`relative p-2 grid grid-cols-[190px_60px_1fr] whitespace-nowrap ${isDefaultColour && index < profileSoils.length - 1 ? 'after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-[oklch(0.87_0.01_258)] dark:after:bg-[oklch(1_0_0_/_25%)]' : ''} ${isDefaultColour && index === 0 && needsHorizontalScroll ? 'before:absolute before:top-0 before:left-0 before:right-0 before:h-px before:bg-[oklch(0.87_0.01_258)] dark:before:bg-[oklch(1_0_0_/_25%)]' : ''}`} style={{ backgroundColor: isDefaultColour ? "" : soil.colour}}>
 
                 <div className={`flex flex-col space-y-2 text-sm leading-snug ${isDefaultColour ? 'text-foreground' : textColor}`}>
                   {!isLayerBeyondPile && (
@@ -129,7 +132,7 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
           />
         </div>
       </div>
-      <ScrollBar orientation="horizontal"/>
+      <ScrollBar orientation="horizontal" className="h-2"/>
     </ScrollArea>
   )
 }
