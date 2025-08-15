@@ -1,6 +1,6 @@
 'use client'
 import { ToverviewSoilSchema } from "@/schemas/soilSchemas"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend } from "recharts"
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend, Tooltip } from "recharts"
 import { useTheme } from "next-themes"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 
@@ -12,8 +12,6 @@ export function SoilGraph({profileSoils, pileLength, pileDiameter, profileIndex,
   const shaftCapacity = pileDiameter === 60 ? "shaft_capacity60" : "shaft_capacity100"
   const bearingCapacity = pileDiameter === 60 ? "bearing_capacity60" : "bearing_capacity100"
   
-  const needsHorizontalScroll = windowWidth != undefined && windowWidth < 490
-
   if (profileSoils.length === 0) {
     return (
       <ScrollArea className="overflow-auto grid grid-cols-1 border-2">
@@ -27,10 +25,9 @@ export function SoilGraph({profileSoils, pileLength, pileDiameter, profileIndex,
   }
   
   return (
-    <ScrollArea className={`overflow-auto grid grid-cols-1 ${needsHorizontalScroll ? 'border' : ''}`}>
-      <div className="min-w-[432px]">
-        <div className={`p-2 bg-sky-50 dark:bg-sky-900/50 whitespace-nowrap ${needsHorizontalScroll ? '' : 'border-2'}`}> 
-          <div className="flex justify-between">
+    <>
+      <div className="border-2 p-2 bg-sky-50 dark:bg-sky-900/50">
+        <div className="flex justify-between">
 
             <div className="flex flex-col">
               <h1 className="text-xl font-semibold">{profileName || `Soil Profile ${profileIndex + 1}`}</h1>
@@ -46,20 +43,18 @@ export function SoilGraph({profileSoils, pileLength, pileDiameter, profileIndex,
           </div>
         </div>
 
-        <div className={`h-100 ${needsHorizontalScroll ? 'border-t' : 'border-b border-x'}`}>
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={filteredSoils} margin={{ top: 15, right: 40, left: 20, bottom: 20 }}>
-              <CartesianGrid vertical={false}/>
-              <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: '14px' }}/>
-              <XAxis dataKey="end_depth" name="End Depth (m)" domain={['dataMin', 'dataMax']} label={{ value: 'End Depth / m', position: 'insideBottom', offset: -3, style: {fontSize: 14} }} tick={{ fontSize: 14 }}/>
-              <YAxis name="Capacity / kN" domain={[0, 'dataMax']} label={{ value: 'Capacity / kN', angle: -90, position: 'insideLeft', style: {fontSize: 14} }} tick={{ fontSize: 14 }} />
-              <Line type="monotone" dataKey={shaftCapacity} {...theme === 'light' ? { stroke: "oklch(0.6 0.118 184.704)" } : { stroke: "oklch(0.696 0.17 162.48)" }} strokeWidth={2} name="Shaft Capacity" activeDot={{ r: 6 }} />
-              <Line type="monotone" dataKey={bearingCapacity} {...theme === 'light' ? { stroke: "oklch(0.646 0.222 41.116)" } : { stroke: "oklch(0.488 0.243 264.376)" }} strokeWidth={2} name="Bearing Capacity" activeDot={{ r: 6 }} />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+      <div className="h-100 w-full border-b border-x">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={filteredSoils} margin={{ top: 15, right: 40, left: 20, bottom: 20 }}>
+            <CartesianGrid vertical={false}/>
+            <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: '14px' }}/>
+            <XAxis dataKey="end_depth" name="End Depth (m)" domain={['dataMin', 'dataMax']} label={{ value: 'End Depth / m', position: 'insideBottom', offset: -3, style: {fontSize: 14} }} tick={{ fontSize: 14 }}/>
+            <YAxis name="Capacity / kN" domain={[0, 'dataMax']} label={{ value: 'Capacity / kN', angle: -90, position: 'insideLeft', style: {fontSize: 14} }} tick={{ fontSize: 14 }} />
+            <Line type="monotone" dataKey={shaftCapacity} {...theme === 'light' ? { stroke: "oklch(0.6 0.118 184.704)" } : { stroke: "oklch(0.696 0.17 162.48)" }} strokeWidth={2} name="Shaft Capacity" activeDot={{ r: 6 }} />
+            <Line type="monotone" dataKey={bearingCapacity} {...theme === 'light' ? { stroke: "oklch(0.646 0.222 41.116)" } : { stroke: "oklch(0.488 0.243 264.376)" }} strokeWidth={2} name="Bearing Capacity" activeDot={{ r: 6 }} />
+          </LineChart>
+        </ResponsiveContainer>
       </div>
-    <ScrollBar orientation="horizontal" className="h-2"/>
-    </ScrollArea>
+    </>
   )
 }

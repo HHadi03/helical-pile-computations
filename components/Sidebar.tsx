@@ -69,8 +69,7 @@ export const Sidebar = () => {
         />
       )}
 
-      <aside
-        className={`bg-sidebar flex flex-col shrink-0 border-r border-sidebar-border p-2 shadow-inner overflow-y-auto overflow-x-clip scrollbar-thin scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-500 transform transition-all duration-300 ease-in-out ${mobileMenuOpen ? 'fixed left-0 top-0 h-full w-[260px] z-50 translate-x-0' : 'fixed left-0 top-0 h-full w-[260px] z-50 -translate-x-full'} sm:static sm:translate-x-0 ${expanded ? 'sm:w-[260px]' : 'sm:w-[70px]'}`}>
+      <aside className={`bg-sidebar flex flex-col shrink-0 border-r border-sidebar-border p-2 shadow-inner overflow-y-auto overflow-x-clip scrollbar-thin scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-500 sm:static sm:translate-x-0 ${mobileMenuOpen ? 'fixed left-0 top-0 h-full w-[260px] z-50 -translate-x-0' : 'fixed left-0 top-0 h-full w-[260px] z-50 -translate-x-full'} ${expanded ? 'sm:w-[260px]' : 'sm:w-[70px]'}`}>
 
         {expanded ? (
           <div className="hidden xl:flex flex-row items-center justify-between mt-2">
