@@ -39,6 +39,7 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
   return (
     <ScrollArea className={`overflow-auto grid grid-cols-1 ${needsHorizontalScroll ? 'border' : ''}`}>
       <div className="min-w-[634px]">
+        
         <div className={`p-2 bg-sky-50 dark:bg-sky-900/50 relative whitespace-nowrap ${needsHorizontalScroll ? '' : 'border-2'}`}> 
           <div className="flex justify-between">
             
@@ -131,6 +132,7 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
             }}
           />
         </div>
+        
       </div>
       <ScrollBar orientation="horizontal" className="h-2"/>
     </ScrollArea>

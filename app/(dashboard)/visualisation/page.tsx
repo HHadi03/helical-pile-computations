@@ -1,10 +1,9 @@
 import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
-import { Metadata } from "next"
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Visualisation | Helical Pile Computations",
-  description: "View and compare your computed results as graphs.",
+  description: "View and compare your computed results as graphs",
 }
 
 export default async function VisualisationPage() {
@@ -16,7 +15,7 @@ export default async function VisualisationPage() {
 
   return (
     <div>
-      <h1>Visualisation</h1>
+      Disabled
     </div>
   )
 }

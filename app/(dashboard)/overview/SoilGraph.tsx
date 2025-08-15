@@ -1,6 +1,6 @@
 'use client'
 import { ToverviewSoilSchema } from "@/schemas/soilSchemas"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend } from "recharts"
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend, Tooltip } from "recharts"
 import { useTheme } from "next-themes"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 
@@ -13,6 +13,23 @@ export function SoilGraph({profileSoils, pileLength, pileDiameter, profileIndex,
   const bearingCapacity = pileDiameter === 60 ? "bearing_capacity60" : "bearing_capacity100"
   
   const needsHorizontalScroll = windowWidth != undefined && windowWidth < 490
+
+  const chartData = filteredSoils.reduce((acc, soil, index) => {
+    const prevShaft = index === 0 ? 0 : acc[index - 1][shaftCapacity];
+    const prevBearing = index === 0 ? 0 : acc[index - 1][bearingCapacity];
+
+    const cumulativeShaft = prevShaft + soil[shaftCapacity];
+    const cumulativeBearing = prevBearing + soil[bearingCapacity];
+
+    acc.push({
+      end_depth: soil.end_depth,
+      [shaftCapacity]: cumulativeShaft,
+      [bearingCapacity]: cumulativeBearing
+    });
+
+    return acc;
+  }, [] as { end_depth: number; [key: string]: number }[]);
+  chartData.unshift({ end_depth: 0, [shaftCapacity]: 0, [bearingCapacity]: 0 });
 
   if (profileSoils.length === 0) {
     return (
@@ -29,6 +46,7 @@ export function SoilGraph({profileSoils, pileLength, pileDiameter, profileIndex,
   return (
     <ScrollArea className={`overflow-auto grid grid-cols-1 ${needsHorizontalScroll ? 'border' : ''}`}>
       <div className="min-w-[432px]">
+        
         <div className={`p-2 bg-sky-50 dark:bg-sky-900/50 whitespace-nowrap ${needsHorizontalScroll ? '' : 'border-2'}`}> 
           <div className="flex justify-between">
 
@@ -46,18 +64,71 @@ export function SoilGraph({profileSoils, pileLength, pileDiameter, profileIndex,
           </div>
         </div>
 
-        <div className={`h-100 ${needsHorizontalScroll ? 'border-t' : 'border-b border-x'}`}>
+        <div className={`h-110 ${needsHorizontalScroll ? 'border-t' : 'border-b border-x'}`}>
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={filteredSoils} margin={{ top: 15, right: 40, left: 20, bottom: 20 }}>
-              <CartesianGrid vertical={false}/>
-              <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: '14px' }}/>
-              <XAxis dataKey="end_depth" name="End Depth (m)" domain={['dataMin', 'dataMax']} label={{ value: 'End Depth / m', position: 'insideBottom', offset: -3, style: {fontSize: 14} }} tick={{ fontSize: 14 }}/>
-              <YAxis name="Capacity / kN" domain={[0, 'dataMax']} label={{ value: 'Capacity / kN', angle: -90, position: 'insideLeft', style: {fontSize: 14} }} tick={{ fontSize: 14 }} />
-              <Line type="monotone" dataKey={shaftCapacity} {...theme === 'light' ? { stroke: "oklch(0.6 0.118 184.704)" } : { stroke: "oklch(0.696 0.17 162.48)" }} strokeWidth={2} name="Shaft Capacity" activeDot={{ r: 6 }} />
-              <Line type="monotone" dataKey={bearingCapacity} {...theme === 'light' ? { stroke: "oklch(0.646 0.222 41.116)" } : { stroke: "oklch(0.488 0.243 264.376)" }} strokeWidth={2} name="Bearing Capacity" activeDot={{ r: 6 }} />
+            <LineChart data={chartData} layout="vertical" margin={{ top: 15, right: 40, left: 0, bottom: 30 }}>
+              
+              <CartesianGrid strokeDasharray="3 3"/>
+
+              <Legend 
+                verticalAlign="top" 
+                height={36} 
+                wrapperStyle={{ fontSize: '14px' }}
+              />
+
+              <Tooltip
+                wrapperStyle={{ fontSize: '14px' }}
+                labelFormatter={(value: number) => `Depth: ${value.toFixed(1)} m`}
+                formatter={(value: number, name: string | number) => {
+                  const nameStr = String(name);
+                  if (
+                    nameStr.includes("Shaft") ||
+                    nameStr.includes("Bearing") ||
+                    nameStr.includes("Total")
+                  ) {
+                    return [`${value.toFixed(2)} kN`, nameStr];
+                  }
+                  return [value, nameStr];
+                }}
+              />
+
+              <YAxis
+                dataKey="end_depth" 
+                domain={[0, 'dataMax']}
+                type="number"
+                label={{ value: 'Depth / m', angle: -90, position: 'insideLeft', offset: 20, style: {fontSize: 14} }}
+                tick={{ fontSize: 14 }}
+              />
+
+              <XAxis 
+                dataKey={shaftCapacity}
+                type="number"
+                domain={[0, 'dataMax']}
+                label={{ value: 'Capacity / kN', position: 'insideBottom', offset: -10, style: {fontSize: 14} }}
+                tick={{ fontSize: 14 }}
+              />
+              
+              <Line 
+                type="monotone"
+                dataKey={shaftCapacity}
+                {...theme === 'dark' ? { stroke: "oklch(0.696 0.17 162.48)" } : { stroke: "oklch(0.6 0.118 184.704)" }}
+                strokeWidth={2}
+                name="Shaft Capacity"
+                activeDot={{ r: 6 }}
+              />
+              
+              
+              <Line 
+                type="monotone" 
+                dataKey={bearingCapacity}
+                {...theme === 'dark' ? { stroke: "oklch(0.488 0.243 264.376)" } : { stroke: "oklch(0.646 0.222 41.116)" }}
+                strokeWidth={2} name="Bearing Capacity"
+                activeDot={{ r: 6 }}
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>
+
       </div>
     <ScrollBar orientation="horizontal" className="h-2"/>
     </ScrollArea>
