@@ -26,7 +26,11 @@ export async function duplicateProfile(profileId: string): Promise<ReturnType> {
     if (soilFetchError || profilFetchError) {
       return { message: "Failed to fetch relevant soil layers/soil profile please try again later.", errors: {}}
     }
-    
+
+    if (profileData.profile_name){
+      profileData.profile_name = `${profileData.profile_name} ✦`
+    }
+
     const {data: profileAdd, error: profileAddError} = await supabase
     .from("soil_profiles")
     .insert(profileData)

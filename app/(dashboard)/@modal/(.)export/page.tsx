@@ -28,11 +28,7 @@ async function getSoilProfiles(): Promise<SoilProfile[]> {
 export default async function ExportModal() {
   return (
     <Modal title='Export'>
-      <div className='px-4'>
-        <InsertDesignMethodForm soilProfiles={await getSoilProfiles()} />
-      </div>
+      <InsertDesignMethodForm soilProfiles={await getSoilProfiles()} />
     </Modal>
   )
 }
-
-

@@ -24,9 +24,7 @@ export default async function EditSoilEngineeredModal({params}:{params: Promise<
   
   return (
     <Modal title="Edit Soil Engineered">
-      <div className="px-4">
-        <EditSoilEngineered soil={data} soilId={id}/>
-      </div>
+      <EditSoilEngineered soil={data} soilId={id}/>
     </Modal>
   )
 }

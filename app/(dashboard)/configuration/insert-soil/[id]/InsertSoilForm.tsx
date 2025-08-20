@@ -24,7 +24,7 @@ import darkSPTImage from '@/public/SPTNPictureDark.png'
 export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDepth?: number, profileId: string}) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("soil")
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   
   const form = useForm({
     resolver: zodResolver(insertSoilSchema),
@@ -310,7 +310,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                           <Button variant="link" className="absolute -top-3 -right-2 text-blue-500 text-xs">I dont have SPT N-Value</Button>
                         </PopoverTrigger>
                         <PopoverContent align="end" side="top" sideOffset={-2} className="w-sm m:w-lg md:w-xl lg:w-2xl dark:bg-black rounded-none p-1">
-                          <Image src={theme === "dark" ? darkSPTImage : lightSPTImage} placeholder="blur" alt="SPT N-Value Guide Picture"/>
+                          <Image src={resolvedTheme === "dark" ? darkSPTImage : lightSPTImage} placeholder="blur" alt="SPT N-Value Guide Picture"/>
                         </PopoverContent>
                       </Popover>
                     <FormControl>

@@ -24,9 +24,7 @@ export default async function EditProfileModal({params}:{params: Promise<{id: st
   
   return (
     <Modal title="Edit Soil Profile">
-      <div className="px-4">
-       <EditProfileForm profile={data} profileId={id}/>
-      </div>
+      <EditProfileForm profile={data} profileId={id}/>
     </Modal>
   )
 }

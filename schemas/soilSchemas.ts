@@ -20,10 +20,10 @@ export const insertSoilSchema = z.object({
       message: "End Depth must be greater than Start Depth",
     }
   ).refine(
-    (data) => data.soil_name === undefined || data.soil_name.length <= 25,
+    (data) => data.soil_name === undefined || data.soil_name.length <= 30,
     {
       path: ['soil_name'],
-      message: "Name must be less than 25 characters long"
+      message: "Name must be less than 30 characters long"
     }
   )
   .refine(
@@ -85,10 +85,10 @@ export const editSoilInformationSchema = z.object({
   description: z.string().optional(),
   colour: z.string(),
 }).refine(
-    (data) => data.soil_name === undefined || data.soil_name.length <= 25,
+    (data) => data.soil_name === undefined || data.soil_name.length <= 30,
     {
       path: ['soil_name'],
-      message: "Name must be less than 25 characters long"
+      message: "Name must be less than 30 characters long"
     }
   )
   .refine(

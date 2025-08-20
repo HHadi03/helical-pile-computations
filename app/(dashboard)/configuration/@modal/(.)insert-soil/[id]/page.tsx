@@ -23,9 +23,7 @@ export default async function InsertSoilModal({params}:{params: Promise<{id: str
 
   return (
     <Modal title='Add Soil Layer'>
-      <div className='px-4'>
-        <InsertSoilForm previousEndDepth={previousEndDepth} profileId={id}/>
-      </div>
+      <InsertSoilForm previousEndDepth={previousEndDepth} profileId={id}/>
     </Modal>
   )
 }

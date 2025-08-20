@@ -11,15 +11,15 @@ function getLuminance (color: string) {
   return (0.299 * r + 0.587 * g + 0.114 * b) / 255
 }
 
-export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter, windowWidth}: { profileSoils: ToverviewSoilSchema[], profile: ToverviewSoilProfileSchema, profileIndex: number, pileDiameter: 60 | 100, windowWidth?: number }) {
-  
+export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter, hideBearingCapacity, windowWidth}: { profileSoils: ToverviewSoilSchema[], profile: ToverviewSoilProfileSchema, profileIndex: number, pileDiameter: 60 | 100, hideBearingCapacity: boolean, windowWidth?: number }) {
+
   const needsHorizontalScroll = windowWidth != undefined && windowWidth < 760
   
   if (profileSoils.length === 0) {
     return (
-      <ScrollArea className="overflow-auto grid grid-cols-1 border-2">
+      <ScrollArea className="overflow-x-auto overflow-y-clip grid grid-cols-1 border-2">
         <div className="p-2 bg-sky-50 dark:bg-sky-900/50 whitespace-nowrap"> 
-          <h1 className="text-xl font-semibold mb-2">{profile.profile_name || `Soil Profile ${profileIndex + 1}`}</h1>
+          <h1 className="text-base font-semibold mb-2">{profile.profile_name || `Soil Profile ${profileIndex + 1}`}</h1>
           <p className="text-sm text-muted-foreground">No soil layers detected, add soil layers in configuration to begin analysis.</p>
         </div>
         <ScrollBar orientation="horizontal" className="h-2"/>
@@ -37,24 +37,26 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
 
   let pileHeight = 0
   return (
-    <ScrollArea className={`overflow-auto grid grid-cols-1 ${needsHorizontalScroll ? 'border' : ''}`}>
+    <ScrollArea className={`overflow-x-auto overflow-y-clip grid grid-cols-1 ${needsHorizontalScroll ? 'border' : ''}`}>
       <div className="min-w-[634px]">
         
         <div className={`p-2 bg-sky-50 dark:bg-sky-900/50 relative whitespace-nowrap ${needsHorizontalScroll ? '' : 'border-2'}`}> 
           <div className="flex justify-between">
             
             <div className="flex flex-col">
-              <h1 className="text-xl font-semibold">{profile.profile_name || `Soil Profile ${profileIndex + 1}`}</h1>
+              <h1 className="text-base font-semibold">{profile.profile_name || `Soil Profile ${profileIndex + 1}`}</h1>
               <p className="text-sm mt-auto text-muted-foreground">Pile Diameter: {pileDiameter} mm</p>
             </div>
           
             <div className="text-right text-sm">
               <p><span className="font-semibold">Effective Pile Length:</span> {profile.effective_pile_length} m</p>
               <p><span className="font-semibold">Ultimate Pullout Capacity:</span> {ultimatePulloutCapacity.toFixed(2)} kN</p> 
-              <p><span className="font-semibold">Ultimate Bearing Capacity:</span> {ultimateBearingCapacity.toFixed(2)} kN</p>
+              {!hideBearingCapacity && (
+                <p><span className="font-semibold">Ultimate Bearing Capacity:</span> {ultimateBearingCapacity.toFixed(2)} kN</p>
+              )}
             </div>
 
-            <div className="absolute bottom-3.5 left-[255px]">
+            <div className="absolute bottom-3 left-[253px]">
               <div className="flex flex-row text-xs gap-2">
                 <MoveLeft className="size-4"/><span className="font-semibold -ml-1 -mr-1">Stickout: </span> {profile.pile_stick_out} m
               </div>
@@ -89,7 +91,9 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
                   {!isLayerBeyondPile && (
                     <>
                       <p><span className="font-semibold">Shaft Capacity:</span> {pileDiameter === 60 ? soil.shaft_capacity60 : soil.shaft_capacity100} kN</p>
-                      {lastLayer && soil.id === lastLayer.id && (<p><span className="font-semibold">Bearing Capacity:</span> {pileDiameter === 60 ? lastLayer.bearing_capacity60 : lastLayer.bearing_capacity100} kN</p>)}
+                      {!hideBearingCapacity && (
+                        soil.id === lastLayer.id && (<p><span className="font-semibold">Bearing Capacity:</span> {bearingCapacity} kN</p>)
+                      )}
                     </>
                   )}
                   <div className={`mt-auto text-xs ${isDefaultColour ? 'text-foreground/70' : textColor}`}><span className="font-semibold">Depth:</span> {soil.start_depth} – {soil.end_depth} m</div>
@@ -103,7 +107,7 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
                   <p><span className="font-semibold">Moist Unit Weight:</span> {soil.y_moist} kN/m³</p>
                   <p><span className="font-semibold">Sat Unit Weight:</span> {soil.y_sat} kN/m³</p>
                   <p><span className="font-semibold">{soil.soil_type === 'fine' ? 'Undrained Shear Strength:' : 'Shear Strength:'}</span> {soil.soil_type === 'fine' ? soil.su : soil.t} kPa</p>
-                  <p className="overflow-x-hidden"><span className="font-semibold">Description:</span> {soil.description || "N/A"}</p>
+                  <p className="truncate"><span className="font-semibold">Description:</span> {soil.description || "N/A"}</p>
                 </div>
 
                 <div className={`absolute right-2 top-2 text-xs px-2 py-1 rounded-sm border ${isDefaultColour ? 'border-black dark:border-white' : isDark ? 'bg-black text-white border-white' : 'bg-white text-black border-black'}`}><span className="font-semibold">Layer No:</span> {index + 1}</div>
@@ -123,12 +127,12 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
             className="absolute top-0 z-20"
             style={{
               top: "-25px",
-              left: "230px",
+              left: "225px",
               transform: "translateX(-50%)",
               height: `${pileHeight + 25}px`,
-              width: "40px", 
+              width: `${pileDiameter === 60 ? '40px' : '50px'}`, 
               backgroundImage: `url(/${pileDiameter}mm-pile.png)`,
-              backgroundSize: "40px auto",
+              backgroundSize: `${pileDiameter === 60 ? '40px auto' : '50px auto'}`,
             }}
           />
         </div>

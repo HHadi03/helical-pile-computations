@@ -28,20 +28,21 @@ function AccordionItem({
 function AccordionTrigger({
   className,
   children,
+  actions,
   ...props
-}: React.ComponentProps<typeof AccordionPrimitive.Trigger>) {
+}: React.ComponentProps<typeof AccordionPrimitive.Trigger> & {actions?: React.ReactNode}) {
   return (
     <AccordionPrimitive.Header className="flex">
       <AccordionPrimitive.Trigger
         data-slot="accordion-trigger"
         className={cn(
-          "focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-start justify-between gap-4 py-2 text-left text-sm font-medium transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-90",
+          "focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 justify-between gap-4 p-2 text-left text-base font-semibold transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-90",
           className
         )}
         {...props}
       >
         {children}
-        <ChevronRight className="text-muted-foreground pointer-events-none size-6 shrink-0 translate-y-0.5 transition-transform duration-200"/>
+        <ChevronRight className="text-muted-foreground pointer-events-none size-6 shrink-0 transition-transform duration-200"/>
       </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>
   )

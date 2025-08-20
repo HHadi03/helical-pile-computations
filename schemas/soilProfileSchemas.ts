@@ -7,10 +7,10 @@ export const insertSoilProfileSchema = z.object({
   pile_length: z.coerce.number().gt(0, { message: "Pile Length is required" }).transform((val) => Number(val.toFixed(1))),
   water_depth: z.coerce.number().gt(0, { message: "Water Depth is required" }).transform((val) => Number(val.toFixed(1))),
 }).refine(
-    (data) => data.profile_name === undefined || data.profile_name.length <= 20,
+    (data) => data.profile_name === undefined || data.profile_name.length <= 45,
     {
       path: ['profile_name'],
-      message: "Profile Name must be less than 20 characters long"
+      message: "Name must be less than 45 characters long"
     }
   ).refine(
     (data) => data.pile_stick_out < data.pile_length,

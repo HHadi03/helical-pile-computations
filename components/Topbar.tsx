@@ -17,7 +17,7 @@ export const Topbar = () => {
     <header className='flex flex-col shrink-0 mt-5 mx-4 mb-2 @container'>
 
       <div className='flex justify-center relative'>
-        <h1 className="@min-[430px]:text-2xl font-semibold">Helical Pile Computations</h1>
+        <h1 className="text-lg @min-[400px]:text-2xl font-semibold">Helical Pile Computations</h1>
         <div className='absolute right-0'><ModeToggle/></div>
       </div>
       
@@ -28,7 +28,7 @@ export const Topbar = () => {
             return (
               <li key={item.href} className='relative'>
                 <Button asChild variant="ghost">
-                  <Link prefetch={true} href={item.href} className={`text-xs @min-[430px]:text-sm font-semibold after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-primary after:transition-transform after:duration-200 after:ease-in-out ${isActive ? 'after:scale-x-100' :'text-muted-foreground after:scale-x-0 hover:after:scale-x-100'}`}>{item.label}</Link>
+                  <Link prefetch={true} href={item.href} className={`text-sm font-semibold after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-primary after:transition-transform after:duration-200 after:ease-in-out ${isActive ? 'after:scale-x-100' :'text-muted-foreground after:scale-x-0 hover:after:scale-x-100'}`}>{item.label}</Link>
                 </Button>
               </li>
             )

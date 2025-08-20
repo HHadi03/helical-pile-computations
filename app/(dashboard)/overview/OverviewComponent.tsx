@@ -7,12 +7,13 @@ import { SoilDiagram } from "./SoilDiagram"
 import { ToverviewSoilSchema } from "@/schemas/soilSchemas"
 import { ToverviewSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { SoilGraph } from "./SoilGraph"
-import { ChartLine, CircleSlash2 } from "lucide-react"
+import { ChartLine, CircleSlash2, EyeOff } from "lucide-react"
 import { type CarouselApi } from "@/components/ui/carousel"
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 export function OverviewComponent({ soilsData, profilesData}: { soilsData: ToverviewSoilSchema[], profilesData: ToverviewSoilProfileSchema[] }) {
   const [showGraph, setShowGraph] = useState(false)
+  const [hideBearingCapacity, setHideBearingCapacity] = useState(false)
   const [pileDiameter, setPileDiameter] = useState<60 | 100>(100)
   const [api, setApi] = useState<CarouselApi>()
   const [current, setCurrent] = useState(0)
@@ -48,7 +49,7 @@ export function OverviewComponent({ soilsData, profilesData}: { soilsData: Tover
   return (
     <>
       <div className="flex mx-auto justify-between max-w-3xl mb-2">
-        <div className="flex gap-2">
+       <div className="flex gap-2">
           <Tooltip>
             <TooltipTrigger asChild>
               <div>
@@ -57,7 +58,7 @@ export function OverviewComponent({ soilsData, profilesData}: { soilsData: Tover
                 </Toggle>
               </div>
             </TooltipTrigger>
-            <TooltipContent>Toggle Pile Diameter</TooltipContent>
+            <TooltipContent>Pile Diameter</TooltipContent>
           </Tooltip>
 
           <Tooltip>
@@ -68,7 +69,18 @@ export function OverviewComponent({ soilsData, profilesData}: { soilsData: Tover
                 </Toggle>
               </div>
             </TooltipTrigger>
-            <TooltipContent>{showGraph ? "Toggle Diagram Analysis" : "Toggle Graph Analysis"}</TooltipContent>
+            <TooltipContent>Chart Analysis</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div>
+                <Toggle variant="outline" pressed={hideBearingCapacity} onPressedChange={setHideBearingCapacity} aria-label="hide bearing capacity" className="w-10.5">
+                  <EyeOff className="size-6 text-foreground/70"/> 
+                </Toggle>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>Bearing Capacity</TooltipContent>
           </Tooltip>
         </div>
         
@@ -84,8 +96,8 @@ export function OverviewComponent({ soilsData, profilesData}: { soilsData: Tover
               const profileSoils = soilsByProfile[profile.id] || []
               return (
                 <CarouselItem key={profile.id}>
-                  {showGraph ? (<SoilGraph profileSoils={profileSoils} pileLength={profile.effective_pile_length} pileDiameter={pileDiameter} profileIndex={index} profileName={profile.profile_name}/>)
-                  : (<SoilDiagram profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter}/>)}
+                  {showGraph ? (<SoilGraph profileSoils={profileSoils} pileLength={profile.effective_pile_length} pileDiameter={pileDiameter} hideBearingCapacity={hideBearingCapacity} profileIndex={index} profileName={profile.profile_name}/>)
+                  : (<SoilDiagram profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter} hideBearingCapacity={hideBearingCapacity}/>)}
                 </CarouselItem>
               )
             })} 
@@ -100,8 +112,8 @@ export function OverviewComponent({ soilsData, profilesData}: { soilsData: Tover
             return (
               <div key={profile.id}>
                 {showGraph ? (
-                  <SoilGraph profileSoils={profileSoils} pileLength={profile.effective_pile_length} pileDiameter={pileDiameter} profileIndex={index} profileName={profile.profile_name} windowWidth={windowWidth}/>)
-                  : (<SoilDiagram profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter} windowWidth={windowWidth}/>
+                  <SoilGraph profileSoils={profileSoils} pileLength={profile.effective_pile_length} pileDiameter={pileDiameter} hideBearingCapacity={hideBearingCapacity} profileIndex={index} profileName={profile.profile_name} windowWidth={windowWidth}/>)
+                  : (<SoilDiagram profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter} hideBearingCapacity={hideBearingCapacity} windowWidth={windowWidth}/>
                 )}
               </div>
             )

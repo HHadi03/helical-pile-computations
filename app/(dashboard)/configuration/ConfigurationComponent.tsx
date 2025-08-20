@@ -120,20 +120,24 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
           return (
             <AccordionItem key={profile.id} value={profile.id}>
             
-              <div className="relative">
-                <AccordionTrigger className="border-2 pl-2 pr-16 shadow-inner bg-secondary whitespace-nowrap">
-                  <h2 className="text-xl font-semibold"> {profile.profile_name ? profile.profile_name : `Soil Profile ${index + 1}`}</h2>
-                </AccordionTrigger>
-
-                <div className="absolute top-0 right-0 mt-1.5 border-l-2">
+              <div className="bg-secondary border-2 shadow-inner flex justify-between items-center">
+                <div className='flex-1'>
+                  <AccordionTrigger>
+                    <h2 className='line-clamp-1'> {profile.profile_name ? profile.profile_name : `Soil Profile ${index + 1}`}</h2>
+                  </AccordionTrigger>
+                </div>
+                
+                <div className="border-l-2 px-2 py-1">
                   <DropdownMenu>
                     
                     <DropdownMenuTrigger asChild>
-                      <Button title='Profile Menu' variant="ghost" size="icon" className="mx-2 hover:bg-foreground/7 dark:hover:bg-foreground/7"><EllipsisVertical className='size-6 text-muted-foreground'/></Button>
+                      <Button title="Profile Menu" variant="ghost" size="icon" className="hover:bg-foreground/7 dark:hover:bg-foreground/7" onClick={(e) => e.stopPropagation()}>
+                        <EllipsisVertical className='size-6 text-muted-foreground'/>
+                      </Button>
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent align="end" className="w-42" sideOffset={-2}>
-                      <DropdownMenuLabel className='font-semibold'>{profile.profile_name ? profile.profile_name : `Soil Profile ${index + 1}`}</DropdownMenuLabel>
+                      <DropdownMenuLabel className='font-semibold truncate'>{profile.profile_name ? profile.profile_name : `Soil Profile ${index + 1}`}</DropdownMenuLabel>
                       <DropdownMenuSeparator/>
                       <DropdownMenuItem asChild className='hover:cursor-pointer'>
                         <Link href={`/configuration/edit-profile/${profile.id}`} prefetch={true} scroll={false}><Pencil className='text-muted-foreground'/>Edit</Link>
