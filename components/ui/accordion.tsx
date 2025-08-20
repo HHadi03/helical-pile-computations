@@ -28,9 +28,8 @@ function AccordionItem({
 function AccordionTrigger({
   className,
   children,
-  actions,
   ...props
-}: React.ComponentProps<typeof AccordionPrimitive.Trigger> & {actions?: React.ReactNode}) {
+}: React.ComponentProps<typeof AccordionPrimitive.Trigger>) {
   return (
     <AccordionPrimitive.Header className="flex">
       <AccordionPrimitive.Trigger

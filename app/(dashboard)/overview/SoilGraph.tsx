@@ -5,7 +5,9 @@ import { useTheme } from "next-themes"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 
 export function SoilGraph({profileSoils, pileLength, pileDiameter, hideBearingCapacity, profileIndex, profileName, windowWidth}: { profileSoils: ToverviewSoilSchema[], pileLength: number, pileDiameter: 60 | 100, hideBearingCapacity: boolean, profileIndex: number, profileName?: string, windowWidth?: number }) {
-
+  
+  const { resolvedTheme } = useTheme()
+  
   const needsHorizontalScroll = windowWidth != undefined && windowWidth < 720
 
   if (profileSoils.length === 0) {
@@ -19,8 +21,6 @@ export function SoilGraph({profileSoils, pileLength, pileDiameter, hideBearingCa
       </ScrollArea>
     )
   }
-
-  const { resolvedTheme } = useTheme()
 
   const filteredSoils = profileSoils.filter(soil => soil.start_depth < pileLength)
   
