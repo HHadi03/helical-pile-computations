@@ -124,7 +124,7 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
           })}
 
           <div 
-            className="absolute top-0 z-20"
+            className="absolute top-0 z-20 transition-all duration-300 ease-in-out"
             style={{
               top: "-25px",
               left: "225px",
