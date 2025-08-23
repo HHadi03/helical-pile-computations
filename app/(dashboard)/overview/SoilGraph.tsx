@@ -4,11 +4,11 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Lege
 import { useTheme } from "next-themes"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 
-export function SoilGraph({profileSoils, pileLength, pileDiameter, hideBearingCapacity, profileIndex, profileName, windowWidth}: { profileSoils: ToverviewSoilSchema[], pileLength: number, pileDiameter: 60 | 100, hideBearingCapacity: boolean, profileIndex: number, profileName?: string, windowWidth?: number }) {
+export function SoilGraph({profileSoils, pileLength, pileDiameter, hideBearingCapacity, profileIndex, profileName, windowWidth}: { profileSoils: ToverviewSoilSchema[], pileLength: number, pileDiameter: number, hideBearingCapacity: boolean, profileIndex: number, profileName?: string, windowWidth?: number }) {
   
   const { resolvedTheme } = useTheme()
   
-  const needsHorizontalScroll = windowWidth != undefined && windowWidth < 720
+  const needsHorizontalScroll = windowWidth != undefined && windowWidth < 760
 
   if (profileSoils.length === 0) {
     return (
@@ -46,7 +46,7 @@ export function SoilGraph({profileSoils, pileLength, pileDiameter, hideBearingCa
   
   return (
     <ScrollArea className={`overflow-x-auto overflow-y-clip grid grid-cols-1 ${needsHorizontalScroll ? 'border' : ''}`}>
-      <div className="min-w-[592px]">
+      <div className="min-w-[634px]">
         
         <div className={`p-2 bg-sky-50 dark:bg-sky-900/50 whitespace-nowrap ${needsHorizontalScroll ? '' : 'border-2'}`}> 
           <div className="flex justify-between">

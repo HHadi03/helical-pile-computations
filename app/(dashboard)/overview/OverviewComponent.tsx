@@ -14,7 +14,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 export function OverviewComponent({ soilsData, profilesData}: { soilsData: ToverviewSoilSchema[], profilesData: ToverviewSoilProfileSchema[] }) {
   const [showGraph, setShowGraph] = useState(false)
   const [hideBearingCapacity, setHideBearingCapacity] = useState(false)
-  const [pileDiameter, setPileDiameter] = useState<60 | 100>(100)
+  const [pileDiameter, setPileDiameter] = useState(100)
   const [api, setApi] = useState<CarouselApi>()
   const [current, setCurrent] = useState(0)
   const [count, setCount] = useState(0)

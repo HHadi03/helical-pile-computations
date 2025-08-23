@@ -11,7 +11,7 @@ function getLuminance (color: string) {
   return (0.299 * r + 0.587 * g + 0.114 * b) / 255
 }
 
-export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter, hideBearingCapacity, windowWidth}: { profileSoils: ToverviewSoilSchema[], profile: ToverviewSoilProfileSchema, profileIndex: number, pileDiameter: 60 | 100, hideBearingCapacity: boolean, windowWidth?: number }) {
+export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter, hideBearingCapacity, windowWidth}: { profileSoils: ToverviewSoilSchema[], profile: ToverviewSoilProfileSchema, profileIndex: number, pileDiameter: number, hideBearingCapacity: boolean, windowWidth?: number }) {
 
   const needsHorizontalScroll = windowWidth != undefined && windowWidth < 760
   
@@ -37,7 +37,7 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
 
   let pileHeight = 0
   return (
-    <ScrollArea className={`overflow-x-auto overflow-y-clip grid grid-cols-1 ${needsHorizontalScroll ? 'border' : ''}`}>
+    <ScrollArea id="SoilDiagram" className={`overflow-x-auto overflow-y-clip grid grid-cols-1 ${needsHorizontalScroll ? 'border' : ''}`}>
       <div className="min-w-[634px]">
         
         <div className={`p-2 bg-sky-50 dark:bg-sky-900/50 relative whitespace-nowrap ${needsHorizontalScroll ? '' : 'border-2'}`}> 

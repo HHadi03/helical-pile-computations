@@ -122,7 +122,7 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
             
               <div className="bg-secondary border-2 shadow-inner flex justify-between items-center">
                 <div className='flex-1'>
-                  <AccordionTrigger>
+                  <AccordionTrigger title={profile.profile_name ? profile.profile_name : `Soil Profile ${index + 1}`}>
                     <h2 className='line-clamp-1'> {profile.profile_name ? profile.profile_name : `Soil Profile ${index + 1}`}</h2>
                   </AccordionTrigger>
                 </div>
@@ -137,7 +137,7 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent align="end" className="w-42" sideOffset={-2}>
-                      <DropdownMenuLabel className='font-semibold truncate'>{profile.profile_name ? profile.profile_name : `Soil Profile ${index + 1}`}</DropdownMenuLabel>
+                      <DropdownMenuLabel className='font-semibold truncate' title={profile.profile_name ? profile.profile_name : `Soil Profile ${index + 1}`}>{profile.profile_name ? profile.profile_name : `Soil Profile ${index + 1}`}</DropdownMenuLabel>
                       <DropdownMenuSeparator/>
                       <DropdownMenuItem asChild className='hover:cursor-pointer'>
                         <Link href={`/configuration/edit-profile/${profile.id}`} prefetch={true} scroll={false}><Pencil className='text-muted-foreground'/>Edit</Link>
@@ -177,7 +177,7 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
                           <TableHead>End Depth</TableHead>
                           <TableHead>Sat Unit Weight</TableHead>
                           <TableHead>Moist Unit Weight</TableHead>
-                          <TableHead>SPT N-value</TableHead>
+                          <TableHead>SPT N-Value</TableHead>
                           <TableHead className='hidden 2xl:table-cell'>Description</TableHead>
                           <TableHead></TableHead>
                         </TableRow>

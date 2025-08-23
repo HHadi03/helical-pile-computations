@@ -23,17 +23,24 @@ export type TinsertSoilProfileSchema = z.infer<typeof insertSoilProfileSchema>
 
 //configuration page schema
 export const configSoilProfileSchema = z.object({
-  id: z.string(),
+  id: z.uuid(),
   profile_name: z.string().optional(),
 })
 export type TconfigSoilProfileSchema = z.infer<typeof configSoilProfileSchema>
 
 //overview page schema
 export const overviewSoilProfileSchema = z.object({
-  id: z.string(),
+  id: z.uuid(),
   profile_name: z.string().optional(),
   pile_stick_out: z.number(),
   effective_pile_length: z.number(),
   water_depth: z.number(),
 })
 export type ToverviewSoilProfileSchema = z.infer<typeof overviewSoilProfileSchema>
+
+//export page schema
+export const exportSoilProfileSchema = z.object({
+  profile_name: z.string().optional(),
+  id: z.string(),
+})
+export type TexportSoilProfileSchema = z.infer<typeof exportSoilProfileSchema>

@@ -2,7 +2,7 @@ import * as z from "zod"
 
 //insert soil schema
 export const insertSoilSchema = z.object({
-  soil_type: z.enum(["coarse", "fine", "manmade"], { message: "Please select a soil type" }),
+  soil_type: z.enum(["coarse", "fine", "manmade"], { message: "Please select soil type" }),
   density: z.enum(["loose", "dense"], { message: "Please select soil density" }),
   soil: z.string().min(1, { message: "Please select a soil" }),
   soil_name: z.string().optional(),
@@ -35,47 +35,6 @@ export const insertSoilSchema = z.object({
   )
 export type TinsertSoilSchema = z.infer<typeof insertSoilSchema>
 
-//configuration page schema
-export const configSoilSchema = z.object({
-  id: z.string(),
-  soil_profile_id: z.string(),
-  soil_type: z.enum(["coarse", "fine", "manmade"]),
-  density: z.enum(["loose", "dense"]),
-  soil: z.string(),
-  soil_name: z.string().optional(),
-  description: z.string().optional(),
-  start_depth: z.number(),
-  end_depth: z.number(),
-  n_value: z.number(),
-  y_moist: z.number(),
-  y_sat: z.number(),
-})
-export type TconfigSoilSchema = z.infer<typeof configSoilSchema>
-
-//overview page schema
-export const overviewSoilSchema = z.object({
-  id: z.string(),
-  soil_profile_id: z.string(),
-  soil: z.string(),
-  soil_name: z.string().optional(),
-  description: z.string().optional(),
-  soil_type: z.enum(["coarse", "fine", "manmade"]),
-  colour: z.string(),
-  start_depth: z.number(),
-  end_depth: z.number(),
-  n_value: z.number(),
-  y_moist: z.number(),
-  y_sat: z.number(),
-  h: z.number(),
-  su: z.number(),
-  t: z.number(),
-  shaft_capacity60: z.number(),
-  shaft_capacity100: z.number(),
-  bearing_capacity60: z.number(),
-  bearing_capacity100: z.number(),
-})
-export type ToverviewSoilSchema = z.infer<typeof overviewSoilSchema>
-
 //edit soil information schema
 export const editSoilInformationSchema = z.object({
   soil_type: z.enum(["coarse", "fine", "manmade"], { message: "Please select a soil type" }),
@@ -107,7 +66,7 @@ export const editSoilParametersSchema = z.object({
   n_value: z.coerce.number().gt(0, { message: "SPT N-Value is required" }),
   y_moist: z.coerce.number().gt(0, { message: "Moist Unit Weight is required" }),
   y_sat: z.coerce.number().gt(0, { message: "Sat Unit Weight is required" }),
-  soil_profile_id: z.string().optional(),
+  soil_profile_id: z.uuid().optional(),
   soil_type: z.string().optional(),
   soil: z.string().optional(),
   soil_name: z.string().optional(),
@@ -168,3 +127,44 @@ export const fineSoilCalculationsSchema = z.object({
   n_value: z.number(),
 })
 export type TfineSoilCalculationsSchema = z.infer<typeof fineSoilCalculationsSchema>
+
+//configuration page schema
+export const configSoilSchema = z.object({
+  id: z.uuid(),
+  soil_profile_id: z.uuid(),
+  soil_type: z.enum(["coarse", "fine", "manmade"]),
+  density: z.enum(["loose", "dense"]),
+  soil: z.string(),
+  soil_name: z.string().optional(),
+  description: z.string().optional(),
+  start_depth: z.number(),
+  end_depth: z.number(),
+  n_value: z.number(),
+  y_moist: z.number(),
+  y_sat: z.number(),
+})
+export type TconfigSoilSchema = z.infer<typeof configSoilSchema>
+
+//overview page schema
+export const overviewSoilSchema = z.object({
+  id: z.uuid(),
+  soil_profile_id: z.uuid(),
+  soil: z.string(),
+  soil_name: z.string().optional(),
+  description: z.string().optional(),
+  soil_type: z.enum(["coarse", "fine", "manmade"]),
+  colour: z.string(),
+  start_depth: z.number(),
+  end_depth: z.number(),
+  n_value: z.number(),
+  y_moist: z.number(),
+  y_sat: z.number(),
+  h: z.number(),
+  su: z.number(),
+  t: z.number(),
+  shaft_capacity60: z.number(),
+  shaft_capacity100: z.number(),
+  bearing_capacity60: z.number(),
+  bearing_capacity100: z.number(),
+})
+export type ToverviewSoilSchema = z.infer<typeof overviewSoilSchema>
