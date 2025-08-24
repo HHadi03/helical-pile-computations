@@ -1,10 +1,11 @@
 'use client'
 import { ToverviewSoilSchema } from "@/schemas/soilSchemas"
+import { ToverviewSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend, Tooltip } from "recharts"
 import { useTheme } from "next-themes"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 
-export function SoilGraph({profileSoils, pileLength, pileDiameter, hideBearingCapacity, profileIndex, profileName, windowWidth}: { profileSoils: ToverviewSoilSchema[], pileLength: number, pileDiameter: number, hideBearingCapacity: boolean, profileIndex: number, profileName?: string, windowWidth?: number }) {
+export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, hideBearingCapacity, windowWidth}: { profileSoils: ToverviewSoilSchema[], profile: ToverviewSoilProfileSchema, profileIndex: number, pileDiameter: number, hideBearingCapacity: boolean, windowWidth?: number }) {
   
   const { resolvedTheme } = useTheme()
   
@@ -14,7 +15,7 @@ export function SoilGraph({profileSoils, pileLength, pileDiameter, hideBearingCa
     return (
       <ScrollArea className="overflow-x-auto overflow-y-clip grid grid-cols-1 border-2">
         <div className="p-2 bg-sky-50 dark:bg-sky-900/50 whitespace-nowrap"> 
-          <h1 className="text-base font-semibold mb-2">{profileName || `Soil Profile ${profileIndex + 1}`}</h1>
+          <h1 className="text-base font-semibold mb-2">{profile.profile_name || `Soil Profile ${profileIndex + 1}`}</h1>
           <p className="text-sm text-muted-foreground">No soil layers detected, add soil layers in configuration to begin analysis.</p>
         </div>
         <ScrollBar orientation="horizontal" className="h-2"/>
@@ -22,7 +23,7 @@ export function SoilGraph({profileSoils, pileLength, pileDiameter, hideBearingCa
     )
   }
 
-  const filteredSoils = profileSoils.filter(soil => soil.start_depth < pileLength)
+  const filteredSoils = profileSoils.filter(soil => soil.start_depth < profile.effective_pile_length)
   
   const lastLayer = filteredSoils[filteredSoils.length - 1]
 
@@ -39,7 +40,7 @@ export function SoilGraph({profileSoils, pileLength, pileDiameter, hideBearingCa
     return accumulator;
   }, [] as { end_depth: number; [key: string]: number }[])
   
-  chartData[chartData.length - 1].end_depth = pileLength
+  chartData[chartData.length - 1].end_depth = profile.effective_pile_length
   if (!hideBearingCapacity) {chartData[chartData.length - 1][shaftCapacityKey] += bearingCapacity}
   chartData[chartData.length - 1][shaftCapacityKey] = Math.round(chartData[chartData.length - 1][shaftCapacityKey] * 100) / 100
   chartData.unshift({ end_depth: 0, [shaftCapacityKey]: 0 })
@@ -52,12 +53,12 @@ export function SoilGraph({profileSoils, pileLength, pileDiameter, hideBearingCa
           <div className="flex justify-between">
 
             <div className="flex flex-col">
-              <h1 className="text-base font-semibold">{profileName || `Soil Profile ${profileIndex + 1}`}</h1>
+              <h1 className="text-base font-semibold">{profile.profile_name|| `Soil Profile ${profileIndex + 1}`}</h1>
               <p className="text-sm mt-auto text-muted-foreground">Pile Diameter: {pileDiameter} mm</p>
             </div>
 
             <div className="text-right text-sm">
-              <p><span className="font-semibold">Maximum Depth:</span> {pileLength} m</p>
+              <p><span className="font-semibold">Maximum Depth:</span> {profile.effective_pile_length} m</p>
               <p><span className="font-semibold">Maximum Total Capacity:</span> {chartData[chartData.length - 1][shaftCapacityKey]} kN</p>
               {!hideBearingCapacity && (
                 <p><span className="font-semibold">Bearing Capacity Contribution:</span> {bearingCapacity} kN</p>

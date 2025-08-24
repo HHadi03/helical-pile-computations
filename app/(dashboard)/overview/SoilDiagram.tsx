@@ -37,7 +37,7 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
 
   let pileHeight = 0
   return (
-    <ScrollArea id="SoilDiagram" className={`overflow-x-auto overflow-y-clip grid grid-cols-1 ${needsHorizontalScroll ? 'border' : ''}`}>
+    <ScrollArea className={`overflow-x-auto overflow-y-clip grid grid-cols-1 ${needsHorizontalScroll ? 'border' : ''}`}>
       <div className="min-w-[634px]">
         
         <div className={`p-2 bg-sky-50 dark:bg-sky-900/50 relative whitespace-nowrap ${needsHorizontalScroll ? '' : 'border-2'}`}> 

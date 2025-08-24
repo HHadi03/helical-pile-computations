@@ -96,7 +96,7 @@ export function OverviewComponent({ soilsData, profilesData}: { soilsData: Tover
               const profileSoils = soilsByProfile[profile.id] || []
               return (
                 <CarouselItem key={profile.id}>
-                  {showGraph ? (<SoilGraph profileSoils={profileSoils} pileLength={profile.effective_pile_length} pileDiameter={pileDiameter} hideBearingCapacity={hideBearingCapacity} profileIndex={index} profileName={profile.profile_name}/>)
+                  {showGraph ? (<SoilGraph profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter} hideBearingCapacity={hideBearingCapacity}/>)
                   : (<SoilDiagram profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter} hideBearingCapacity={hideBearingCapacity}/>)}
                 </CarouselItem>
               )
@@ -112,7 +112,7 @@ export function OverviewComponent({ soilsData, profilesData}: { soilsData: Tover
             return (
               <div key={profile.id}>
                 {showGraph ? (
-                  <SoilGraph profileSoils={profileSoils} pileLength={profile.effective_pile_length} pileDiameter={pileDiameter} hideBearingCapacity={hideBearingCapacity} profileIndex={index} profileName={profile.profile_name} windowWidth={windowWidth}/>)
+                  <SoilGraph profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter} hideBearingCapacity={hideBearingCapacity} windowWidth={windowWidth}/>)
                   : (<SoilDiagram profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter} hideBearingCapacity={hideBearingCapacity} windowWidth={windowWidth}/>
                 )}
               </div>
