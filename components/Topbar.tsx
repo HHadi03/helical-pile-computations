@@ -14,7 +14,7 @@ export const Topbar = () => {
   ] 
 
   return (
-    <header className='flex flex-col shrink-0 mt-5 mx-4 mb-2 @container'>
+    <header className='flex flex-col shrink-0 mt-5 mx-4 mb-2'>
 
       <div className='flex justify-center relative'>
         <h1 className="text-lg sm:text-xl tracking-wide whitespace-nowrap"> Helical Pile Computations </h1>

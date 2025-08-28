@@ -106,7 +106,7 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
 
   const soilsByProfile = Object.groupBy(soilsData, soil => soil.soil_profile_id)
   return (
-    <section className='min-h-full flex flex-col'>
+    <section className='h-full flex flex-col'>
 
       <div className="mb-3 flex justify-end">
         <Button asChild variant="outline" className="w-42 hover:bg-green-200 dark:hover:bg-green-900/50 shadow-sm" size="lg">
