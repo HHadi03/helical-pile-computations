@@ -11,9 +11,9 @@ function getLuminance (color: string) {
   return (0.299 * r + 0.587 * g + 0.114 * b) / 255
 }
 
-export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter, hideBearingCapacity, windowWidth}: { profileSoils: ToverviewSoilSchema[], profile: ToverviewSoilProfileSchema, profileIndex: number, pileDiameter: number, hideBearingCapacity: boolean, windowWidth?: number }) {
+export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter, hideBearingCapacity, needsHorizontalScroll}: { profileSoils: ToverviewSoilSchema[], profile: ToverviewSoilProfileSchema, profileIndex: number, pileDiameter: number, hideBearingCapacity: boolean, needsHorizontalScroll?: boolean }) {
 
-  const needsHorizontalScroll = windowWidth != undefined && windowWidth < 760
+  
   
   if (profileSoils.length === 0) {
     return (
@@ -124,15 +124,15 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
           })}
 
           <div 
-            className="absolute top-0 z-20 transition-all duration-300 ease-in-out"
+            className="absolute top-0 z-20 duration-300"
             style={{
               top: "-25px",
               left: "225px",
               transform: "translateX(-50%)",
               height: `${pileHeight + 25}px`,
-              width: `${pileDiameter === 60 ? '40px' : '50px'}`, 
+              width: `${pileDiameter === 60 ? '35px' : '45px'}`, 
               backgroundImage: `url(/${pileDiameter}mm-pile.png)`,
-              backgroundSize: `${pileDiameter === 60 ? '40px auto' : '50px auto'}`,
+              backgroundSize: `${pileDiameter === 60 ? '35px auto' : '45px auto'}`,
             }}
           />
         </div>

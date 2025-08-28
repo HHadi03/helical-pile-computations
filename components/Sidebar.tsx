@@ -10,9 +10,15 @@ import { Button } from './ui/button'
 export const Sidebar = () => {
   const [expanded, setExpanded] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isResizing, setIsResizing] = useState(false)
    
   useEffect(() => {
+    let resizeTimer: number
+
     const handleResize = () => {
+      setIsResizing(true)
+      window.clearTimeout(resizeTimer)
+
       if (window.innerWidth < 1280) {
         setExpanded(false)
       }
@@ -20,18 +26,21 @@ export const Sidebar = () => {
       if (window.innerWidth >= 640) {
         setMobileMenuOpen(false)
       }
+    
+      resizeTimer = window.setTimeout(() => {
+        setIsResizing(false)
+      }, 150) 
     }
 
     handleResize()
-
     window.addEventListener('resize', handleResize)
-    return () => {window.removeEventListener('resize', handleResize)}
+  
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      window.clearTimeout(resizeTimer)
+    }
   }, [])
   
-   const handleNavClick = () => {
-    setMobileMenuOpen(false)
-  }
-
   const navigationSections = [
     {
       title: "File",
@@ -54,7 +63,7 @@ export const Sidebar = () => {
 
   return (
     <>
-       {!mobileMenuOpen && (
+      {!mobileMenuOpen && (
         <div className="sm:hidden fixed top-5 left-4 z-40">
           <Button variant="outline" size="icon" className='size-8' onClick={() => setMobileMenuOpen(true)} title='Toggle Sidebar'>
             <Menu className="size-[1.2rem]"/>
@@ -69,7 +78,7 @@ export const Sidebar = () => {
         />
       )}
 
-      <aside className={`bg-sidebar flex flex-col shrink-0 border-r border-sidebar-border p-2 shadow-inner overflow-y-auto overflow-x-clip scrollbar-thin scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-500 sm:static sm:translate-x-0 ${mobileMenuOpen ? 'fixed left-0 top-0 h-full w-[260px] z-50 -translate-x-0' : 'fixed left-0 top-0 h-full w-[260px] z-50 -translate-x-full'} ${expanded ? 'sm:w-[260px]' : 'sm:w-[70px]'}`}>
+      <aside className={`bg-sidebar flex flex-col h-full shrink-0 border-r border-sidebar-border p-2 shadow-inner overflow-y-auto overflow-x-clip scrollbar-thin scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-500 fixed left-0 top-0 z-50 w-[260px] sm:static sm:translate-x-0 ${mobileMenuOpen ? (isResizing ? "translate-x-0" : "translate-x-0 animate-in duration-500 ease-in-out") : (isResizing ? "-translate-x-full" : "-translate-x-full animate-out duration-500 ease-out")} ${expanded ? (isResizing ? "sm:w-[260px]" : "sm:w-[260px] sm:animate-in sm:duration-500 sm:ease-in-out") : (isResizing ? "sm:w-[70px]" : "sm:w-[70px] sm:animate-out sm:duration-500 sm:ease-out")}`}>
 
         {expanded ? (
           <div className="hidden xl:flex flex-row items-center justify-between mt-2">
@@ -99,7 +108,7 @@ export const Sidebar = () => {
                   {section.items.map((item) => (
                     <li key={item.href} className='my-3 animate-in fade-in slide-in-from-top-8 duration-700'>
                       <Button asChild variant="ghost" className='hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7'>
-                        <Link prefetch={true} href={item.href} className="flex gap-3 w-full justify-start"  onClick={handleNavClick}><item.icon className='size-6'/>{item.text}</Link>
+                        <Link prefetch={true} href={item.href} className="flex gap-3 w-full justify-start"  onClick={() => setMobileMenuOpen(false)}><item.icon className='size-6'/>{item.text}</Link>
                       </Button>
                     </li>
                   ))}
@@ -114,7 +123,7 @@ export const Sidebar = () => {
                         <Link prefetch={true} href={item.href}> <item.icon className='size-6'/></Link>
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent side="right" className='p-2 text-sm'>{item.text}</TooltipContent>
+                    <TooltipContent side="right" className='p-2'>{item.text}</TooltipContent>
                   </Tooltip>
                 </li>
               ))
@@ -130,7 +139,7 @@ export const Sidebar = () => {
                   <LogOut className="size-6 rotate-180"/>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="right" className='p-2 text-sm'>Log Out</TooltipContent>
+              <TooltipContent side="right" className='p-2'>Log Out</TooltipContent>
             </Tooltip>
           ) : (
             <div className='animate-in fade-in slide-in-from-left-8 duration-700'>

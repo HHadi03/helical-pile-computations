@@ -45,22 +45,13 @@ export function OverviewComponent({ soilsData, profilesData}: { soilsData: Tover
   }, [])
  
   const soilsByProfile = Object.groupBy(soilsData, soil => soil.soil_profile_id)
+
   const displayCarousel = windowWidth > 950
+  const needsHorizontalScroll = windowWidth < 760
   return (
     <>
       <div className="flex mx-auto justify-between max-w-3xl mb-2">
        <div className="flex gap-2">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div>
-                <Toggle variant="outline" pressed={pileDiameter === 60} onPressedChange={(pressed) => setPileDiameter(pressed ? 60 : 100)} aria-label="Toggle pile diameter" className="w-10.5">
-                  <CircleSlash2 className="size-5 text-foreground/70"/>
-                </Toggle>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>Pile Diameter</TooltipContent>
-          </Tooltip>
-
           <Tooltip>
             <TooltipTrigger asChild>
               <div>
@@ -70,6 +61,17 @@ export function OverviewComponent({ soilsData, profilesData}: { soilsData: Tover
               </div>
             </TooltipTrigger>
             <TooltipContent>Chart Analysis</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div>
+                <Toggle variant="outline" pressed={pileDiameter === 60} onPressedChange={(pressed) => setPileDiameter(pressed ? 60 : 100)} aria-label="Toggle pile diameter" className="w-10.5">
+                  <CircleSlash2 className="size-5 text-foreground/70"/>
+                </Toggle>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>Pile Diameter</TooltipContent>
           </Tooltip>
 
           <Tooltip>
@@ -112,8 +114,8 @@ export function OverviewComponent({ soilsData, profilesData}: { soilsData: Tover
             return (
               <div key={profile.id}>
                 {showGraph ? (
-                  <SoilGraph profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter} hideBearingCapacity={hideBearingCapacity} windowWidth={windowWidth}/>)
-                  : (<SoilDiagram profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter} hideBearingCapacity={hideBearingCapacity} windowWidth={windowWidth}/>
+                  <SoilGraph profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter} hideBearingCapacity={hideBearingCapacity} needsHorizontalScroll={needsHorizontalScroll}/>)
+                  : (<SoilDiagram profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter} hideBearingCapacity={hideBearingCapacity} needsHorizontalScroll={needsHorizontalScroll}/>
                 )}
               </div>
             )

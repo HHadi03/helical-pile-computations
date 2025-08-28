@@ -39,7 +39,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TexportSoilProfileS
 
   async function onSubmit(values: TexportFormSchema) {
     try {
-      
+      console.log(values)
       // const result = await (values)
 
       // if (result.errors) {

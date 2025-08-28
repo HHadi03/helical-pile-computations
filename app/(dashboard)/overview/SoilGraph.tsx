@@ -5,12 +5,10 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Lege
 import { useTheme } from "next-themes"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 
-export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, hideBearingCapacity, windowWidth}: { profileSoils: ToverviewSoilSchema[], profile: ToverviewSoilProfileSchema, profileIndex: number, pileDiameter: number, hideBearingCapacity: boolean, windowWidth?: number }) {
-  
+export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, hideBearingCapacity, needsHorizontalScroll}: { profileSoils: ToverviewSoilSchema[], profile: ToverviewSoilProfileSchema, profileIndex: number, pileDiameter: number, hideBearingCapacity: boolean, needsHorizontalScroll?: boolean }) {
+
   const { resolvedTheme } = useTheme()
   
-  const needsHorizontalScroll = windowWidth != undefined && windowWidth < 760
-
   if (profileSoils.length === 0) {
     return (
       <ScrollArea className="overflow-x-auto overflow-y-clip grid grid-cols-1 border-2">

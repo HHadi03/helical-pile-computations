@@ -3,7 +3,7 @@ import { Sidebar } from "@/components/Sidebar"
 
 export default function DashboardLayout({children, modal}: {children: React.ReactNode, modal: React.ReactNode}) {
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen overflow-x-hidden">
       <Sidebar/>
      
       <div className="flex flex-col flex-1">
