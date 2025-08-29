@@ -12,7 +12,7 @@ export default async function ExportModal() {
   if (error) {
     return (
       <Modal title="Error - Export Analysis">
-        <div className="text-destructive text-sm flex justify-center">
+        <div className="text-destructive text-sm flex justify-center border-t-2 pt-2">
           <p>Could not find soil profile data</p>
         </div>
       </Modal>
@@ -21,11 +21,12 @@ export default async function ExportModal() {
 
   if (data.length === 0) {
     return (
-      <Modal title="Export Analysis">
-        <div className="text-sm flex justify-center">
-          <p>No soil profiles found</p>
-        </div>
-      </Modal>
+     <Modal title="Export Analysis">
+      <div className="text-sm flex text-center items-center flex-col space-y-2 border-y-2 py-2">
+        <p className="text-destructive">No Soil Profiles Found</p>
+        <p className="text-muted-foreground"> Please add a soil profile first before attempting to export analysis</p>
+      </div>
+    </Modal>
     )
   }
 

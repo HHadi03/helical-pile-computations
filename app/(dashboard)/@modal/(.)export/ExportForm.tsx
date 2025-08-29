@@ -2,7 +2,7 @@
 import { toast } from "sonner"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { TexportSoilProfileSchema } from "@/schemas/soilProfileSchemas"
+import { TselectSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { exportFormSchema, TexportFormSchema } from "@/schemas/exportSchema"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, } from "@/components/ui/form"
@@ -12,7 +12,7 @@ import { Loader2 } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 
-export function ExportForm({ soilProfiles }: { soilProfiles: TexportSoilProfileSchema[] }) {
+export function ExportForm({ soilProfiles }: { soilProfiles: TselectSoilProfileSchema[] }) {
   const router = useRouter()
 
   const form = useForm({

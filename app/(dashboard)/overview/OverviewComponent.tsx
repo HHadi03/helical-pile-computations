@@ -108,7 +108,7 @@ export function OverviewComponent({ soilsData, profilesData}: { soilsData: Tover
           <CarouselNext/>
         </Carousel>
       ) : (
-        <div className="max-w-3xl mx-auto space-y-6">
+        <section className="max-w-3xl mx-auto space-y-6">
           {profilesData.map((profile, index) => {
             const profileSoils = soilsByProfile[profile.id] || []
             return (
@@ -120,7 +120,7 @@ export function OverviewComponent({ soilsData, profilesData}: { soilsData: Tover
               </div>
             )
           })}
-        </div>
+        </section>
       )}
     </>
   )

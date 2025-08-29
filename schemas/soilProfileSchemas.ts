@@ -39,8 +39,8 @@ export const overviewSoilProfileSchema = z.object({
 export type ToverviewSoilProfileSchema = z.infer<typeof overviewSoilProfileSchema>
 
 //export page schema
-export const exportSoilProfileSchema = z.object({
+export const selectSoilProfileSchema = z.object({
   profile_name: z.string().optional(),
   id: z.string(),
 })
-export type TexportSoilProfileSchema = z.infer<typeof exportSoilProfileSchema>
+export type TselectSoilProfileSchema = z.infer<typeof selectSoilProfileSchema>

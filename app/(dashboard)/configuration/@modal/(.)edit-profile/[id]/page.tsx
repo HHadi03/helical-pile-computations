@@ -15,8 +15,8 @@ export default async function EditProfileModal({params}:{params: Promise<{id: st
   if (error) {
     return (
       <Modal title="Error - Edit Soil Profile">
-        <div className="text-destructive text-sm flex justify-center">
-          <p>Could not find profile data</p>
+        <div className="text-destructive text-sm flex justify-center border-t-2 pt-2">
+          <p>Could not find soil profile data</p>
         </div>
       </Modal>
     )

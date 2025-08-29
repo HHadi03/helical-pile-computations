@@ -1,4 +1,4 @@
-import { FolderX, ArrowBigRight} from "lucide-react"
+import { FolderX, ArrowBigRight, FolderOpen} from "lucide-react"
 import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
 import Link from "next/link"
@@ -64,10 +64,16 @@ export default async function OverviewPage() {
       <section className="bg-secondary border-2 border-foreground flex flex-col items-center text-center justify-center min-h-full p-5">
         <FolderX className="size-10 text-muted-foreground mb-2"/>
         <h3 className="text-2xl font-semibold mb-2">No Soil Profiles Found</h3>
-        <p className="mb-4 text-muted-foreground">Head to the configuration page to add your first soil profile</p>
-        <Button asChild className="w-80">
-          <Link href="/configuration"><ArrowBigRight className="size-6"/>Go to Configuration</Link>
-        </Button>
+        <p className="mb-4 text-muted-foreground">Go to configuration to add a soil profile or load previously saved soil profiles</p>
+
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Button asChild className="w-45">
+            <Link href="/configuration"><ArrowBigRight className="size-6"/>Go to Configuration</Link>
+          </Button>
+          <Button asChild variant="outline" className="w-45">
+            <Link href="/load" prefetch={true} scroll={false}><FolderOpen className="size-6"/>Load Saved Data</Link>
+          </Button>
+        </div>
       </section>
     )
   }

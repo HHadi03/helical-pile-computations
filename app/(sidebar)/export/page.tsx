@@ -2,7 +2,6 @@ import { Metadata } from "next"
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { ExportForm } from "@/app/(dashboard)/@modal/(.)export/ExportForm"
-import { NotFound } from "@/components/NotFound"
 
 export const metadata: Metadata = {
   title: "Export | Helical Pile Computations",
@@ -22,12 +21,25 @@ export default async function ExportPage() {
   .order("created_at", { ascending: true })
 
   if (soilProfilesError) {
-    return <NotFound/>
+    return (
+      <div className="text-destructive text-sm flex justify-center">
+        <p>Could not find soil profile data</p>
+      </div>
+    )
+  }
+
+  if (soilProfiles.length === 0) {
+    return (
+      <div className="text-sm flex text-center items-center flex-col space-y-2">
+        <p className="text-destructive">No Soil Profiles Found</p>
+        <p className="text-muted-foreground">Please add a soil profile first before attempting to export analysis</p>
+      </div>
+    )
   }
 
   return (
     <section className='p-5 rounded-lg border max-w-lg mx-auto'>
-      <ExportForm soilProfiles={soilProfiles} />
+      <ExportForm soilProfiles={soilProfiles}/>
     </section>
   )
 }

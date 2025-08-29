@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, Fragment } from 'react'
-import { logOut } from '@/app/actions/logOut'
+import { logOut } from '@/app/(dashboard)/actions/logOut'
 import { ArrowLeftToLine, ArrowRightToLine, LogOut, Save, FolderOpen, Upload, MessageSquareText, CircleHelp, Menu, X } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import Link from 'next/link'
