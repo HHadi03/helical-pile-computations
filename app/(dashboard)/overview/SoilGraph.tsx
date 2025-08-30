@@ -35,12 +35,20 @@ export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, 
 
     accumulator.push({ end_depth: soil.end_depth, [shaftCapacityKey]: Math.round(cumulativeShaft * 100) / 100})
 
-    return accumulator;
+    return accumulator
   }, [] as { end_depth: number; [key: string]: number }[])
   
-  chartData[chartData.length - 1].end_depth = profile.effective_pile_length
-  if (!hideBearingCapacity) {chartData[chartData.length - 1][shaftCapacityKey] += bearingCapacity}
-  chartData[chartData.length - 1][shaftCapacityKey] = Math.round(chartData[chartData.length - 1][shaftCapacityKey] * 100) / 100
+  const lastChartDataObject = chartData[chartData.length - 1]
+  if ( lastChartDataObject.end_depth > profile.effective_pile_length) {
+    lastChartDataObject.end_depth = profile.effective_pile_length
+  }
+  
+  if (!hideBearingCapacity) {
+    lastChartDataObject[shaftCapacityKey] += bearingCapacity
+  }
+
+  lastChartDataObject[shaftCapacityKey] = Math.round(lastChartDataObject[shaftCapacityKey] * 100) / 100
+  
   chartData.unshift({ end_depth: 0, [shaftCapacityKey]: 0 })
   
   return (
@@ -56,11 +64,9 @@ export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, 
             </div>
 
             <div className="text-right text-sm">
-              <p><span className="font-semibold">Maximum Depth:</span> {profile.effective_pile_length} m</p>
-              <p><span className="font-semibold">Maximum Total Capacity:</span> {chartData[chartData.length - 1][shaftCapacityKey]} kN</p>
-              {!hideBearingCapacity && (
-                <p><span className="font-semibold">Bearing Capacity Contribution:</span> {bearingCapacity} kN</p>
-              )}
+              <p><span className="font-semibold">Maximum Depth:</span> {lastChartDataObject.end_depth > profile.effective_pile_length ? profile.effective_pile_length : lastChartDataObject.end_depth} m</p>
+              <p><span className="font-semibold">Maximum Total Capacity:</span> {lastChartDataObject[shaftCapacityKey]} kN</p>
+              {!hideBearingCapacity && (<p><span className="font-semibold">Bearing Capacity Contribution:</span> {bearingCapacity} kN</p>)}
             </div>
 
           </div>

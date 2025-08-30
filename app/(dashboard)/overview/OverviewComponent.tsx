@@ -7,7 +7,7 @@ import { SoilDiagram } from "./SoilDiagram"
 import { ToverviewSoilSchema } from "@/schemas/soilSchemas"
 import { ToverviewSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { SoilGraph } from "./SoilGraph"
-import { ChartLine, CircleSlash2, EyeOff } from "lucide-react"
+import { ChartLine, CircleSlash2, MoveUp } from "lucide-react"
 import { type CarouselApi } from "@/components/ui/carousel"
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
@@ -78,11 +78,11 @@ export function OverviewComponent({ soilsData, profilesData}: { soilsData: Tover
             <TooltipTrigger asChild>
               <div>
                 <Toggle variant="outline" pressed={hideBearingCapacity} onPressedChange={setHideBearingCapacity} aria-label="hide bearing capacity" className="w-10.5">
-                  <EyeOff className="size-6 text-foreground/70"/> 
+                  <MoveUp className="size-6 text-foreground/70"/>
                 </Toggle>
               </div>
             </TooltipTrigger>
-            <TooltipContent>Bearing Capacity</TooltipContent>
+            <TooltipContent>Pullout Only</TooltipContent>
           </Tooltip>
         </div>
         

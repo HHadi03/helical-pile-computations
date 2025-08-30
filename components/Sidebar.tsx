@@ -123,7 +123,7 @@ export const Sidebar = () => {
                         <Link prefetch={true} href={item.href}> <item.icon className='size-6'/></Link>
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent side="right" className='p-2'>{item.text}</TooltipContent>
+                    <TooltipContent side="right" className='p-2 text-sm'>{item.text}</TooltipContent>
                   </Tooltip>
                 </li>
               ))
@@ -139,7 +139,7 @@ export const Sidebar = () => {
                   <LogOut className="size-6 rotate-180"/>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="right" className='p-2'>Log Out</TooltipContent>
+              <TooltipContent side="right" className='p-2 text-sm'>Log Out</TooltipContent>
             </Tooltip>
           ) : (
             <div className='animate-in fade-in slide-in-from-left-8 duration-700'>

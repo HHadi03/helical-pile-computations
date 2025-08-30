@@ -12,8 +12,6 @@ function getLuminance (color: string) {
 }
 
 export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter, hideBearingCapacity, needsHorizontalScroll}: { profileSoils: ToverviewSoilSchema[], profile: ToverviewSoilProfileSchema, profileIndex: number, pileDiameter: number, hideBearingCapacity: boolean, needsHorizontalScroll?: boolean }) {
-
-  
   
   if (profileSoils.length === 0) {
     return (
@@ -37,7 +35,7 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
 
   let pileHeight = 0
   return (
-    <ScrollArea className={`overflow-auto grid grid-cols-1 ${needsHorizontalScroll ? 'border' : ''}`}>
+    <ScrollArea className={` ${needsHorizontalScroll ? 'border' : ''}`}>
       <div className="min-w-[634px]">
         
         <div className={`p-2 bg-sky-50 dark:bg-sky-900/50 relative whitespace-nowrap ${needsHorizontalScroll ? '' : 'border-2'}`}> 
@@ -51,9 +49,7 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
             <div className="text-right text-sm">
               <p><span className="font-semibold">Effective Pile Length:</span> {profile.effective_pile_length} m</p>
               <p><span className="font-semibold">Ultimate Pullout Capacity:</span> {ultimatePulloutCapacity.toFixed(2)} kN</p> 
-              {!hideBearingCapacity && (
-                <p><span className="font-semibold">Ultimate Bearing Capacity:</span> {ultimateBearingCapacity.toFixed(2)} kN</p>
-              )}
+              {!hideBearingCapacity && (<p><span className="font-semibold">Ultimate Bearing Capacity:</span> {ultimateBearingCapacity.toFixed(2)} kN</p>)}
             </div>
 
             <div className="absolute bottom-3 left-[253px]">
