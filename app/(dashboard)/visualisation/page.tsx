@@ -2,16 +2,17 @@
 import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { ArrowBigRight, FolderX, FolderOpen } from "lucide-react"
-import { TselectSoilProfileSchema } from "@/schemas/soilProfileSchemas"
+import { ArrowBigRight, FolderOpen, FolderX } from "lucide-react"
+import { TconfigSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import Link from "next/link"
+import { VisulisationComponent } from "./VisulisationComponent"
 
 export const metadata = {
   title: "Visualisation | Helical Pile Computations",
   description: "Visualise a selection of your soil profiles computed results.",
 }
 
-async function getProfiles(): Promise<TselectSoilProfileSchema[]>{
+async function getProfiles(): Promise<TconfigSoilProfileSchema[]>{
   try {
     const supabase = await createClient()
     const {data, error} = await supabase
@@ -30,11 +31,12 @@ async function getProfiles(): Promise<TselectSoilProfileSchema[]>{
   }
 }
 
+//for each soil profile id selection, and for each 60mm or 100mm selection, query start end shaft bearing.
 export default async function VisualisationPage() {
   const supabase = await createClient()
-  const { data, error } = await supabase.auth.getUser()
-  if (error || !data?.user) {
-    redirect("/")
+  const { data, error } = await supabase.auth.getClaims()
+  if (error || !data?.claims) {
+    redirect('/')
   }
 
   const profilesData = await getProfiles()
@@ -59,7 +61,9 @@ export default async function VisualisationPage() {
 
   return (
     <div>
-   
+      <VisulisationComponent/>
     </div>
   )
 }
+
+//fetch data on client 

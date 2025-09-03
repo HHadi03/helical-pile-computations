@@ -2,7 +2,7 @@
 import { toast } from "sonner"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { TselectSoilProfileSchema } from "@/schemas/soilProfileSchemas"
+import { TconfigSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { exportFormSchema, TexportFormSchema } from "@/schemas/exportSchema"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, } from "@/components/ui/form"
@@ -12,7 +12,7 @@ import { Loader2 } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 
-export function ExportForm({ soilProfiles }: { soilProfiles: TselectSoilProfileSchema[] }) {
+export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileSchema[] }) {
   const router = useRouter()
 
   const form = useForm({
@@ -39,19 +39,38 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TselectSoilProfileS
 
   async function onSubmit(values: TexportFormSchema) {
     try {
-      console.log(values)
-      // const result = await (values)
+      // Call the PDF export API
+      const response = await fetch('/api/export-pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      })
+ 
 
-      // if (result.errors) {
-      //   toast.error(result.message)
-      // }
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF')
+      }
 
-      // else {
-      //   handleClose()
-      //   toast.success(result.message)
-      // }
+      // Get the PDF blob
+      const pdfBlob = await response.blob()
+      
+      // Create download link
+      const url = window.URL.createObjectURL(pdfBlob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `soil-report-${values.job_number || 'export'}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
 
-    } catch {
+      toast.success("PDF exported successfully!")
+      handleClose()
+
+    } catch (error) {
+      console.error('Export error:', error)
       toast.error("An unexpected error has occurred.", { description: "Please try again later." })
     }
   }

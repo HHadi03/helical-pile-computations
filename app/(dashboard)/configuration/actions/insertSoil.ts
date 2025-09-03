@@ -25,11 +25,11 @@ export async function insertSoil(soil: TinsertSoilSchema, profileId: string): Pr
 
   try {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data } = await supabase.auth.getClaims()
 
     const fullSoil = {
       ...soil,
-      user_id: user!.id,
+      user_id: data?.claims.sub,
       soil_profile_id: profileId
     }
 

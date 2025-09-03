@@ -5,13 +5,13 @@ import { Button } from './ui/button'
 
 export const NotFound = async () => {
   const supabase = await createClient()
-  const { data, error } = await supabase.auth.getUser()
-  if (error || !data?.user) {
-    redirect("/")
+  const { data, error } = await supabase.auth.getClaims()
+  if (error || !data?.claims) {
+    redirect('/')
   }
 
   return (
-    <section className="flex flex-col items-center justify-center min-h-full">
+    <section className="flex flex-col text-center place-content-center min-h-full">
       <h1 className="text-4xl font-bold">404 - Entry Not Found</h1>
       <p className="text-lg text-muted-foreground">The Entry you are looking for does not exist.</p>
       <Button variant="link" asChild>

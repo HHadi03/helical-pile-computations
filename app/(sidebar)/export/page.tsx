@@ -10,8 +10,8 @@ export const metadata: Metadata = {
 
 export default async function ExportPage() {
   const supabase = await createClient()
-  const { data, error } = await supabase.auth.getUser()
-  if (error || !data?.user) {
+  const { data, error } = await supabase.auth.getClaims()
+  if (error || !data?.claims) {
     redirect('/')
   }
 

@@ -1,4 +1,4 @@
-import { FolderX, ArrowBigRight, FolderOpen} from "lucide-react"
+import { ArrowBigRight, FolderOpen, FolderX } from "lucide-react"
 import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
 import Link from "next/link"
@@ -52,8 +52,8 @@ async function getSoils(): Promise<ToverviewSoilSchema[]> {
 
 export default async function OverviewPage() {
   const supabase = await createClient()
-  const { data, error } = await supabase.auth.getUser() 
-  if (error || !data?.user) {
+  const { data, error } = await supabase.auth.getClaims()
+  if (error || !data?.claims) {
     redirect('/')
   }
 

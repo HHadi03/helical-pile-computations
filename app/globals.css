@@ -166,3 +166,65 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   appearance: none;
 }
+
+
+/* Add this to your global CSS or create a separate PDF stylesheet */
+
+@media print {
+  body {
+    margin: 0;
+    padding: 0;
+    background: white !important;
+    color: black !important;
+  }
+  
+  .print\:hidden {
+    display: none !important;
+  }
+  
+  .print\:block {
+    display: block !important;
+  }
+  
+  .print\:p-4 {
+    padding: 1rem !important;
+  }
+  
+  /* Ensure charts and graphs print correctly */
+  canvas, svg {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+  
+  /* Page break controls */
+  .page-break-before {
+    page-break-before: always;
+  }
+  
+  .page-break-after {
+    page-break-after: always;
+  }
+  
+  .page-break-avoid {
+    page-break-inside: avoid;
+  }
+}
+
+@media print {
+  /* Prevent awkward breaks in the middle of soil layers */
+  .soil-layer {
+    page-break-inside: avoid;
+  }
+  
+  /* Ensure diagram scaling works in print */
+  .diagram-container {
+    overflow: visible !important;
+  }
+  
+  /* If you want to scale differently for print vs screen */
+  .soil-diagram-print-scale {
+    transform: scale(0.7) !important;
+    width: 143% !important;
+    margin-bottom: -30% !important;
+  }
+}

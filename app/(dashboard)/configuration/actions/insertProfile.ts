@@ -19,11 +19,11 @@ export async function insertProfile(profile: TinsertSoilProfileSchema): Promise<
 
   try {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    
+    const { data } = await supabase.auth.getClaims()
+
     const fullProfile = {
       ...profile,
-      user_id: user!.id,
+      user_id: data?.claims.sub,
       effective_pile_length: roundedEffectivePileLength
     }
     

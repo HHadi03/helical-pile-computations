@@ -5,8 +5,8 @@ import { NotFound } from '@/components/NotFound'
 
 export default async function EditSoilParametersPage({params}:{params: Promise<{id: string}>}) {
   const supabase = await createClient()
-  const { data, error } = await supabase.auth.getUser()
-  if (error || !data?.user) {
+  const { data, error } = await supabase.auth.getClaims()
+  if (error || !data?.claims) {
     redirect('/')
   }
 

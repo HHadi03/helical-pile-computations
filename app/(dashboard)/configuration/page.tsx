@@ -2,10 +2,11 @@ import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
 import { TconfigSoilSchema } from "@/schemas/soilSchemas"
 import { ConfigurationComponent } from "./ConfigurationComponent"
-import { Plus, FolderX, FolderOpen } from 'lucide-react'
+import { Plus, FolderOpen, FolderX } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { TconfigSoilProfileSchema } from "@/schemas/soilProfileSchemas"
+import { Suspense } from "react"
 
 async function getProfiles(): Promise<TconfigSoilProfileSchema[]>{
   try {
@@ -44,13 +45,18 @@ async function getSoils(): Promise<TconfigSoilSchema[]> {
   }
 }
 
-export default async function ConfigurationPage() {
-  const supabase = await createClient()
-  const { data, error } = await supabase.auth.getUser()
-  if (error || !data?.user) {
-    redirect('/')
-  }
-  
+function ConfigurationLoading() {
+  return (
+    <div className="flex justify-center items-center min-h-full">
+      <div className="relative">
+        <div className="size-15 rounded-full border-4 border-gray-200 dark:border-gray-700"></div>
+        <div className="absolute top-0 left-0 size-15 rounded-full border-4 border-transparent border-t-blue-600 dark:border-t-blue-400 animate-spin"></div>
+      </div>
+    </div>
+  )
+}
+
+async function ConfigurationContent() {
   const profilesData = await getProfiles()
 
   if (profilesData.length === 0) {
@@ -73,7 +79,19 @@ export default async function ConfigurationPage() {
   }
 
   const soilsData = await getSoils()
+  return <ConfigurationComponent soilsData={soilsData} profilesData={profilesData}/>
+}
+
+export default async function ConfigurationPage() {
+  const supabase = await createClient()
+  const { data, error } = await supabase.auth.getClaims()
+  if (error || !data?.claims) {
+    redirect('/')
+  }
+  
   return (
-    <ConfigurationComponent soilsData={soilsData} profilesData={profilesData}/>
+    <Suspense fallback={<ConfigurationLoading />}>
+      <ConfigurationContent />
+    </Suspense>
   )
 }
