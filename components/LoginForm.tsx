@@ -12,23 +12,29 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 
 export function LoginForm() {
   const [globalError, setGlobalError] = useState<string | null>(null)
+  const [isPending, setIsPending] = useState(false) 
 
   const form = useForm({
     resolver: zodResolver(loginSchema),
-     defaultValues: {
+    defaultValues: {
       email: '',
       password: '',
     }
   })
-   
-  const { formState: { isSubmitting } } = form
 
   async function onSubmit(values: TloginSchema) {
     setGlobalError(null)
-    
+    setIsPending(true) 
+
     const result = await logIn(values)
+
     if (result.error) {
       setGlobalError(result.error)
+      setIsPending(false) 
+    } 
+    
+    else { 
+      setTimeout(() => {setIsPending(false)}, 150)
     }
   }
 
@@ -39,7 +45,7 @@ export function LoginForm() {
           
           {globalError && (
             <Alert variant="destructive" className="mb-4">
-              <AlertCircle/>
+              <AlertCircle className="h-4 w-4" />
               <AlertDescription>
                 {globalError}
               </AlertDescription>
@@ -76,7 +82,9 @@ export function LoginForm() {
             />
           </div>
           
-          <Button disabled={isSubmitting} type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg"> {isSubmitting ? <Loader2 className="size-6 animate-spin"/>  : "Login"}</Button>
+          <Button disabled={isPending} type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg">
+            {isPending ? <Loader2 className="size-6 animate-spin"/> : "Login"}
+          </Button>
           <Button variant="link" className="text-muted-foreground hover:text-foreground/90 -ml-3 mt-2">Forgotten Password?</Button>
         </form>
       </Form>

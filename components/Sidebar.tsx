@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect, Fragment } from 'react'
 import { logOut } from '@/app/actions'
-import { ArrowLeftToLine, ArrowRightToLine, LogOut, Save, FolderOpen, Upload, MessageSquareText, CircleHelp, Menu, X } from 'lucide-react'
+import { ArrowLeftToLine, ArrowRightToLine, LogOut, Save, FolderOpen, Upload, MessageSquareText, CircleHelp, Menu, X, Loader2 } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -11,6 +11,7 @@ export const Sidebar = () => {
   const [expanded, setExpanded] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isResizing, setIsResizing] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
    
   useEffect(() => {
     let resizeTimer: number
@@ -41,6 +42,10 @@ export const Sidebar = () => {
     }
   }, [])
   
+   const handleLogout = async () => {
+    setIsLoggingOut(true)
+    await logOut()
+  }
   const navigationSections = [
     {
       title: "File",
@@ -135,16 +140,16 @@ export const Sidebar = () => {
           {!expanded  && !mobileMenuOpen ? (
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" type="submit" className='hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7' onClick={async () => await logOut()}>
-                  <LogOut className="size-6 rotate-180"/>
+                <Button variant="ghost" type="button" disabled={isLoggingOut} className='hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7' onClick={handleLogout}>
+                  {isLoggingOut ? <Loader2 className="size-6 animate-spin" /> : <LogOut className="size-6 rotate-180" />}
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="right" className='p-2 text-sm'>Log Out</TooltipContent>
             </Tooltip>
           ) : (
             <div className='animate-in fade-in slide-in-from-left-8 duration-500'>
-              <Button variant="ghost" type="submit" className='w-full justify-start hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7' onClick={async () => await logOut()}>
-                <LogOut className="size-6 rotate-180"/>Log Out
+              <Button variant="ghost" type="button" disabled={isLoggingOut} className='w-full justify-start hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7' onClick={handleLogout}>
+                {isLoggingOut ? (<> <Loader2 className="size-6 animate-spin" /> <span>Logging out...</span></>) : (<> <LogOut className="size-6 rotate-180" /> <span>Log Out</span></>)}
               </Button>
             </div>
           )}

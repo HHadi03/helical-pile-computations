@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { InsertProfileForm } from "../../insert-profile/InsertProfileForm"
 import { Modal } from "@/components/Modal"
 
