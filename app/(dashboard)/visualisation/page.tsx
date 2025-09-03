@@ -6,6 +6,7 @@ import { ArrowBigRight, FolderOpen, FolderX } from "lucide-react"
 import { TconfigSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import Link from "next/link"
 import { VisulisationComponent } from "./VisulisationComponent"
+import MultiProfileSoilChart from "./VisulisationGraph"
 
 export const metadata = {
   title: "Visualisation | Helical Pile Computations",
@@ -31,7 +32,6 @@ async function getProfiles(): Promise<TconfigSoilProfileSchema[]>{
   }
 }
 
-//for each soil profile id selection, and for each 60mm or 100mm selection, query start end shaft bearing.
 export default async function VisualisationPage() {
   const supabase = await createClient()
   const { data, error } = await supabase.auth.getClaims()
@@ -59,11 +59,14 @@ export default async function VisualisationPage() {
     )
   }
 
-  return (
-    <div>
-      <VisulisationComponent/>
-    </div>
+   return (
+    <section className="p-6 space-y-6">
+      {/* Configurator dialog */}
+      <VisulisationComponent />
+
+      {/* Chart (will render once config exists) */}
+      <MultiProfileSoilChart />
+    </section>
   )
 }
 
-//fetch data on client 
