@@ -234,8 +234,8 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
             </div>
 
             <div className="pt-2 flex justify-between">
-              <Button type="button" className="w-32" onClick={() => showParametersTab && setActiveTab("parameters")} disabled={!showParametersTab}>Next</Button>
               <Button type="button" variant="outline" onClick={handleClose}>Close</Button>
+              <Button type="button" className="w-32" onClick={() => showParametersTab && setActiveTab("parameters")} disabled={!showParametersTab}>Next</Button>
             </div>
           </TabsContent>
 
@@ -323,8 +323,8 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
             </div>
 
             <div className="pt-2 flex justify-between">
-              <Button type="submit" className="w-32" disabled={isSubmitting}> {isSubmitting ? (<> <Loader2 className="mr-2 size-4 animate-spin"/> Submitting... </>) : ("Submit")}</Button>
               <Button type="button" variant="outline" disabled={isSubmitting} onClick={handleClose}>Close</Button>
+              <Button type="submit" className="w-32" disabled={isSubmitting}> {isSubmitting ? (<> <Loader2 className="size-5 animate-spin"/> Submitting... </>) : ("Submit")}</Button>
             </div>
           </TabsContent>)}
 

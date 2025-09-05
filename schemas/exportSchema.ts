@@ -1,9 +1,10 @@
 import * as z from "zod"
 
 export const exportFormSchema = z.object({
-	job_number: z.string().min(1, "Job Number is required"),
-  job_location: z.string().min(1, "Job Location is required"), 
-  pile_number: z.string().min(1, "Pile Number is required"),
+ 
+	job_number: z.string().optional(),
+  job_location: z.string().optional(), 
+  pile_number: z.string().optional(),
   soil_profile: z.uuid("Soil Profile is required"),
   pile_diameter: z.string().min(1, "Pile Diameter is required"),
   additional_information: z.string().optional(),

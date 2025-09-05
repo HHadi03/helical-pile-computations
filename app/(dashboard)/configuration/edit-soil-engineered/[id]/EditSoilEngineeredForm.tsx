@@ -112,8 +112,8 @@ export function EditSoilEngineered({ soil, soilId }: { soil: TeditSoilEngineered
         </div>
 
         <div className="pt-2 flex justify-between">
-          <Button type="submit" className="w-28" disabled={!isDirty || isSubmitting}>{isSubmitting ? (<><Loader2 className="mr-2 size-4 animate-spin" />Saving...</>) : ("Save")}</Button>
           <Button type="button" variant="outline" disabled={isSubmitting} onClick={handleClose}>Close</Button>
+          <Button type="submit" className="w-28" disabled={!isDirty || isSubmitting}>{isSubmitting ? (<><Loader2 className="size-5 animate-spin" />Saving...</>) : ("Save")}</Button>
         </div>
       </form>
     </Form>

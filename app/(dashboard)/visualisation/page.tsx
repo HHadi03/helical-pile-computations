@@ -1,12 +1,10 @@
-
 import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { ArrowBigRight, FolderOpen, FolderX } from "lucide-react"
-import { TconfigSoilProfileSchema } from "@/schemas/soilProfileSchemas"
+import { TconfigSoilProfileSchema, TselectionsSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import Link from "next/link"
 import { VisulisationComponent } from "./VisulisationComponent"
-import MultiProfileSoilChart from "./VisulisationGraph"
 
 export const metadata = {
   title: "Visualisation | Helical Pile Computations",
@@ -24,9 +22,29 @@ async function getProfiles(): Promise<TconfigSoilProfileSchema[]>{
     if (error) {
       return []
     }
-    return data
 
+    return data
   }
+
+  catch {
+    return []
+  }
+}
+
+async function getSelections(): Promise<TselectionsSoilProfileSchema[]> {
+  try {
+    const supabase = await createClient()
+    const {data, error} = await supabase
+    .from("selections")
+    .select("id, pile_diameter, colour, stroke_width")
+
+    if (error) {
+      return []
+    }
+
+    return data
+  }
+
   catch {
     return []
   }
@@ -59,14 +77,20 @@ export default async function VisualisationPage() {
     )
   }
 
-   return (
-    <section className="p-6 space-y-6">
-      {/* Configurator dialog */}
-      <VisulisationComponent />
+  const selectionsData = await getSelections()
 
-      {/* Chart (will render once config exists) */}
-      <MultiProfileSoilChart />
-    </section>
+  if (!selectionsData || selectionsData.length === 0) {
+    return (
+      <VisulisationComponent profilesData={profilesData} initialDialogOpen={true} />
+    )
+  }
+  
+  return (
+    <div>
+      Rendering visualisation graph....
+    </div>
   )
+    
+  
 }
 

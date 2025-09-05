@@ -33,7 +33,9 @@ export function EditSoilParameters({ soil, soilId }: { soil: TeditSoilParameters
       const result = await updateSoilParameters(values, soilId, dirtyFields)
 
       if (result.errors) {
-        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TeditSoilParametersSchema, {message: Array.isArray(value) ? value[0] : String(value)})})
+        Object.entries(result.errors).forEach(([key, value]) => {
+          form.setError(key as keyof TeditSoilParametersSchema, {message: Array.isArray(value) ? value[0] : String(value)})
+        })
         toast.error(result.message)
       } 
       
@@ -125,8 +127,8 @@ export function EditSoilParameters({ soil, soilId }: { soil: TeditSoilParameters
         </div>
 
         <div className="pt-2 flex justify-between">
-          <Button type="submit" className="w-28" disabled={!isDirty || isSubmitting}>{isSubmitting ? (<><Loader2 className="mr-2 size-4 animate-spin" />Saving...</>) : ("Save")}</Button>
           <Button type="button" variant="outline" disabled={isSubmitting} onClick={handleClose}>Close</Button>
+          <Button type="submit" className="w-28" disabled={!isDirty || isSubmitting}>{isSubmitting ? (<><Loader2 className="size-5 animate-spin" />Saving...</>) : ("Save")}</Button>
         </div>
       </form>
     </Form>

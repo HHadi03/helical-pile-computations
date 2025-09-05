@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from "@/components/ui/alert-dialog"
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from "@/components/ui/alert-dialog"
 import {DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel} from "@/components/ui/dropdown-menu"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { useState } from "react"
@@ -9,7 +9,7 @@ import type { TconfigSoilSchema } from "@/schemas/soilSchemas"
 import { TconfigSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { toast } from "sonner"
 import { deleteSoil } from "./actions/deleteSoil"
-import { Trash2, Copy, Pencil, Layers, EllipsisVertical, Ellipsis, ArrowDown, RotateCcw, PlusCircle } from 'lucide-react'
+import { Trash2, Copy, Pencil, Layers, EllipsisVertical, Ellipsis, ArrowDown, RotateCcw, PlusCircle, Loader2 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { deleteProfile } from "./actions/deleteProfile"
 import { duplicateProfile } from './actions/duplicateProfile'
@@ -32,47 +32,84 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
   const [isSoilDeleteDialogOpen, setisSoilDeleteDialogOpen] = useState(false)
   const [isProfileDeleteDialogOpen, setIsProfileDeleteDialogOpen] = useState(false)
   const [isDeleteAlleDialogOpen, setIsDeleteAllDialogOpen] = useState(false)
+  const [isDuplicating, setIsDuplicating] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const handleSoilDelete = async () => {
     if (selectedSoil !== null) {
       try {
+        setIsDeleting(true)
+
         const result = await deleteSoil(selectedSoil.id, selectedSoil.name, selectedSoil.profileId)
         if (result.errors) {
           toast.error(result.message)
         }
         
         else {
-          setSelectedSoil(null)
+          setisSoilDeleteDialogOpen(false)
           toast.success(result.message)
         }
        
       } catch {
        toast.error("An unexpected error has occurred.", {description: "Please try again later."})
-      }
+      
+      } finally {
+        setTimeout(() => setIsDeleting(false), 150)
+      } 
     }
   }
 
   const handleProfileDelete = async () => {
     if (selectedProfile !== null) {
       try {
+        setIsDeleting(true)
+
         const result = await deleteProfile(selectedProfile.id, selectedProfile.name)
         if (result.errors) {
           toast.error(result.message)
         }
 
         else {
-          setSelectedProfile(null)    
+          setIsProfileDeleteDialogOpen(false)
           toast.success(result.message)
         }
 
       } catch {
         toast.error("An unexpected error has occurred.", { description: "Please try again later." })
+
+      } finally {
+        setTimeout(() => setIsDeleting(false), 150)
+      } 
+    }
+  }
+
+  const handleStartOver = async () => {
+    try {
+      setIsDeleting(true)
+
+      const result = await deleteAll()
+      if (result.errors) {
+        toast.error(result.message)
+      }
+
+      else {
+        setIsDeleteAllDialogOpen(false)
+        toast.success(result.message)
       }
     }
+
+    catch {
+      toast.error("An unexpected error has occurred.", { description: "Please try again later." })
+    
+    } finally {
+      setTimeout(() => setIsDeleting(false), 150)
+    } 
   }
 
   const handleDuplicateProfile = async (profileId: string) => {
     try {
+      setIsDuplicating(true)
+
       const result = await duplicateProfile(profileId)
       if (result.errors) {
         toast.error(result.message)
@@ -84,23 +121,9 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
 
     } catch {
       toast.error("An unexpected error has occurred.", { description: "Please try again later." })
-    }
-  }
 
-  const handleStartOver = async () => {
-    try {
-      const result = await deleteAll()
-      if (result.errors) {
-        toast.error(result.message)
-      }
-
-      else {
-        toast.success(result.message)
-      }
-    }
-
-    catch {
-      toast.error("An unexpected error has occurred.", { description: "Please try again later." })
+    } finally {
+      setIsDuplicating(false)
     }
   }
 
@@ -142,8 +165,8 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
                       <DropdownMenuItem asChild className='hover:cursor-pointer'>
                         <Link href={`/configuration/edit-profile/${profile.id}`} prefetch={true} scroll={false}><Pencil className='text-muted-foreground'/>Edit</Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleDuplicateProfile(profile.id)} className='hover:cursor-pointer'>
-                        <Copy className='text-muted-foreground'/>Duplicate
+                      <DropdownMenuItem onClick={() => handleDuplicateProfile(profile.id)} className='hover:cursor-pointer' disabled={isDuplicating}>
+                        {isDuplicating ? <> <Loader2 className="text-muted-foreground animate-spin" />Duplicate</> : <><Copy className='text-muted-foreground'/>Duplicate</>}
                       </DropdownMenuItem>
                       <DropdownMenuItem variant='destructive' onClick={() => {setSelectedProfile({id: profile.id, name: profile.profile_name || `Soil Profile ${index + 1}`}); setIsProfileDeleteDialogOpen(true)}} className='hover:cursor-pointer'>
                         <Trash2/>Delete
@@ -250,8 +273,8 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
             <AlertDialogDescription>This action cannot be undone. <span className='font-semibold text-primary/80'>{selectedProfile?.name ?? 'Selected Profile'}</span> will be permanently deleted and removed from the configuration.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleProfileDelete}>Delete</AlertDialogAction>
+            <AlertDialogCancel className='sm:w-22'>Cancel</AlertDialogCancel>
+            <Button className='sm:w-22' onClick={handleProfileDelete} variant={"destructive"} disabled={isDeleting}>{isDeleting ? <><Loader2 className='animate-spin size-4'/>Delete</> : "Delete"}</Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -264,7 +287,7 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleSoilDelete}>Delete</AlertDialogAction>
+            <Button className='sm:w-22' onClick={handleSoilDelete} variant={"destructive"} disabled={isDeleting}>{isDeleting ? <><Loader2 className='animate-spin size-4'/>Delete</> : "Delete"}</Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -276,8 +299,8 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
             <AlertDialogDescription> This action cannot be undone. All soil profiles will be permanently deleted and removed from the configuration.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleStartOver}>Delete</AlertDialogAction>
+            <AlertDialogCancel className='sm:w-22'>Cancel</AlertDialogCancel>
+            <Button className='sm:w-22' onClick={handleStartOver} variant={"destructive"} disabled={isDeleting}>{isDeleting ? <><Loader2 className='animate-spin size-4'/>Delete</> : "Delete"}</Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

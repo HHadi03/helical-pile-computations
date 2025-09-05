@@ -11,7 +11,7 @@ import { ChartLine, CircleSlash2, MoveUp } from "lucide-react"
 import { type CarouselApi } from "@/components/ui/carousel"
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
-export function OverviewComponent({ soilsData, profilesData}: { soilsData: ToverviewSoilSchema[], profilesData: ToverviewSoilProfileSchema[] }) {
+export function OverviewComponent({ soilsData, profilesData }: { soilsData: ToverviewSoilSchema[], profilesData: ToverviewSoilProfileSchema[] }) {
   const [showGraph, setShowGraph] = useState(false)
   const [hideBearingCapacity, setHideBearingCapacity] = useState(false)
   const [pileDiameter, setPileDiameter] = useState(100)

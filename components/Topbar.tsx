@@ -29,7 +29,7 @@ export const Topbar = () => {
             return (
               <li key={item.href} className='relative'>
                 <Button asChild variant="ghost">
-                  <Link prefetch={true} href={item.href} className={`text-xs sm:text-sm font-semibold after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-primary after:transition-transform after:duration-200 after:ease-in-out ${isActive ? 'after:scale-x-100' :'text-muted-foreground after:scale-x-0 hover:after:scale-x-100'}`}>{item.label}</Link>
+                  <Link prefetch={true} scroll={false} href={item.href} className={`text-xs sm:text-sm font-semibold after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-primary after:transition-transform after:duration-200 after:ease-in-out ${isActive ? 'after:scale-x-100' :'text-muted-foreground after:scale-x-0 hover:after:scale-x-100'}`}>{item.label}</Link>
                 </Button>
               </li>
             )

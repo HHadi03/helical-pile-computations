@@ -85,7 +85,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
               name="job_number"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel>Job Number</FormLabel>
+                  <FormLabel>Job Number <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                   <FormControl>
                     <Input  placeholder="Project-AX34" {...field} className="text-sm"/>
                   </FormControl>
@@ -99,7 +99,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
               name="pile_number"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel>Pile Number</FormLabel>
+                  <FormLabel>Pile Number <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                   <FormControl>
                     <Input placeholder="HP-003" {...field} className="text-sm"/>
                   </FormControl>
@@ -114,7 +114,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
             name="job_location"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Job Location</FormLabel>
+                <FormLabel>Job Location <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                 <FormControl>
                   <Input placeholder="Farnborough, Hampshire" {...field} className="text-sm"/>
                 </FormControl>
@@ -182,8 +182,8 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
         </div>
 
         <div className="pt-2 flex justify-between">
-          <Button type="submit" className="w-32" disabled={isSubmitting}>{isSubmitting ? (<> <Loader2 className="mr-2 size-4 animate-spin"/>Exporting... </>) : ("Export")}</Button>
           <Button type="button" variant="outline" disabled={isSubmitting} onClick={handleClose}>Close</Button>
+          <Button type="submit" className="w-32" disabled={isSubmitting}>{isSubmitting ? (<> <Loader2 className="mr-2 size-4 animate-spin"/>Exporting... </>) : ("Export")}</Button>
         </div>
 
       </form>
