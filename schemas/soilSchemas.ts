@@ -171,7 +171,6 @@ export type ToverviewSoilSchema = z.infer<typeof overviewSoilSchema>
 
 //visualisation page schema
 export const visualisationSoilSchema = z.object({
-  start_depth: z.number(),
   end_depth: z.number(),
   shaft_capacity60: z.number().optional(),
   bearing_capacity60: z.number().optional(),

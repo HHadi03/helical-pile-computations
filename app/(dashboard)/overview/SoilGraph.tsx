@@ -33,7 +33,10 @@ export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, 
 
     const cumulativeShaft = prevShaft + soil[shaftCapacityKey]
 
-    accumulator.push({ end_depth: soil.end_depth, [shaftCapacityKey]: Math.round(cumulativeShaft * 100) / 100})
+    accumulator.push({ 
+      end_depth: soil.end_depth,
+      [shaftCapacityKey]: cumulativeShaft
+    })
 
     return accumulator
   }, [] as { end_depth: number; [key: string]: number }[])

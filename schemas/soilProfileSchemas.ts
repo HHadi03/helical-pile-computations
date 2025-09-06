@@ -41,6 +41,7 @@ export type ToverviewSoilProfileSchema = z.infer<typeof overviewSoilProfileSchem
 //selections soil profile schema
 export const selectionsSoilProfileSchema = z.object({
   id: z.uuid(),
+  soil_profile_id: z.uuid(),
   pile_diameter: z.number(),
   colour: z.string().optional(),
   stroke_width: z.number().optional(),

@@ -3,8 +3,9 @@ import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { ArrowBigRight, FolderOpen, FolderX } from "lucide-react"
 import { TconfigSoilProfileSchema, TselectionsSoilProfileSchema } from "@/schemas/soilProfileSchemas"
+import { VisualisationSelection } from "./VisualisationSelection"
+import { VisualisationComponent } from "./VisualisationComponent"
 import Link from "next/link"
-import { VisulisationComponent } from "./VisulisationComponent"
 
 export const metadata = {
   title: "Visualisation | Helical Pile Computations",
@@ -36,7 +37,7 @@ async function getSelections(): Promise<TselectionsSoilProfileSchema[]> {
     const supabase = await createClient()
     const {data, error} = await supabase
     .from("selections")
-    .select("id, pile_diameter, colour, stroke_width")
+    .select("id, pile_diameter, soil_profile_id, colour, stroke_width")
 
     if (error) {
       return []
@@ -78,19 +79,14 @@ export default async function VisualisationPage() {
   }
 
   const selectionsData = await getSelections()
-
   if (!selectionsData || selectionsData.length === 0) {
     return (
-      <VisulisationComponent profilesData={profilesData} initialDialogOpen={true} />
+      <VisualisationSelection profilesData={profilesData} initialDialogOpen={true} />
     )
   }
   
   return (
-    <div>
-      Rendering visualisation graph....
-    </div>
+   <VisualisationComponent profilesData={profilesData} selectionsData={selectionsData}/>
   )
-    
-  
 }
 
