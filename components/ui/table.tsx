@@ -12,7 +12,7 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
         className={cn("relative w-full caption-bottom text-sm", className)}
         {...props}
       />
-      <ScrollBar orientation="horizontal"/>
+      <ScrollBar orientation="horizontal" className="h-2"/>
     </ScrollArea>
   )
 }

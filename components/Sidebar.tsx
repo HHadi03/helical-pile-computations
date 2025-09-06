@@ -6,6 +6,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from './ui/button'
+import type { Route } from 'next'
 
 export const Sidebar = () => {
   const [expanded, setExpanded] = useState(false)
@@ -42,10 +43,11 @@ export const Sidebar = () => {
     }
   }, [])
   
-   const handleLogout = async () => {
+  const handleLogout = async () => {
     setIsLoggingOut(true)
     await logOut()
   }
+
   const navigationSections = [
     {
       title: "File",
@@ -113,7 +115,7 @@ export const Sidebar = () => {
                   {section.items.map((item) => (
                     <li key={item.href} className='my-3 animate-in fade-in slide-in-from-top-8 duration-500'>
                       <Button asChild variant="ghost" className='hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7'>
-                        <Link prefetch={true} href={item.href} className="flex gap-3 w-full justify-start"  onClick={() => setMobileMenuOpen(false)}><item.icon className='size-6'/>{item.text}</Link>
+                        <Link prefetch={true} href={item.href as Route} className="flex gap-3 w-full justify-start"  onClick={() => setMobileMenuOpen(false)}><item.icon className='size-6'/>{item.text}</Link>
                       </Button>
                     </li>
                   ))}
@@ -125,7 +127,7 @@ export const Sidebar = () => {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button asChild variant="ghost" className='hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7'>
-                        <Link prefetch={true} href={item.href}> <item.icon className='size-6'/></Link>
+                        <Link prefetch={true} href={item.href as Route}> <item.icon className='size-6'/></Link>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent side="right" className='p-2 text-sm'>{item.text}</TooltipContent>

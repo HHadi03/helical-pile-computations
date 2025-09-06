@@ -3,7 +3,6 @@ import { TconfigSoilProfileSchema, TselectionsSoilProfileSchema } from "@/schema
 import { TvisualisationSoilSchema } from "@/schemas/soilSchemas"
 import { useState, useEffect } from "react"
 import { getSoils } from "./actions/getSoils"
-import { revalidateVisualisation } from "./actions/revalidateVisualisation"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend, Tooltip } from "recharts"
 import { useTheme } from "next-themes"
 
@@ -12,6 +11,7 @@ type ChartDataItem = {
   soilsData: TvisualisationSoilSchema[]
 }
 
+//why is it posting four times? technical issue here
 export function VisualisationComponent({ profilesData, selectionsData }: { profilesData: TconfigSoilProfileSchema[], selectionsData: TselectionsSoilProfileSchema[] }) {
   const [isFetchingData, setIsFetchingData] = useState(false)
   const [chartData, setChartData] = useState<ChartDataItem[]>([])
@@ -34,8 +34,6 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
         
         const allData = await Promise.all(soilsDataPromises)
         setChartData(allData)
-
-        await revalidateVisualisation()
       } 
 
       catch {
@@ -43,12 +41,12 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
       } 
       
       finally {
-        setTimeout(() => setIsFetchingData(false), 500)
+        setIsFetchingData(false)
       }
     }
 
     fetchSoilsData()
-  }, [])
+  }, [profilesData, selectionsData])
 
   if (isFetchingData) {
     return (
