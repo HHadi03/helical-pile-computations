@@ -1,6 +1,7 @@
 "use server"
 import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
+import { randomColorPicker } from "@/lib/utils"
 
 export async function insertSelections (selections: string[]) {
   
@@ -16,6 +17,7 @@ export async function insertSelections (selections: string[]) {
         user_id: data?.claims.sub,
         soil_profile_id: profileId,
         pile_diameter: pileDiameter,
+        colour: randomColorPicker(),
       }
 
       const { error } = await supabase
@@ -28,7 +30,6 @@ export async function insertSelections (selections: string[]) {
     catch {
       return false
     }
-
   }))
   
   const allSuccessful = insertingSelections.every((success) => success)

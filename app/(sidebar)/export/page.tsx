@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
-import { ExportForm } from "@/app/(dashboard)/@modal/(.)export/ExportForm"
+import { ExportForm } from "./ExportForm"
 
 export const metadata: Metadata = {
   title: "Export | Helical Pile Computations",

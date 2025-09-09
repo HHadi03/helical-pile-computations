@@ -1,6 +1,6 @@
 import { Modal } from "@/components/Modal"
 import { createClient } from "@/utils/supabase/server"
-import { ExportForm } from "./ExportForm"
+import { ExportForm } from "@/app/(sidebar)/export/ExportForm"
 
 export default async function ExportModal() {
   const supabase = await createClient()

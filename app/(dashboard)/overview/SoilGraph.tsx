@@ -23,10 +23,8 @@ export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, 
 
   const filteredSoils = profileSoils.filter(soil => soil.start_depth < profile.effective_pile_length)
   
-  const lastLayer = filteredSoils[filteredSoils.length - 1]
-
   const shaftCapacityKey = pileDiameter === 60 ? "shaft_capacity60" : "shaft_capacity100"
-  const bearingCapacity = pileDiameter === 60 ? lastLayer.bearing_capacity60 : lastLayer.bearing_capacity100
+  const bearingCapacity = pileDiameter === 60 ? filteredSoils[filteredSoils.length - 1].bearing_capacity60 : filteredSoils[filteredSoils.length - 1].bearing_capacity100
 
   const chartData = filteredSoils.reduce((accumulator, soil, index) => {
     const prevShaft = index === 0 ? 0 : accumulator[index - 1][shaftCapacityKey]
@@ -41,16 +39,17 @@ export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, 
     return accumulator
   }, [] as { end_depth: number; [key: string]: number }[])
   
-  const lastChartDataObject = chartData[chartData.length - 1]
-  if ( lastChartDataObject.end_depth > profile.effective_pile_length) {
-    lastChartDataObject.end_depth = profile.effective_pile_length
+  const lastChartDataSoil = chartData[chartData.length - 1]
+  
+  if ( lastChartDataSoil.end_depth > profile.effective_pile_length) {
+    lastChartDataSoil.end_depth = profile.effective_pile_length
   }
   
   if (!hideBearingCapacity) {
-    lastChartDataObject[shaftCapacityKey] += bearingCapacity
+    lastChartDataSoil[shaftCapacityKey] += bearingCapacity
   }
 
-  lastChartDataObject[shaftCapacityKey] = Math.round(lastChartDataObject[shaftCapacityKey] * 100) / 100
+  lastChartDataSoil[shaftCapacityKey] = Math.round(lastChartDataSoil[shaftCapacityKey] * 100) / 100
   
   chartData.unshift({ end_depth: 0, [shaftCapacityKey]: 0 })
   
@@ -67,8 +66,8 @@ export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, 
             </div>
 
             <div className="text-right text-sm">
-              <p><span className="font-semibold">Maximum Depth:</span> {lastChartDataObject.end_depth > profile.effective_pile_length ? profile.effective_pile_length : lastChartDataObject.end_depth} m</p>
-              <p><span className="font-semibold">Maximum Total Capacity:</span> {lastChartDataObject[shaftCapacityKey]} kN</p>
+              <p><span className="font-semibold">Maximum Depth:</span> {lastChartDataSoil.end_depth > profile.effective_pile_length ? profile.effective_pile_length : lastChartDataSoil.end_depth} m</p>
+              <p><span className="font-semibold">Maximum Total Capacity:</span> {lastChartDataSoil[shaftCapacityKey]} kN</p>
               {!hideBearingCapacity && (<p><span className="font-semibold">Bearing Capacity Contribution:</span> {bearingCapacity} kN</p>)}
             </div>
 
@@ -113,7 +112,7 @@ export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, 
               <XAxis 
                 dataKey={shaftCapacityKey}
                 type="number"
-                domain={[0, 'dataMax']}
+                domain={[0, dataMax => dataMax * 1.5]}
                 label={{ fill: resolvedTheme === 'dark' ? "oklch(0.985 0.002 247.839)" : "oklch(0.13 0.028 261.692)", value: 'Capacity / kN', position: 'insideBottom', offset: -10, fontSize: '0.875rem' }}
                 tick={{ fontSize: '0.875rem', fill: resolvedTheme === 'dark' ? "oklch(0.707 0.022 261.325)" : "oklch(0.551 0.027 264.364)" }}
                 axisLine={{ stroke: resolvedTheme === 'dark' ? "oklch(0.92 0.00 49)" : "oklch(0.56 0.00 0)", strokeWidth: 2, strokeOpacity: 0.8}}

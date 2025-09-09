@@ -65,7 +65,7 @@ export function VisualisationSelection({ profilesData, initialDialogOpen }: { pr
               return (
                 <div key={key} className="flex items-center gap-2">
                   <Checkbox id={key} checked={selections.has(key)} onCheckedChange={(checked: boolean) => handleCheckboxToggle(key, checked)}/>
-                  <Label htmlFor={key}>{profile.profile_name ? `${profile.profile_name} - ${diameter}mm` : `Soil Profile ${index + 1} - ${diameter}mm`}</Label>
+                  <Label htmlFor={key}>{profile.profile_name ? `${profile.profile_name} - (${diameter} mm)` : `Soil Profile ${index + 1} - (${diameter} mm)`}</Label>
                 </div>
               )
             })
