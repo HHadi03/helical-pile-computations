@@ -2,13 +2,7 @@
 import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
 
-type ReturnType = {
-  message: string
-  errors?: Record<string, string[]>
-}
-
-export async function deleteAll(): Promise<ReturnType> {
-
+export async function deleteAll() {
   try {
     const supabase = await createClient()
     const { error } = await supabase

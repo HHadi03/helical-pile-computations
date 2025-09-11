@@ -4,14 +4,9 @@ import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
 import { calculateResultsForFineSoilNoFetch, calculateResultsForSoilsNoFetch } from "@/lib/equations"
 
-type ReturnType = {
-  message: string
-  errors?: Record<string, string[]>
-}
-
 type DirtyFields = Partial<Record<keyof TinsertSoilProfileSchema, boolean>>
 
-export async function updateProfile(profile: TinsertSoilProfileSchema, profileId: string, dirtyFields: DirtyFields = {}): Promise<ReturnType> {
+export async function updateProfile(profile: TinsertSoilProfileSchema, profileId: string, dirtyFields: DirtyFields = {}) {
   
   if (profile.profile_name && dirtyFields.profile_name) {
     profile = {...profile, profile_name: profile.profile_name.charAt(0).toUpperCase() + profile.profile_name.slice(1)}

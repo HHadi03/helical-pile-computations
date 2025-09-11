@@ -2,44 +2,44 @@ import * as z from "zod"
 
 //insert soil schema
 export const insertSoilSchema = z.object({
-  soil_type: z.enum(["coarse", "fine", "manmade"], { message: "Please select soil type" }),
-  density: z.enum(["loose", "dense"], { message: "Please select soil density" }),
-  soil: z.string().min(1, { message: "Please select a soil" }),
+  soil_type: z.enum(["coarse", "fine", "manmade"], { error: "Please select soil type" }),
+  density: z.enum(["loose", "dense"], { error: "Please select soil density" }),
+  soil: z.string().min(1, { error: "Please select a soil" }),
   soil_name: z.string().optional(),
   description: z.string().optional(),
   colour: z.string(),
-  start_depth: z.coerce.number().gte(0, { message: "Start Depth is required" }),
-  end_depth: z.coerce.number().gt(0,{ message: "End Depth is required"}).transform((val) => Number(val.toFixed(1))),
-  n_value: z.coerce.number().gt(0, { message: "SPT N-Value is required" }),
-  y_moist: z.coerce.number().gt(0, { message: "Moist Unit Weight is required" }),
-  y_sat: z.coerce.number().gt(0, { message: "Sat Unit Weight is required" }),
+  start_depth: z.coerce.number().gte(0, { error: "Start Depth is required" }),
+  end_depth: z.coerce.number().gt(0,{ error: "End Depth is required" }).transform((val) => Number(val.toFixed(1))),
+  n_value: z.coerce.number().gt(0, { error: "SPT N-Value is required" }),
+  y_moist: z.coerce.number().gt(0, { error: "Moist Unit Weight is required" }),
+  y_sat: z.coerce.number().gt(0, { error: "Sat Unit Weight is required" }),
 }).refine(
     (data) => data.end_depth > data.start_depth,
     {
       path: ['end_depth'], 
-      message: "End Depth must be greater than Start Depth",
+      error: "End Depth must be greater than Start Depth",
     }
   ).refine(
     (data) => data.soil_name === undefined || data.soil_name.length <= 30,
     {
       path: ['soil_name'],
-      message: "Name must be less than 30 characters long"
+      error: "Name must be less than 30 characters long"
     }
   )
   .refine(
     (data) => data.description === undefined || data.description.length <= 60,
     {
       path: ['description'],
-      message: "Description must be less than 60 characters long"
+      error: "Description must be less than 60 characters long"
     }
   )
 export type TinsertSoilSchema = z.infer<typeof insertSoilSchema>
 
 //edit soil information schema
 export const editSoilInformationSchema = z.object({
-  soil_type: z.enum(["coarse", "fine", "manmade"], { message: "Please select a soil type" }),
-  density: z.enum(["loose", "dense"], { message: "Please select soil density" }),
-  soil: z.string().min(1, { message: "Please select a soil" }),
+  soil_type: z.enum(["coarse", "fine", "manmade"], { error: "Please select a soil type" }),
+  density: z.enum(["loose", "dense"], { error: "Please select soil density" }),
+  soil: z.string().min(1, { error: "Please select a soil" }),
   soil_name: z.string().optional(),
   description: z.string().optional(),
   colour: z.string(),
@@ -47,25 +47,25 @@ export const editSoilInformationSchema = z.object({
     (data) => data.soil_name === undefined || data.soil_name.length <= 30,
     {
       path: ['soil_name'],
-      message: "Name must be less than 30 characters long"
+      error: "Name must be less than 30 characters long"
     }
   )
   .refine(
     (data) => data.description === undefined || data.description.length <= 60,
     {
       path: ['description'],
-      message: "Description must be less than 60 characters long"
+      error: "Description must be less than 60 characters long"
     }
   )
 export type TeditSoilInformationSchema = z.infer<typeof editSoilInformationSchema>
 
 //edit soil parameters schema
 export const editSoilParametersSchema = z.object({
-  start_depth: z.coerce.number().gte(0, { message: "Start Depth is required" }),
-  end_depth: z.coerce.number().gt(0,{ message: "End Depth is required"}).transform((val) => Number(val.toFixed(1))),
-  n_value: z.coerce.number().gt(0, { message: "SPT N-Value is required" }),
-  y_moist: z.coerce.number().gt(0, { message: "Moist Unit Weight is required" }),
-  y_sat: z.coerce.number().gt(0, { message: "Sat Unit Weight is required" }),
+  start_depth: z.coerce.number().gte(0, { error: "Start Depth is required" }),
+  end_depth: z.coerce.number().gt(0,{ error: "End Depth is required"}).transform((val) => Number(val.toFixed(1))),
+  n_value: z.coerce.number().gt(0, { error: "SPT N-Value is required" }),
+  y_moist: z.coerce.number().gt(0, { error: "Moist Unit Weight is required" }),
+  y_sat: z.coerce.number().gt(0, { error: "Sat Unit Weight is required" }),
   soil_profile_id: z.uuid().optional(),
   soil_type: z.string().optional(),
   soil: z.string().optional(),
@@ -74,7 +74,7 @@ export const editSoilParametersSchema = z.object({
     (data) => data.end_depth > data.start_depth,
     {
       path: ['end_depth'], 
-      message: "End Depth must be greater than Start Depth",
+      error: "End Depth must be greater than Start Depth",
     }
   )
 export type TeditSoilParametersSchema = z.infer<typeof editSoilParametersSchema>
@@ -85,27 +85,33 @@ export const editSoilEngineeredSchema = z.object({
   su: z.coerce.number().nullish(),
   t: z.coerce.number().nullish(),
   angle: z.coerce.number().nullish(),
-  qult: z.coerce.number().gt(0, { message: "Bearing Pressure is required" })
+  qult: z.coerce.number().gt(0, { error: "Bearing Pressure is required" })
 })
 .refine(
   (data) => data.su === undefined || data.su === null || data.su > 0,
   {
     path: ['su'],
-    message: "Undrained Shear Soil Strength is required"
+    error: "Undrained Shear Soil Strength is required"
   }
 )
 .refine(
   (data) => data.t === undefined || data.t === null || data.t > 0,
   {
     path: ['t'],
-    message: "Shear Soil Strength is required"
+    error: "Shear Soil Strength is required"
   }
 )
 .refine(
-  (data) => data.angle === undefined || data.angle === null || (data.angle > 0 && data.angle < 46),
+  (data) => data.angle === undefined || data.angle === null || data.angle > 0,
   {
     path: ['angle'],
-    message: "Angle of Internal Friction is required / cannot be greater than 45°"
+    error: "Angle of Internal Friction is required"
+  }
+).refine(
+  (data) => data.angle === undefined || data.angle === null || data.angle < 46,
+  {
+    path: ['angle'],
+    error: "Angle of Internal Friction cannot be greater than 45°"
   }
 )
 export type TeditSoilEngineeredSchema = z.infer<typeof editSoilEngineeredSchema>

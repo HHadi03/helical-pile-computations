@@ -4,14 +4,9 @@ import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
 import { calculateResultsForFineSoil, calculateResultsForSoils } from "@/lib/equations"
 
-type ReturnType = {
-  message: string
-  errors?: Record<string, string[]>
-}
-
 type DirtyFields = Partial<Record<keyof TeditSoilInformationSchema, boolean>>
 
-export async function updateSoilInformation(soil: TeditSoilInformationSchema, soilId: string,  dirtyFields: DirtyFields = {}): Promise<ReturnType> {
+export async function updateSoilInformation(soil: TeditSoilInformationSchema, soilId: string,  dirtyFields: DirtyFields = {}) {
 
   if (soil.soil_name && dirtyFields.soil_name) {
     soil = {...soil, soil_name: soil.soil_name.charAt(0).toUpperCase() + soil.soil_name.slice(1)}

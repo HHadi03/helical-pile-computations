@@ -4,12 +4,7 @@ import { calculateResultsForFineSoil, calculateResultsForSoils } from "@/lib/equ
 import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
 
-type ReturnType = {
-  message: string
-  errors?: Record<string, string[]>
-}
-
-export async function insertSoil(soil: TinsertSoilSchema, profileId: string): Promise<ReturnType> {
+export async function insertSoil(soil: TinsertSoilSchema, profileId: string) {
 
   if (soil.soil_name) {
     soil = {...soil, soil_name: soil.soil_name.charAt(0).toUpperCase() + soil.soil_name.slice(1)}

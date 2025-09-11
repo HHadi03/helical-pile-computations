@@ -3,12 +3,7 @@ import { TinsertSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
 
-type ReturnType = {
-  message: string
-  errors?: Record<string, string[]>
-}
-  
-export async function insertProfile(profile: TinsertSoilProfileSchema): Promise<ReturnType> {
+export async function insertProfile(profile: TinsertSoilProfileSchema) {
  
   if (profile.profile_name) {
     profile = {...profile, profile_name: profile. profile_name.charAt(0).toUpperCase() + profile. profile_name.slice(1)}

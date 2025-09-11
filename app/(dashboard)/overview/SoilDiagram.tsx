@@ -4,13 +4,13 @@ import { Triangle, MoveLeft } from "lucide-react"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { getLuminance } from "@/lib/utils"
 
-export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter, hideBearingCapacity, needsHorizontalScroll}: { profileSoils: ToverviewSoilSchema[], profile: ToverviewSoilProfileSchema, profileIndex: number, pileDiameter: number, hideBearingCapacity: boolean, needsHorizontalScroll?: boolean }) {
+export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter, hideBearingCapacity, needsHorizontalScroll}: { profileSoils: ToverviewSoilSchema[], profile: ToverviewSoilProfileSchema, profileIndex?: number, pileDiameter: string, hideBearingCapacity: boolean, needsHorizontalScroll?: boolean }) {
   
   if (profileSoils.length === 0) {
     return (
       <ScrollArea className="overflow-auto grid grid-cols-1 border-2">
         <div className="p-2 bg-sky-50 dark:bg-sky-900/50 whitespace-nowrap"> 
-          <h1 className="text-base font-semibold mb-2">{profile.profile_name || `Soil Profile ${profileIndex + 1}`}</h1>
+          <h1 className="text-base font-semibold mb-2">{profile.profile_name || `Soil Profile${profileIndex != null ? ` ${profileIndex + 1}` : ""}`}</h1>
           <p className="text-sm text-muted-foreground">No soil layers detected, add soil layers in configuration to begin analysis.</p>
         </div>
         <ScrollBar orientation="horizontal" className="h-2"/>
@@ -18,24 +18,24 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
     )
   }
 
-  const ultimatePulloutCapacity = pileDiameter === 60 ? profileSoils.reduce((sum, soil) => sum + soil.shaft_capacity60, 0) : profileSoils.reduce((sum, soil) => sum + soil.shaft_capacity100, 0)
+  const ultimatePulloutCapacity = pileDiameter === "60" ? profileSoils.reduce((sum, soil) => sum + soil.shaft_capacity60, 0) : profileSoils.reduce((sum, soil) => sum + soil.shaft_capacity100, 0)
   
   const lastLayer = profileSoils.find(soil => soil.start_depth <= profile.effective_pile_length && profile.effective_pile_length <= soil.end_depth) || profileSoils[profileSoils.length - 1]
 
-  const bearingCapacity = pileDiameter === 60 ? lastLayer.bearing_capacity60 : lastLayer.bearing_capacity100
+  const bearingCapacity = pileDiameter === "60" ? lastLayer.bearing_capacity60 : lastLayer.bearing_capacity100
 
   const ultimateBearingCapacity = ultimatePulloutCapacity + bearingCapacity
 
   let pileHeight = 0
   return (
-    <ScrollArea className={`overflow-x-auto overflow-y-clip grid grid-cols-1 ${needsHorizontalScroll ? 'border' : ''}`}>
+    <ScrollArea className={`overflow-auto grid grid-cols-1 ${needsHorizontalScroll ? 'border' : ''}`}>
       <div className="min-w-[634px]">
         
         <div className={`p-2 bg-sky-50 dark:bg-sky-900/50 relative whitespace-nowrap ${needsHorizontalScroll ? '' : 'border-2'}`}> 
           <div className="flex justify-between">
             
             <div className="flex flex-col">
-              <h1 className="text-base font-semibold">{profile.profile_name || `Soil Profile ${profileIndex + 1}`}</h1>
+              <h1 className="text-base font-semibold">{profile.profile_name || `Soil Profile${profileIndex != null ? ` ${profileIndex + 1}` : ""}`}</h1>
               <p className="text-sm mt-auto text-muted-foreground">Pile Diameter: {pileDiameter} mm</p>
             </div>
           
@@ -79,7 +79,7 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
                 <div className={`flex flex-col space-y-2 text-sm leading-snug ${isDefaultColour ? 'text-foreground' : textColor}`}>
                   {!isLayerBeyondPile && (
                     <>
-                      <p><span className="font-semibold">Shaft Capacity:</span> {pileDiameter === 60 ? soil.shaft_capacity60 : soil.shaft_capacity100} kN</p>
+                      <p><span className="font-semibold">Shaft Capacity:</span> {pileDiameter === "60" ? soil.shaft_capacity60 : soil.shaft_capacity100} kN</p>
                       {!hideBearingCapacity && (
                         soil.id === lastLayer.id && (<p><span className="font-semibold">Bearing Capacity:</span> {bearingCapacity} kN</p>)
                       )}
@@ -119,9 +119,9 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
               left: "225px",
               transform: "translateX(-50%)",
               height: `${pileHeight + 25}px`,
-              width: `${pileDiameter === 60 ? '35px' : '45px'}`, 
+              width: `${pileDiameter === "60" ? '35px' : '45px'}`, 
               backgroundImage: `url(/${pileDiameter}mm-pile.png)`,
-              backgroundSize: `${pileDiameter === 60 ? '35px auto' : '45px auto'}`,
+              backgroundSize: `${pileDiameter === "60" ? '35px auto' : '45px auto'}`,
             }}
           />
         </div>

@@ -5,7 +5,7 @@ import { useTheme } from "next-themes"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { roundToTwoDecimals } from "@/lib/utils"
 
-export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, hideBearingCapacity, needsHorizontalScroll}: { profileSoils: ToverviewSoilSchema[], profile: ToverviewSoilProfileSchema, profileIndex: number, pileDiameter: number, hideBearingCapacity: boolean, needsHorizontalScroll?: boolean }) {
+export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, hideBearingCapacity, needsHorizontalScroll}: { profileSoils: ToverviewSoilSchema[], profile: ToverviewSoilProfileSchema, profileIndex?: number, pileDiameter: string, hideBearingCapacity: boolean, needsHorizontalScroll?: boolean }) {
   
   const { resolvedTheme } = useTheme()
   
@@ -13,7 +13,7 @@ export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, 
     return (
       <ScrollArea className="overflow-auto grid grid-cols-1 border-2">
         <div className="p-2 bg-sky-50 dark:bg-sky-900/50 whitespace-nowrap"> 
-          <h1 className="text-base font-semibold mb-2">{profile.profile_name || `Soil Profile ${profileIndex + 1}`}</h1>
+          <h1 className="text-base font-semibold mb-2">{profile.profile_name || `Soil Profile${profileIndex != null ? ` ${profileIndex + 1}` : ""}`}</h1>
           <p className="text-sm text-muted-foreground">No soil layers detected, add soil layers in configuration to begin analysis.</p>
         </div>
         <ScrollBar orientation="horizontal" className="h-2"/>
@@ -23,8 +23,8 @@ export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, 
 
   const filteredSoils = profileSoils.filter(soil => soil.start_depth < profile.effective_pile_length)
   
-  const shaftCapacityKey = pileDiameter === 60 ? "shaft_capacity60" : "shaft_capacity100"
-  const bearingCapacity = pileDiameter === 60 ? filteredSoils[filteredSoils.length - 1].bearing_capacity60 : filteredSoils[filteredSoils.length - 1].bearing_capacity100
+  const shaftCapacityKey = pileDiameter === "60" ? "shaft_capacity60" : "shaft_capacity100"
+  const bearingCapacity = pileDiameter === "60" ? filteredSoils[filteredSoils.length - 1].bearing_capacity60 : filteredSoils[filteredSoils.length - 1].bearing_capacity100
 
   const chartData = filteredSoils.reduce((accumulator, soil, index) => {
     const prevShaft = index === 0 ? 0 : accumulator[index - 1][shaftCapacityKey]
@@ -61,7 +61,7 @@ export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, 
           <div className="flex justify-between">
 
             <div className="flex flex-col">
-              <h1 className="text-base font-semibold">{profile.profile_name|| `Soil Profile ${profileIndex + 1}`}</h1>
+              <h1 className="text-base font-semibold">{profile.profile_name|| `Soil Profile${profileIndex != null ? ` ${profileIndex + 1}` : ""}`}</h1>
               <p className="text-sm mt-auto text-muted-foreground">Pile Diameter: {pileDiameter} mm</p>
             </div>
 

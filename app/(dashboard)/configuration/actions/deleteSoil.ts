@@ -4,12 +4,7 @@ import { revalidatePath } from "next/cache"
 import { TsoilCalculationsSchema } from "@/schemas/soilSchemas"
 import { calculateResultsForFineSoil, calculateResultsForSoils } from "@/lib/equations"
 
-type ReturnType = {
-  message: string
-  errors?: Record<string, string[]>
-}
-
-export async function deleteSoil(id: string, name: string, profileId: string): Promise<ReturnType> {
+export async function deleteSoil(id: string, name: string, profileId: string) {
 
   const supabase = await createClient()
   const {data: profileSoils, error: profileSoilsError} = await supabase

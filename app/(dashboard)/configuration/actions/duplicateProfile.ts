@@ -2,16 +2,9 @@
 import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
 
-type ReturnType = {
-  message: string
-  errors?: Record<string, string[]>
-}
-
-export async function duplicateProfile(profileId: string): Promise<ReturnType> {
-
+export async function duplicateProfile(profileId: string) {
   try {
     const supabase = await createClient()
-
     const { data: profileData, error: profilFetchError } = await supabase
     .from("soil_profiles")
     .select("profile_name, water_depth, pile_length, pile_stick_out, effective_pile_length, user_id")

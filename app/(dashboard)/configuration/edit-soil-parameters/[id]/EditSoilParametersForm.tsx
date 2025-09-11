@@ -58,7 +58,7 @@ export function EditSoilParameters({ soil, soilId }: { soil: TeditSoilParameters
               control={form.control}
               name="start_depth"
               render={({ field }) => (
-                <FormItem className="sm:w-27 hover:cursor-not-allowed">
+                <FormItem className="sm:w-27">
                   <FormLabel>Start Depth <span className="font-semibold -ml-1">(m)</span></FormLabel>
                   <FormControl>
                     <NumberInput field={field} placeholder="0" disabled className="text-sm"/>

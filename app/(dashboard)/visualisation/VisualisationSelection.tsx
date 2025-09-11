@@ -81,12 +81,12 @@ export function VisualisationSelection({ profilesData, initialDialogOpen }: { pr
           <AlertDialogDescription> Select the soil profiles and pile diameters you wish to visualise.</AlertDialogDescription>
         </AlertDialogHeader>
 
-        <div className="flex items-center gap-2 -mb-1.5 ml-3">
-          <Checkbox id="select-all" checked={selections.size === profilesData.length * pileDiameters.length} onCheckedChange={handleSelectAll}/>
-          <Label htmlFor="select-all">{selections.size === profilesData.length * pileDiameters.length ? "Deselect All" : "Select All"}</Label>
-        </div>
-
         <div className="flex flex-col gap-2 border p-3 max-h-60 overflow-y-auto -mt-1">
+          <div className="flex items-center gap-2">
+            <Checkbox id="select-all" checked={selections.size === profilesData.length * pileDiameters.length} onCheckedChange={handleSelectAll}/>
+            <Label htmlFor="select-all">{selections.size === profilesData.length * pileDiameters.length ? "Deselect All" : "Select All"}</Label>
+          </div>
+
           {profilesData.map((profile, index) => (
             pileDiameters.map((diameter) => {
               const key = `${profile.id}-${diameter}`

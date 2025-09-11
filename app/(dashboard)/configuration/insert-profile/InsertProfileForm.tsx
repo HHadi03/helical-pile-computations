@@ -29,6 +29,8 @@ export function InsertProfileForm() {
   
   const { formState: { isSubmitting } } = form
 
+  const waterDepth = form.watch("water_depth")
+
   const handleClose = () => {
     if (window.history.length > 1) {
       router.back()
@@ -80,7 +82,7 @@ export function InsertProfileForm() {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="profile">Profile</TabsTrigger>
-            <TabsTrigger value="pile">Pile</TabsTrigger>
+            <TabsTrigger value="pile" disabled={!waterDepth}>Pile</TabsTrigger>
           </TabsList>
 
           <TabsContent value="profile" className="focus-visible:ring-transparent">
@@ -116,7 +118,7 @@ export function InsertProfileForm() {
 
             <div className="pt-2 flex justify-between">
               <Button type="button" variant="outline" onClick={handleClose}>Close</Button>
-              <Button type="button" className="w-32" onClick={() => {setActiveTab("pile")}}>Next</Button>
+              <Button type="button" className="w-32" onClick={() => waterDepth && setActiveTab("pile")} disabled={!waterDepth}>Next</Button>
             </div>
           </TabsContent>
           
@@ -152,7 +154,7 @@ export function InsertProfileForm() {
             </div>
             
             <div className="pt-2 flex justify-between">
-              <Button type="button" variant="outline" disabled={isSubmitting} onClick={handleClose}>Close</Button>
+              <Button type="button" variant="outline" disabled={isSubmitting} onClick={() => setActiveTab("profile")}>Back</Button>
               <Button type="submit" className="w-32" disabled={isSubmitting}> {isSubmitting ? (<> <Loader2 className="size-5 animate-spin"/> Submitting... </>) : ("Submit")}</Button>
             </div>
           </TabsContent>

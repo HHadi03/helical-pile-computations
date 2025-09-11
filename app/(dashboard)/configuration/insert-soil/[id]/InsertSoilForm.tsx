@@ -106,7 +106,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="soil">Information</TabsTrigger>
-            {showParametersTab && <TabsTrigger value="parameters">Parameters</TabsTrigger>}
+            <TabsTrigger value="parameters" disabled={!showParametersTab}>Parameters</TabsTrigger>
           </TabsList>
       
           <TabsContent value="soil" className="focus-visible:ring-transparent">
@@ -239,14 +239,14 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
             </div>
           </TabsContent>
 
-          {showParametersTab && (<TabsContent value="parameters" className="focus-visible:ring-transparent">
+          <TabsContent value="parameters" className="focus-visible:ring-transparent">
             <div className="space-y-6 border-y-2 py-3">
               <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
                 <FormField
                   control={form.control}
                   name="start_depth"
                   render={({ field }) => (
-                    <FormItem className="sm:w-27 hover:cursor-not-allowed">
+                    <FormItem className="sm:w-27">
                       <FormLabel>Start Depth <span className="font-semibold -ml-1">(m)</span></FormLabel>
                       <FormControl>
                         <NumberInput field={field} placeholder="0" disabled className="text-sm"/>
@@ -323,10 +323,10 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
             </div>
 
             <div className="pt-2 flex justify-between">
-              <Button type="button" variant="outline" disabled={isSubmitting} onClick={handleClose}>Close</Button>
+              <Button type="button" variant="outline" disabled={isSubmitting} onClick={() => setActiveTab("soil")}>Back</Button>
               <Button type="submit" className="w-32" disabled={isSubmitting}> {isSubmitting ? (<> <Loader2 className="size-5 animate-spin"/> Submitting... </>) : ("Submit")}</Button>
             </div>
-          </TabsContent>)}
+          </TabsContent>
 
         </Tabs>
       </form>

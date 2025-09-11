@@ -5,11 +5,6 @@ import { revalidatePath } from "next/cache"
 import { calculateSoilHeight } from "@/lib/equations"
 import { roundToTwoDecimals } from "@/lib/utils"
 
-type ReturnType = {
-  message: string
-  errors?: Record<string, string[]>
-}
-
 type SoilWithCalculations = TeditSoilEngineeredSchema & {
   bearing_capacity60: number
   bearing_capacity100: number
@@ -26,7 +21,7 @@ const pileDiameter100 = 0.314
 const pileAreaDiameter60 = 0.001223
 const pileAreaDiameter100 = 0.002463
 
-export async function updateSoilEngineered(soil: TeditSoilEngineeredSchema, soilId: string, dirtyFields: DirtyFields = {}): Promise<ReturnType> {
+export async function updateSoilEngineered(soil: TeditSoilEngineeredSchema, soilId: string, dirtyFields: DirtyFields = {}) {
   const supabase = await createClient()
 
   const { data: soilData, error: soilError } = await supabase

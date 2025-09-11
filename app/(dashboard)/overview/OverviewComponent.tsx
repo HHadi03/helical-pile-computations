@@ -14,7 +14,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 export function OverviewComponent({ soilsData, profilesData }: { soilsData: ToverviewSoilSchema[], profilesData: ToverviewSoilProfileSchema[] }) {
   const [showGraph, setShowGraph] = useState(false)
   const [hideBearingCapacity, setHideBearingCapacity] = useState(false)
-  const [pileDiameter, setPileDiameter] = useState(100)
+  const [pileDiameter, setPileDiameter] = useState("100")
   const [api, setApi] = useState<CarouselApi>()
   const [current, setCurrent] = useState(0)
   const [count, setCount] = useState(0)
@@ -66,7 +66,7 @@ export function OverviewComponent({ soilsData, profilesData }: { soilsData: Tove
           <Tooltip>
             <TooltipTrigger asChild>
               <div>
-                <Toggle variant="outline" pressed={pileDiameter === 60} onPressedChange={(pressed) => setPileDiameter(pressed ? 60 : 100)} aria-label="Toggle pile diameter" className="w-10.5">
+                <Toggle variant="outline" pressed={pileDiameter === "60"} onPressedChange={(pressed) => setPileDiameter(pressed ? "60" : "100")} aria-label="Toggle pile diameter" className="w-10.5">
                   <CircleSlash2 className="size-5 text-foreground/70"/>
                 </Toggle>
               </div>
