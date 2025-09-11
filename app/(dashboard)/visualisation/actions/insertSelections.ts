@@ -39,5 +39,5 @@ export async function insertSelections (selections: string[]) {
   }
 
   revalidatePath("/visualisation")
-  return { message: "Your selections have been saved successfully!" } 
+  return { message: "Selections have been successfully saved" } 
 }

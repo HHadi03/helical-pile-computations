@@ -1,9 +1,9 @@
-'use client'
 import { ToverviewSoilSchema } from "@/schemas/soilSchemas"
 import { ToverviewSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend, Tooltip } from "recharts"
 import { useTheme } from "next-themes"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import { roundToTwoDecimals } from "@/lib/utils"
 
 export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, hideBearingCapacity, needsHorizontalScroll}: { profileSoils: ToverviewSoilSchema[], profile: ToverviewSoilProfileSchema, profileIndex: number, pileDiameter: number, hideBearingCapacity: boolean, needsHorizontalScroll?: boolean }) {
   
@@ -49,7 +49,7 @@ export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, 
     lastChartDataSoil[shaftCapacityKey] += bearingCapacity
   }
 
-  lastChartDataSoil[shaftCapacityKey] = Math.round(lastChartDataSoil[shaftCapacityKey] * 100) / 100
+  lastChartDataSoil[shaftCapacityKey] = roundToTwoDecimals(lastChartDataSoil[shaftCapacityKey])
   
   chartData.unshift({ end_depth: 0, [shaftCapacityKey]: 0 })
   
@@ -79,7 +79,9 @@ export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, 
             <LineChart data={chartData} layout="vertical" margin={{ top: 15, right: 40, left: 0, bottom: 30 }}>
               
               <CartesianGrid 
-                strokeDasharray="3 3" stroke={resolvedTheme === 'dark' ? "oklch(0.707 0.022 261.325)" : "oklch(0.551 0.027 264.364)"} strokeOpacity={0.5}
+                strokeDasharray="3 3"
+                stroke={resolvedTheme === 'dark' ? "oklch(0.707 0.022 261.325)" : "oklch(0.551 0.027 264.364)"}
+                strokeOpacity={0.5}
               />
               
               <Legend 
@@ -112,7 +114,7 @@ export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, 
               <XAxis 
                 dataKey={shaftCapacityKey}
                 type="number"
-                domain={[0, dataMax => dataMax * 1.5]}
+                domain={[0, 'dataMax']}
                 label={{ fill: resolvedTheme === 'dark' ? "oklch(0.985 0.002 247.839)" : "oklch(0.13 0.028 261.692)", value: 'Capacity / kN', position: 'insideBottom', offset: -10, fontSize: '0.875rem' }}
                 tick={{ fontSize: '0.875rem', fill: resolvedTheme === 'dark' ? "oklch(0.707 0.022 261.325)" : "oklch(0.551 0.027 264.364)" }}
                 axisLine={{ stroke: resolvedTheme === 'dark' ? "oklch(0.92 0.00 49)" : "oklch(0.56 0.00 0)", strokeWidth: 2, strokeOpacity: 0.8}}

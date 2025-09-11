@@ -1,5 +1,6 @@
 import { TsoilCalculationsSchema, TfineSoilCalculationsSchema } from '@/schemas/soilSchemas'
 import { createClient } from '@/utils/supabase/server'
+import { roundToTwoDecimals } from './utils'
 
 const SPT = 6.2
 const UNITWEIGHT = 9.8
@@ -7,10 +8,6 @@ const pileDiameter60 = 0.1884
 const pileDiameter100 = 0.314
 const pileAreaDiameter60 = 0.001223
 const pileAreaDiameter100 = 0.002463
-
-export function roundToTwoDecimals (value: number): number {
-  return Math.round(value * 100) / 100
-}
 
 export function calculateSoilHeight(start_depth: number, end_depth: number, h: number, effective_pile_length: number): number {
   if (end_depth <= effective_pile_length) {

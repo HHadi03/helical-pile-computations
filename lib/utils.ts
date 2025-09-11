@@ -14,7 +14,17 @@ export function getLuminance (color: string) {
 }
 
 export function randomColorPicker() {
-  const randomColor = Math.floor(Math.random() * 16777216)
-  const hexColor = randomColor.toString(16).padStart(6, '0')
+  let hexColor: string
+
+  do {
+    const randomColor = Math.floor(Math.random() * 16777216)
+    hexColor = randomColor.toString(16).padStart(6, "0")
+  } while (hexColor === "000000" || hexColor === "ffffff")
+
   return `#${hexColor}`
 }
+
+export function roundToTwoDecimals (value: number): number {
+  return Math.round(value * 100) / 100
+}
+

@@ -2,7 +2,8 @@
 import { TeditSoilEngineeredSchema } from "@/schemas/soilSchemas"
 import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
-import { roundToTwoDecimals, calculateSoilHeight } from "@/lib/equations"
+import { calculateSoilHeight } from "@/lib/equations"
+import { roundToTwoDecimals } from "@/lib/utils"
 
 type ReturnType = {
   message: string

@@ -4,11 +4,11 @@ import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, A
 import { Checkbox } from "@/components/ui/checkbox"
 import { TconfigSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { Label } from "@/components/ui/label"
-import { Loader2, AlertCircle } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { insertSelections } from "./actions/insertSelections"
 import { Button } from "@/components/ui/button"
-import { Alert, AlertDescription } from '@/components/ui/alert'
+import { toast } from "sonner"
 
 const pileDiameters = ["60", "100"]
 
@@ -16,7 +16,6 @@ export function VisualisationSelection({ profilesData, initialDialogOpen }: { pr
   const [isDialogOpen, setDialogOpen] = useState(initialDialogOpen)
   const [selections, setSelections] = useState<Set<string>>(new Set())
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   
   const handleCheckboxToggle = (key: string, checked: boolean) => {
@@ -33,21 +32,45 @@ export function VisualisationSelection({ profilesData, initialDialogOpen }: { pr
     })
   }
   
+  const handleSelectAll = () => {
+    const totalPossibleSelections = profilesData.length * pileDiameters.length
+    
+    if (selections.size === totalPossibleSelections) {
+      setSelections(new Set())
+    } 
+    
+    else {
+      const allKeys = new Set<string>()
+      profilesData.forEach(profile => {
+        pileDiameters.forEach(diameter => {
+          allKeys.add(`${profile.id}-${diameter}`)
+        })
+      })
+      setSelections(allKeys)
+    }
+  }
+
   const handleConfigureChart = async (selections: Set<string>) => {
-    setError(null)
-    setIsLoading(true)
-    
-    const result = await insertSelections(Array.from(selections))
-    
-    if (result.errors) {
-      setIsLoading(false)
-      setError(result.message)
+    try {
+      setIsLoading(true)
+      
+      const result = await insertSelections(Array.from(selections))
+      if (result.errors) {
+        toast.error(result.message)
+      }
+
+      else {
+        setDialogOpen(false)
+        toast.success(result.message)
+      }
     }
 
-    else {
-      setDialogOpen(false)
-      setIsLoading(false)
-    }
+    catch {
+      toast.error("An unexpected error has occurred.", { description: "Please try again later." })
+
+    } finally {
+      setTimeout(() => setIsLoading(false), 150)
+    } 
   }
 
   return (
@@ -57,6 +80,11 @@ export function VisualisationSelection({ profilesData, initialDialogOpen }: { pr
           <AlertDialogTitle>Visualisation</AlertDialogTitle>
           <AlertDialogDescription> Select the soil profiles and pile diameters you wish to visualise.</AlertDialogDescription>
         </AlertDialogHeader>
+
+        <div className="flex items-center gap-2 -mb-1.5 ml-3">
+          <Checkbox id="select-all" checked={selections.size === profilesData.length * pileDiameters.length} onCheckedChange={handleSelectAll}/>
+          <Label htmlFor="select-all">{selections.size === profilesData.length * pileDiameters.length ? "Deselect All" : "Select All"}</Label>
+        </div>
 
         <div className="flex flex-col gap-2 border p-3 max-h-60 overflow-y-auto -mt-1">
           {profilesData.map((profile, index) => (
@@ -76,13 +104,6 @@ export function VisualisationSelection({ profilesData, initialDialogOpen }: { pr
           {selections.size} option(s) selected
         </div>
         
-        {error &&
-          <Alert variant="destructive" className="p-0 border-none">
-            <AlertCircle className="size-4"/>
-            <AlertDescription> {error} </AlertDescription>
-          </Alert>
-        }
-
         <AlertDialogFooter>
           <AlertDialogCancel onClick={router.back}>Cancel</AlertDialogCancel>
           <Button disabled={selections.size === 0 || isLoading} onClick={() => handleConfigureChart(selections)} className="sm:w-32">

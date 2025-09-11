@@ -7,11 +7,6 @@ import { VisualisationSelection } from "./VisualisationSelection"
 import { VisualisationComponent } from "./VisualisationComponent"
 import Link from "next/link"
 
-export const metadata = {
-  title: "Visualisation | Helical Pile Computations",
-  description: "Visualise a selection of your soil profiles computed results.",
-}
-
 async function getProfiles(): Promise<TconfigSoilProfileSchema[]>{
   try {
     const supabase = await createClient()
