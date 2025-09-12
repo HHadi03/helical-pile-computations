@@ -14,6 +14,7 @@ import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { NumberInput } from "@/components/NumberInput"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileSchema[] }) {
   const router = useRouter()
@@ -32,8 +33,10 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
       structure_rigid: false,
       use_characteristic: false,
       number_of_tests: "",
-      mean_rcm: "",
-      min_rcm: "",
+      mean_tensile_rcm: "",
+      min_tensile_rcm: "",
+      mean_compression_rcm: "",
+      min_compression_rcm: "",
       global_safety_factor: 1.5,
       uk_safety_factor_compression_yG1: 1.35,
       uk_safety_factor_compression_yQ1: 1.5,
@@ -289,34 +292,6 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                 <>
                   <FormField
                     control={form.control}
-                    name="permanent_actions"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Permanent Actions <span className="font-semibold -ml-1">(kN)</span></FormLabel>
-                        <FormControl>
-                          <NumberInput field={field} placeholder="0" className="text-sm"/>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="variable_actions"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Variable Actions <span className="font-semibold -ml-1">(kN)</span></FormLabel>
-                        <FormControl>
-                          <NumberInput field={field} placeholder="0" className="text-sm"/>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                 
-                  <FormField
-                    control={form.control}
                     name="structure_rigid"
                     render={({ field }) => (
                       <FormItem className="flex items-center border py-3 px-2 rounded-md">
@@ -342,29 +317,6 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                       </FormItem>
                     )}
                   />
-
-                  <FormField
-                    control={form.control}
-                    name="country"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel htmlFor="country">Country</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value} name={field.name} autoComplete="off">
-                          <FormControl>
-                            <SelectTrigger className="w-full" id="country">
-                              <SelectValue placeholder="Select country"/>
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="uk">United Kingdom</SelectItem>
-                            <SelectItem value="pl">Poland</SelectItem>
-                            <SelectItem value="nl">Netherlands</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                 </>
               )}
 
@@ -386,7 +338,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
 
                   <FormField
                     control={form.control}
-                    name="mean_rcm"
+                    name="mean_tensile_rcm"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Mean Tensile Capacity <span className="font-semibold -ml-1">(kN)</span></FormLabel>
@@ -400,7 +352,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
 
                   <FormField
                     control={form.control}
-                    name="min_rcm"
+                    name="min_tensile_rcm"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Minimum Tensile Capacity <span className="font-semibold -ml-1">(kN)</span></FormLabel>
@@ -412,6 +364,38 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                     )}
                   />
 
+                  <FormField
+                    control={form.control}
+                    name="mean_compression_rcm"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Mean Compression Capacity <span className="font-semibold -ml-1">(kN)</span></FormLabel>
+                        <FormControl>
+                          <NumberInput field={field} placeholder="0" className="text-sm"/>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="min_compression_rcm"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Minimum Compression Capacity <span className="font-semibold -ml-1">(kN)</span></FormLabel>
+                        <FormControl>
+                          <NumberInput field={field} placeholder="0" className="text-sm"/>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
+
+              {(selectedMethod === "method_test" || selectedMethod === "method_en") && (
+                <>
                   <FormField
                     control={form.control}
                     name="permanent_actions"
@@ -439,382 +423,422 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                       </FormItem>
                     )}
                   />
+                  
+                  <div className="flex flex-col sm:flex-row gap-4 sm:items-end">
+                    <FormField
+                      control={form.control}
+                      name="country"
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormLabel htmlFor="country">Country</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value} name={field.name} autoComplete="off">
+                            <FormControl>
+                              <SelectTrigger className="w-full" id="country" >
+                                <SelectValue placeholder="Select country" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="uk">United Kingdom</SelectItem>
+                              <SelectItem value="pl">Poland</SelectItem>
+                              <SelectItem value="nl">Netherlands</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" className="p-2 w-30">Safety Factors</Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full" align="end" side="top">
+                        
+                        {selectedCountry ? (
+                          <>
+                            {selectedCountry === "uk" && (
+                              <>
+                                <div className="grid grid-cols-2 gap-4">
+                                  <div className="space-y-2">
+                                    <h4 className="text-xs font-semibold">Tension</h4>
+                                    <FormField
+                                      control={form.control}
+                                      name="uk_safety_factor_tension_yG1"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>yG1 (Tension)</FormLabel>
+                                          <FormControl>
+                                            <NumberInput field={field} placeholder="1.35" className="text-sm" />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
 
-                  <FormField
-                    control={form.control}
-                    name="country"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel htmlFor="country">Country</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value} name={field.name} autoComplete="off">
-                          <FormControl>
-                            <SelectTrigger className="w-full" id="country" >
-                              <SelectValue placeholder="Select country" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="uk">United Kingdom</SelectItem>
-                            <SelectItem value="pl">Poland</SelectItem>
-                            <SelectItem value="nl">Netherlands</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </>
-              )}
+                                    <FormField
+                                      control={form.control}
+                                      name="uk_safety_factor_tension_yQ1"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>yQ1 (Tension)</FormLabel>
+                                          <FormControl>
+                                            <NumberInput field={field} placeholder="1.5" className="text-sm" />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
 
-              {(selectedMethod === "method_en" || selectedMethod === "method_test") && selectedCountry === "uk" && (
-                <>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <h4 className="text-xs font-semibold">Tension</h4>
-                      <FormField
-                        control={form.control}
-                        name="uk_safety_factor_tension_yG1"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>yG1 (Tension)</FormLabel>
-                            <FormControl>
-                              <NumberInput field={field} placeholder="1.35" className="text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="uk_safety_factor_tension_yQ1"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>yQ1 (Tension)</FormLabel>
-                            <FormControl>
-                              <NumberInput field={field} placeholder="1.5" className="text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="uk_safety_factor_tension_yT1"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>yT1 (Tension)</FormLabel>
-                            <FormControl>
-                              <NumberInput field={field} placeholder="1.0" className="text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="uk_safety_factor_tension_yG2"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>yG2 (Tension)</FormLabel>
-                            <FormControl>
-                              <NumberInput field={field} placeholder="1.0" className="text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="uk_safety_factor_tension_yQ2"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>yQ2 (Tension)</FormLabel>
-                            <FormControl>
-                              <NumberInput field={field} placeholder="1.3" className="text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="uk_safety_factor_tension_yT2"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>yT2 (Tension)</FormLabel>
-                            <FormControl>
-                              <NumberInput field={field} placeholder="1.0" className="text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                                    <FormField
+                                      control={form.control}
+                                      name="uk_safety_factor_tension_yT1"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>yT1 (Tension)</FormLabel>
+                                          <FormControl>
+                                            <NumberInput field={field} placeholder="1.0" className="text-sm" />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                    
+                                    <FormField
+                                      control={form.control}
+                                      name="uk_safety_factor_tension_yG2"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>yG2 (Tension)</FormLabel>
+                                          <FormControl>
+                                            <NumberInput field={field} placeholder="1.0" className="text-sm" />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
 
-                    <div className="space-y-2">
-                      <h4 className="text-xs font-semibold">Compression</h4>
-                      <FormField
-                        control={form.control}
-                        name="uk_safety_factor_compression_yG1"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>yG1 (Compression)</FormLabel>
-                            <FormControl>
-                              <NumberInput field={field} placeholder="1.35" className="text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="uk_safety_factor_compression_yQ1"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>yQ1 (Compression)</FormLabel>
-                            <FormControl>
-                              <NumberInput field={field} placeholder="1.5" className="text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="uk_safety_factor_compression_yT1"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>yT1 (Compression)</FormLabel>
-                            <FormControl>
-                              <NumberInput field={field} placeholder="1.0" className="text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="uk_safety_factor_compression_yG2"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>yG2 (Compression)</FormLabel>
-                            <FormControl>
-                              <NumberInput field={field} placeholder="1.0" className="text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="uk_safety_factor_compression_yQ2"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>yQ2 (Compression)</FormLabel>
-                            <FormControl>
-                              <NumberInput field={field} placeholder="1.3" className="text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="uk_safety_factor_compression_yT2"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>yT2 (Compression)</FormLabel>
-                            <FormControl>
-                              <NumberInput field={field} placeholder="1.0" className="text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </div>
-                </>
-              )}
+                                    <FormField
+                                      control={form.control}
+                                      name="uk_safety_factor_tension_yQ2"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>yQ2 (Tension)</FormLabel>
+                                          <FormControl>
+                                            <NumberInput field={field} placeholder="1.3" className="text-sm" />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                    
+                                    <FormField
+                                      control={form.control}
+                                      name="uk_safety_factor_tension_yT2"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>yT2 (Tension)</FormLabel>
+                                          <FormControl>
+                                            <NumberInput field={field} placeholder="1.0" className="text-sm" />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                  </div>
 
-              {(selectedMethod === "method_en" || selectedMethod === "method_test") && selectedCountry === "pl" && (
-                <>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <h4 className="text-xs font-semibold">Tension</h4>
-                      <FormField
-                        control={form.control}
-                        name="pl_safety_factor_tension_yG"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>yG (Tension)</FormLabel>
-                            <FormControl>
-                              <NumberInput field={field} placeholder="1.35" className="text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="pl_safety_factor_tension_yQ"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>yQ (Tension)</FormLabel>
-                            <FormControl>
-                              <NumberInput field={field} placeholder="1.5" className="text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="pl_safety_factor_tension_yT"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>yT (Tension)</FormLabel>
-                            <FormControl>
-                              <NumberInput field={field} placeholder="1.0" className="text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                                  <div className="space-y-2">
+                                    <h4 className="text-xs font-semibold">Compression</h4>
+                                    <FormField
+                                      control={form.control}
+                                      name="uk_safety_factor_compression_yG1"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>yG1 (Compression)</FormLabel>
+                                          <FormControl>
+                                            <NumberInput field={field} placeholder="1.35" className="text-sm" />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
 
-                    <div className="space-y-2">
-                      <h4 className="text-xs font-semibold">Compression</h4>
-                      <FormField
-                        control={form.control}
-                        name="pl_safety_factor_compression_yG"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>yG (Compression)</FormLabel>
-                            <FormControl>
-                              <NumberInput field={field} placeholder="1.35" className="text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="pl_safety_factor_compression_yQ"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>yQ (Compression)</FormLabel>
-                            <FormControl>
-                              <NumberInput field={field} placeholder="1.5" className="text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="pl_safety_factor_compression_yT"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>yT (Compression)</FormLabel>
-                            <FormControl>
-                              <NumberInput field={field} placeholder="1.0" className="text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </div>
-                </>
-              )}
+                                    <FormField
+                                      control={form.control}
+                                      name="uk_safety_factor_compression_yQ1"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>yQ1 (Compression)</FormLabel>
+                                          <FormControl>
+                                            <NumberInput field={field} placeholder="1.5" className="text-sm" />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
 
-              {(selectedMethod === "method_en" || selectedMethod === "method_test") && selectedCountry === "nl" && (
-                <>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <h4 className="text-xs font-semibold">Tension</h4>
-                      <FormField
-                        control={form.control}
-                        name="nl_safety_factor_tension_yG"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>yG (Tension)</FormLabel>
-                            <FormControl>
-                              <NumberInput field={field} placeholder="1.35" className="text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="nl_safety_factor_tension_yQ"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>yQ (Tension)</FormLabel>
-                            <FormControl>
-                              <NumberInput field={field} placeholder="1.5" className="text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="nl_safety_factor_tension_yT"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>yT (Tension)</FormLabel>
-                            <FormControl>
-                              <NumberInput field={field} placeholder="1.0" className="text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                                    <FormField
+                                      control={form.control}
+                                      name="uk_safety_factor_compression_yT1"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>yT1 (Compression)</FormLabel>
+                                          <FormControl>
+                                            <NumberInput field={field} placeholder="1.0" className="text-sm" />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
 
-                    <div className="space-y-2">
-                      <h4 className="text-xs font-semibold">Compression</h4>
-                      <FormField
-                        control={form.control}
-                        name="nl_safety_factor_compression_yG"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>yG (Compression)</FormLabel>
-                            <FormControl>
-                              <NumberInput field={field} placeholder="1.35" className="text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
+                                    <FormField
+                                      control={form.control}
+                                      name="uk_safety_factor_compression_yG2"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>yG2 (Compression)</FormLabel>
+                                          <FormControl>
+                                            <NumberInput field={field} placeholder="1.0" className="text-sm" />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+
+                                    <FormField
+                                      control={form.control}
+                                      name="uk_safety_factor_compression_yQ2"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>yQ2 (Compression)</FormLabel>
+                                          <FormControl>
+                                            <NumberInput field={field} placeholder="1.3" className="text-sm" />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+
+                                    <FormField
+                                      control={form.control}
+                                      name="uk_safety_factor_compression_yT2"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>yT2 (Compression)</FormLabel>
+                                          <FormControl>
+                                            <NumberInput field={field} placeholder="1.0" className="text-sm" />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+
+                                  </div>
+                                </div>
+                              </>
+                            )}
+
+                            {selectedCountry === "pl" && (
+                              <>
+                                <div className="grid grid-cols-2 gap-4">
+                                  <div className="space-y-2">
+                                    <h4 className="text-xs font-semibold">Tension</h4>
+                                    <FormField
+                                      control={form.control}
+                                      name="pl_safety_factor_tension_yG"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>yG (Tension)</FormLabel>
+                                          <FormControl>
+                                            <NumberInput field={field} placeholder="1.35" className="text-sm" />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+
+                                    <FormField
+                                      control={form.control}
+                                      name="pl_safety_factor_tension_yQ"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>yQ (Tension)</FormLabel>
+                                          <FormControl>
+                                            <NumberInput field={field} placeholder="1.5" className="text-sm" />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+
+                                    <FormField
+                                      control={form.control}
+                                      name="pl_safety_factor_tension_yT"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>yT (Tension)</FormLabel>
+                                          <FormControl>
+                                            <NumberInput field={field} placeholder="1.0" className="text-sm" />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                  </div>
+
+                                  <div className="space-y-2">
+                                    <h4 className="text-xs font-semibold">Compression</h4>
+                                    <FormField
+                                      control={form.control}
+                                      name="pl_safety_factor_compression_yG"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>yG (Compression)</FormLabel>
+                                          <FormControl>
+                                            <NumberInput field={field} placeholder="1.35" className="text-sm" />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+
+                                    <FormField
+                                      control={form.control}
+                                      name="pl_safety_factor_compression_yQ"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>yQ (Compression)</FormLabel>
+                                          <FormControl>
+                                            <NumberInput field={field} placeholder="1.5" className="text-sm" />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+
+                                    <FormField
+                                      control={form.control}
+                                      name="pl_safety_factor_compression_yT"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>yT (Compression)</FormLabel>
+                                          <FormControl>
+                                            <NumberInput field={field} placeholder="1.0" className="text-sm" />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+
+                                  </div>
+                                </div>
+                              </>
+                            )}
+
+                            {selectedCountry === "nl" && (
+                              <>
+                                <div className="grid grid-cols-2 gap-4">
+                                  <div className="space-y-2">
+                                    <h4 className="text-xs font-semibold">Tension</h4>
+                                    <FormField
+                                      control={form.control}
+                                      name="nl_safety_factor_tension_yG"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>yG (Tension)</FormLabel>
+                                          <FormControl>
+                                            <NumberInput field={field} placeholder="1.35" className="text-sm" />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+
+                                    <FormField
+                                      control={form.control}
+                                      name="nl_safety_factor_tension_yQ"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>yQ (Tension)</FormLabel>
+                                          <FormControl>
+                                            <NumberInput field={field} placeholder="1.5" className="text-sm" />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+
+                                    <FormField
+                                      control={form.control}
+                                      name="nl_safety_factor_tension_yT"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>yT (Tension)</FormLabel>
+                                          <FormControl>
+                                            <NumberInput field={field} placeholder="1.0" className="text-sm" />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                  </div>
+
+                                  <div className="space-y-2">
+                                    <h4 className="text-xs font-semibold">Compression</h4>
+                                    <FormField
+                                      control={form.control}
+                                      name="nl_safety_factor_compression_yG"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>yG (Compression)</FormLabel>
+                                          <FormControl>
+                                            <NumberInput field={field} placeholder="1.35" className="text-sm" />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+
+                                    <FormField
+                                      control={form.control}
+                                      name="nl_safety_factor_compression_yQ"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>yQ (Compression)</FormLabel>
+                                          <FormControl>
+                                            <NumberInput field={field} placeholder="1.5" className="text-sm" />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+
+                                    <FormField
+                                      control={form.control}
+                                      name="nl_safety_factor_compression_yT"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>yT (Compression)</FormLabel>
+                                          <FormControl>
+                                            <NumberInput field={field} placeholder="1.0" className="text-sm" />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+
+                                  </div>
+                                </div>
+                              </>
+                            )}
+                          </>
+                        ) : (
+                          <div className="text-sm">
+                            Please select a country first
+                          </div>
                         )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="nl_safety_factor_compression_yQ"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>yQ (Compression)</FormLabel>
-                            <FormControl>
-                              <NumberInput field={field} placeholder="1.5" className="text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="nl_safety_factor_compression_yT"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>yT (Compression)</FormLabel>
-                            <FormControl>
-                              <NumberInput field={field} placeholder="1.0" className="text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+
+                      </PopoverContent>
+                    </Popover>
                   </div>
                 </>
               )}

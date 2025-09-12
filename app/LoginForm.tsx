@@ -34,7 +34,7 @@ export function LoginForm() {
     } 
     
     else { 
-      setTimeout(() => {setIsPending(false)}, 150)
+      setIsPending(false)
     }
   }
 
@@ -60,7 +60,7 @@ export function LoginForm() {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="Email" {...field} className="text-sm"/>
+                    <Input type="email" placeholder="Email" {...field} className="text-sm" autoComplete='email'/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -74,7 +74,7 @@ export function LoginForm() {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="Password" {...field} className="text-sm"/>
+                    <Input type="password" placeholder="Password" {...field} className="text-sm" autoComplete='current-password'/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -81,8 +81,8 @@ export function VisualisationSelection({ profilesData, initialDialogOpen }: { pr
           <AlertDialogDescription> Select the soil profiles and pile diameters you wish to visualise.</AlertDialogDescription>
         </AlertDialogHeader>
 
-        <div className="flex flex-col gap-2 border p-3 max-h-60 overflow-y-auto -mt-1">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-3 border p-3 max-h-86 overflow-y-auto -mt-1">
+          <div className="flex items-center gap-2 border-b pb-2">
             <Checkbox id="select-all" checked={selections.size === profilesData.length * pileDiameters.length} onCheckedChange={handleSelectAll}/>
             <Label htmlFor="select-all">{selections.size === profilesData.length * pileDiameters.length ? "Deselect All" : "Select All"}</Label>
           </div>
@@ -91,9 +91,11 @@ export function VisualisationSelection({ profilesData, initialDialogOpen }: { pr
             pileDiameters.map((diameter) => {
               const key = `${profile.id}-${diameter}`
               return (
-                <div key={key} className="flex items-center gap-2">
-                  <Checkbox id={key} checked={selections.has(key)} onCheckedChange={(checked: boolean) => handleCheckboxToggle(key, checked)}/>
-                  <Label htmlFor={key}>{profile.profile_name ? `${profile.profile_name} - (${diameter} mm)` : `Soil Profile ${index + 1} - (${diameter} mm)`}</Label>
+                <div key={key} className="space-y-3 p-3 border rounded-md">
+                  <div className="flex items-center gap-2">
+                    <Checkbox id={key} checked={selections.has(key)} onCheckedChange={(checked: boolean) => handleCheckboxToggle(key, checked)}/>
+                    <Label htmlFor={key}>{profile.profile_name ? `${profile.profile_name} - (${diameter} mm)` : `Soil Profile ${index + 1} - (${diameter} mm)`}</Label>
+                  </div>
                 </div>
               )
             })
@@ -105,7 +107,7 @@ export function VisualisationSelection({ profilesData, initialDialogOpen }: { pr
         </div>
         
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={router.back}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel onClick={router.back} disabled={isLoading}>Cancel</AlertDialogCancel>
           <Button disabled={selections.size === 0 || isLoading} onClick={() => handleConfigureChart(selections)} className="sm:w-32">
             {isLoading ? <><Loader2 className="animate-spin size-4"/>Configuring...</> : "Configure Chart"}
           </Button>

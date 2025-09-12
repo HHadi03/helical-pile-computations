@@ -171,8 +171,3 @@ input::-webkit-inner-spin-button {
 .recharts-wrapper *:focus {
   outline: none !important;
 }
-
-.clickable-line .recharts-curve {
-  pointer-events: all; 
-  cursor: pointer;
-}
