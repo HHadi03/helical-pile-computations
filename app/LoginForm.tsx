@@ -85,7 +85,7 @@ export function LoginForm() {
           <Button disabled={isPending} type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg">
             {isPending ? <Loader2 className="size-6 animate-spin"/> : "Login"}
           </Button>
-          <Button variant="link" className="text-muted-foreground hover:text-foreground/90 -ml-3 mt-2">Forgotten Password?</Button>
+          <Button variant="link" type='button' className="text-muted-foreground hover:text-foreground/90 -ml-3 mt-2">Forgotten Password?</Button>
         </form>
       </Form>
     </div>

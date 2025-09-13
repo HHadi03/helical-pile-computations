@@ -14,7 +14,12 @@ import { Label } from "@/components/ui/label"
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel } from "@/components/ui/alert-dialog"
 import { resetSelections } from "./actions/resetSelections"
 import { toast } from "sonner"
-
+import { Skeleton } from "@/components/ui/skeleton"
+import { modifySelections } from "./actions/modifySelections"
+import { Slider } from "@/components/ui/slider"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { ChromePicker } from "react-color"
+import html2canvas from 'html2canvas-pro'
 
 type ChartDataItem = {
   selection: TselectionsSoilProfileSchema & { selection_name: string }
@@ -39,14 +44,39 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
   const { resolvedTheme } = useTheme()
   
   useEffect(() => {
+    let lastRun = 0
+    let timeoutId: ReturnType<typeof setTimeout> | null = null
+
     const handleResize = () => {
-      setWindowWidth(window.innerWidth)
+      const now = Date.now()
+      const remaining = 200 - (now - lastRun)
+
+      if (remaining <= 0) {
+        if (timeoutId) {
+          clearTimeout(timeoutId)
+          timeoutId = null
+        }
+
+        lastRun = now
+        setWindowWidth(window.innerWidth)
+      } 
+      
+      else if (!timeoutId) {
+        timeoutId = setTimeout(() => {
+          lastRun = Date.now()
+          timeoutId = null
+          setWindowWidth(window.innerWidth)
+        }, remaining)
+      }
     }
-    
+
     handleResize()
 
     window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      if (timeoutId) {clearTimeout(timeoutId)}
+    }
   }, [])
   
   useEffect(() => {
@@ -60,7 +90,7 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
           const selectFields = selection.pile_diameter === 60 ? "end_depth, shaft_capacity60, bearing_capacity60" : "end_depth, shaft_capacity100, bearing_capacity100"
           const capacityField = selection.pile_diameter === 60 ? "shaft_capacity60" : "shaft_capacity100"
           
-          const supabase = createClient()
+            const supabase = createClient()
           const { data, error } = await supabase
           .from("soils")
           .select(selectFields)
@@ -163,10 +193,17 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
     await resetSelections()
   }
 
-  const editSelections = async () => {
+  //edit selection handlers
+  const editSelections = () => {
     setSelectionsToDelete(new Set())
     setselectionsToEdit(new Map())
     setIsEditDialogOpen(true)
+  }
+
+  const handleCancelEdit = () => {
+    setIsEditDialogOpen(false)
+    setSelectionsToDelete(new Set())
+    setselectionsToEdit(new Map())
   }
 
   const handleCheckboxToggle = (key: string, checked: boolean) => {
@@ -179,42 +216,112 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
     setSelectionsToDelete(newSelectionsToDelete)
   }
 
- 
+  const handleColorChange = (selectionId: string, color: string) => {
+    const newEditedSelections = new Map(selectionsToEdit)
+    const currentEdit = newEditedSelections.get(selectionId)
+    newEditedSelections.set(selectionId, { ...currentEdit, colour: color })
+    setselectionsToEdit(newEditedSelections)
+  }
+
+  const handleStrokeWidthChange = (selectionId: string, strokeWidth: number[]) => {
+    const newEditedSelections = new Map(selectionsToEdit)
+    const currentEdit = newEditedSelections.get(selectionId)
+    newEditedSelections.set(selectionId, { ...currentEdit, stroke_width: strokeWidth[0] })
+    setselectionsToEdit(newEditedSelections)
+  }
 
   const handleSaveSelections = async () => {
-    
     try {
       setIsSaving (true)
-      console.log('Selections to delete:', Array.from(selectionsToDelete))
-      console.log('Selections to update:', Array.from(selectionsToEdit.entries()))
-      // const result = await editSelections(Array.from(selectionsToDelete, selectionsToEdit))
-      // if (result.errors) {
-      //   toast.error(result.message)
-      // }
+      const result = await modifySelections(Array.from(selectionsToDelete), Array.from(selectionsToEdit.entries()))
+      if (result.errors) {
+        toast.error(result.message)
+      }
 
-      // else {
-      //   setIsEditDialogOpen(false)
-      //   toast.success(result.message)
-      // }
+      else {
+        setIsEditDialogOpen(false)
+        toast.success(result.message)
+      }
 
     } catch {
       toast.error("An unexpected error has occurred.", { description: "Please try again later." })
 
     } finally {
-      setIsSaving(false)
+      setTimeout(() => setIsSaving(false), 150)
     }
   }
-
-  const handleCancelEdit = () => {
-    setIsEditDialogOpen(false)
-    setSelectionsToDelete(new Set())
-    setselectionsToEdit(new Map())
-  }
+  //edit selection handlers
 
   const downloadChart = async () => {
     setActiveAction("download")
-    await new Promise(r => setTimeout(r, 1500))
-    setActiveAction(null)
+    
+    try {
+      const element = document.getElementById("VisualisationGraph")
+      
+      if (!element) {throw Error}
+
+      // Capture the element with html2canvas
+      const canvas = await html2canvas(element, {
+        backgroundColor: '#ffffff', // Force white background
+        scale: 2, // Higher resolution (2x)
+        useCORS: true, // Allow cross-origin images if any
+        logging: false, // Disable console logs
+        width: element.offsetWidth,
+        height: element.offsetHeight,
+        onclone: (clonedDoc) => {
+          // Force light theme styling on the cloned document
+          const chartElement = clonedDoc.getElementById("VisualisationGraph");
+          if (chartElement) {
+            // Add light theme class or data attribute to force light styling
+            chartElement.setAttribute('data-theme', 'light');
+            
+            // Override any dark theme styles by adding inline styles
+            const style = clonedDoc.createElement('style');
+            style.textContent = `
+              #VisualisationGraph * {
+                color: #000000 !important;
+                fill: #000000 !important;
+              }
+              #VisualisationGraph [stroke] {
+                stroke: #666666 !important;
+              }
+              #VisualisationGraph .recharts-cartesian-grid line {
+                stroke: #e0e0e0 !important;
+              }
+              #VisualisationGraph .recharts-text {
+                fill: #333333 !important;
+              }
+            `;
+            clonedDoc.head.appendChild(style);
+          }
+        }
+      });
+
+      // Convert canvas to blob
+      canvas.toBlob((blob) => {
+        if (blob) {
+          // Create download link
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `chart-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.png`;
+          
+          // Trigger download
+          document.body.appendChild(link);
+          link.click();
+          
+          // Cleanup
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        }
+      }, 'image/png', 1.0); // PNG format with max quality
+
+    } catch {
+      toast.error("An unexpected error has occurred.", { description: "Please try again later." })
+
+    } finally {
+      setActiveAction(null)
+    }
   }
 
   const handleHover = () => {
@@ -223,13 +330,20 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
 
   if (isFetchingData) {
     return (
-      <p>Loading</p>
-    )
-  }
+      <div className="flex flex-col md:flex-row max-w-5xl mx-auto gap-5">
+        <div className="flex-auto h-140 border-2 p-5 relative">
+          <Skeleton className="size-[90%] ml-15 mt-5"/>
+          <Skeleton className="h-4 w-18 absolute left-2 top-1/2 -translate-y-1/2 -rotate-90"/>
+          <Skeleton className="h-4 w-30 absolute left-1/2 -translate-x-1/2 bottom-5"/>  
+        </div>
 
-  if (chartDisplayData.length === 0) {
-    return (
-      <p>No soil data</p>
+        <div className="shrink-0 border p-2 rounded-xl h-fit w-fit flex space-x-2 mx-auto md:mx-0 md:space-y-2 md:flex-col md:space-x-0">
+          <Skeleton className="size-10.5 rounded-md" />
+          <Skeleton className="size-10.5 rounded-md" />
+          <Skeleton className="size-10.5 rounded-md" />
+          <Skeleton className="size-10.5 rounded-md" />
+        </div>
+    </div>
     )
   }
 
@@ -237,7 +351,7 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
   return (
     <>
       <div className="flex flex-col md:flex-row max-w-5xl mx-auto gap-5">
-        <div className="flex-auto h-140 border-2 p-5">
+        <div className="flex-auto h-140 border-2 p-5" id="VisualisationGraph">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartDisplayData} layout="vertical" margin={{ top: 5, right: 20, left: -5, bottom: 15 }}>
               
@@ -258,7 +372,7 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
                 dataKey="end_depth" 
                 domain={[0, 'dataMax']}
                 type="number"
-                label={{ fill: resolvedTheme === 'dark' ? "oklch(0.985 0.002 247.839)" : "oklch(0.13 0.028 261.692)", value: 'Depth / m', angle: -90, position: 'insideLeft', offset: 20, fontSize: '0.875rem' }}
+                label={{ fill: resolvedTheme === 'dark' ? "oklch(0.985 0.002 247.839)" : "oklch(0.13 0.028 261.692)", value: 'Depth / m', angle: -90, position: 'insideLeft', offset: 20, fontSize: '0.875rem', letterSpacing: '0.05em' }}
                 tick={{ fontSize: '0.875rem', fill: resolvedTheme === 'dark' ? "oklch(0.707 0.022 261.325)" : "oklch(0.551 0.027 264.364)" }}
                 axisLine={{ stroke: resolvedTheme === 'dark' ? "oklch(0.92 0.00 49)" : "oklch(0.56 0.00 0)", strokeWidth: 2, strokeOpacity: 0.8}}
                 tickLine={{ stroke: resolvedTheme === 'dark' ? "oklch(0.707 0.022 261.325)" : "oklch(0.551 0.027 264.364)", strokeWidth: 0.5}}
@@ -279,12 +393,19 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
                   type={"monotone"}
                   dataKey={item.selection.id}
                   stroke={item.selection.colour}
-                  strokeWidth={item.selection.stroke_width ?? 2}
+                  strokeWidth={item.selection.stroke_width}
                   animationDuration={1000}
                   name={item.selection.selection_name}
                   activeDot={{r: 6, onMouseOver: handleHover }}
                 />
               ))}
+
+              {chartDisplayData.length === 0 && (
+                <text x="50%" y="50%" textAnchor="middle" fill={resolvedTheme === 'dark' ? "oklch(0.985 0.002 247.839)" : "oklch(0.13 0.028 261.692)"} className="text-sm">
+                  <tspan x="50%" dy="0">No soil layers detected</tspan>
+                  <tspan x="50%" dy="1.2em">Add soil layers in configuration to begin analysis.</tspan>
+                </text>
+              )}
               
             </LineChart>
           </ResponsiveContainer>
@@ -304,7 +425,7 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="outline" className="w-10.5" onClick={downloadChart} disabled={!!activeAction}>
+              <Button variant="outline" className="w-10.5" onClick={downloadChart} disabled={!!activeAction || chartDisplayData.length === 0}>
                 {activeAction === "download" ? <Loader2 className="animate-spin size-6 text-foreground/70"/> : <Download className="size-6 text-foreground/70" />}
               </Button>
             </TooltipTrigger>
@@ -343,13 +464,39 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
           <div className="flex flex-col gap-3 border p-3 max-h-86 overflow-y-auto -mt-1">
             {chartData.map(({ selection }) => {
               const isSelected = !selectionsToDelete.has(selection.id)
+              const currentEdits = selectionsToEdit.get(selection.id) || {}
+              const displayColor = currentEdits.colour || selection.colour
+              const displayStrokeWidth = currentEdits.stroke_width || selection.stroke_width
               return (
                 <div key={selection.id} className="space-y-3 p-3 border rounded-md">
+                  
                   <div className="flex items-center gap-2">
                     <Checkbox id={selection.id} checked={isSelected} onCheckedChange={(checked: boolean) => handleCheckboxToggle(selection.id, checked)}/>
                     <Label htmlFor={selection.id}>{selection.selection_name}</Label>
                   </div>
                   
+                  {isSelected && (
+                    <div className="flex flex-col gap-4 sm:flex-row">
+                      <div className="flex items-center gap-2">
+                        <Label className="text-muted-foreground">Line Color:</Label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" className="size-6 p-0 rounded-full" style={{ backgroundColor: displayColor }}></Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="p-0 w-auto rounded-sm" align="center" side="right">
+                            <ChromePicker color={displayColor} onChangeComplete={(color) => handleColorChange(selection.id, color.hex)} className="text-black" disableAlpha={true}/>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 flex-1">
+                        <Label className="text-muted-foreground">Line Width:</Label>
+                        <Slider value={[displayStrokeWidth]} onValueChange={(value) => handleStrokeWidthChange(selection.id, value)} max={10} min={1} step={1} className="flex-1 max-w-[66%]"/>
+                        <span className="text-sm text-muted-foreground">{displayStrokeWidth}</span>
+                      </div>
+                    </div>
+                  )}
+
                 </div>
               )
             })}
@@ -361,7 +508,7 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
           
           <AlertDialogFooter>
             <AlertDialogCancel onClick={handleCancelEdit} disabled={isSaving}>Cancel</AlertDialogCancel>
-            <Button disabled={isSaving} onClick={handleSaveSelections} className="sm:w-22">
+            <Button disabled={isSaving  || (selectionsToDelete.size === 0  && selectionsToEdit.size === 0)} onClick={handleSaveSelections} className="sm:w-25">
               {isSaving ? <><Loader2 className="animate-spin size-4"/>Saving...</> : "Save"}
             </Button>
           </AlertDialogFooter>

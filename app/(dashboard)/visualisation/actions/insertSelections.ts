@@ -18,6 +18,7 @@ export async function insertSelections (selections: string[]) {
         soil_profile_id: profileId,
         pile_diameter: pileDiameter,
         colour: randomColorPicker(),
+        stroke_width: 1
       }
 
       const { error } = await supabase

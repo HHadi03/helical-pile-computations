@@ -67,7 +67,6 @@ export const Sidebar = () => {
   ]
 
   const allNavigationItems = navigationSections.flatMap(section => section.items)
-
   return (
     <>
       {!mobileMenuOpen && (
@@ -86,7 +85,6 @@ export const Sidebar = () => {
       )}
 
       <aside className={`bg-sidebar flex flex-col h-full shrink-0 border-r border-sidebar-border p-2 shadow-inner overflow-y-auto overflow-x-clip scrollbar-thin scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-500 fixed left-0 top-0 z-50 w-[260px] sm:static sm:translate-x-0 ${mobileMenuOpen ? (isResizing ? "translate-x-0" : "translate-x-0 animate-in duration-500 ease-in-out") : (isResizing ? "-translate-x-full" : "-translate-x-full animate-out duration-500 ease-out")} ${expanded ? (isResizing ? "sm:w-[260px]" : "sm:w-[260px] sm:animate-in sm:duration-500 sm:ease-in-out") : (isResizing ? "sm:w-[70px]" : "sm:w-[70px] sm:animate-out sm:duration-500 sm:ease-out")}`}>
-
         {expanded ? (
           <div className="hidden xl:flex flex-row items-center justify-between mt-2">
             <Image src='/logo.png' alt='Company Logo' width={195} height={40}/>
@@ -156,7 +154,6 @@ export const Sidebar = () => {
             </div>
           )}
         </div>
-      
       </aside>
     </>
   )

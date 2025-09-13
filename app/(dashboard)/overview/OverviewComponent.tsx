@@ -34,14 +34,39 @@ export function OverviewComponent({ soilsData, profilesData }: { soilsData: Tove
   }, [api])
 
   useEffect(() => {
+    let lastRun = 0
+    let timeoutId: ReturnType<typeof setTimeout> | null = null
+
     const handleResize = () => {
-      setWindowWidth(window.innerWidth)
+      const now = Date.now()
+      const remaining = 200 - (now - lastRun)
+
+      if (remaining <= 0) {
+        if (timeoutId) {
+          clearTimeout(timeoutId)
+          timeoutId = null
+        }
+
+        lastRun = now
+        setWindowWidth(window.innerWidth)
+      } 
+      
+      else if (!timeoutId) {
+        timeoutId = setTimeout(() => {
+          lastRun = Date.now()
+          timeoutId = null
+          setWindowWidth(window.innerWidth)
+        }, remaining)
+      }
     }
-    
+
     handleResize()
 
     window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      if (timeoutId) {clearTimeout(timeoutId)}
+    }
   }, [])
  
   const soilsByProfile = Object.groupBy(soilsData, soil => soil.soil_profile_id)

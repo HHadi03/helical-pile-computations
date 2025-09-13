@@ -218,7 +218,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                       <FormControl>
                         <Popover>
                           <PopoverTrigger asChild>
-                            <Button id="colour" variant="outline" className="p-2"><span style={{ backgroundColor: field.value}} className="w-full h-full"></span></Button>
+                            <Button id="colour" variant="outline" className="p-2"><span style={{ backgroundColor: field.value}} className="size-full"></span></Button>
                           </PopoverTrigger>
                           <PopoverContent className="p-0 w-auto rounded-sm" align="end" side="top">
                             <SketchPicker color={field.value} onChangeComplete={(color) => field.onChange(color.hex)} className="text-black" disableAlpha={true}

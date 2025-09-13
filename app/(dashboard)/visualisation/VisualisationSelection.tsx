@@ -82,7 +82,7 @@ export function VisualisationSelection({ profilesData, initialDialogOpen }: { pr
         </AlertDialogHeader>
 
         <div className="flex flex-col gap-3 border p-3 max-h-86 overflow-y-auto -mt-1">
-          <div className="flex items-center gap-2 border-b pb-2">
+          <div className="flex items-start gap-2 border-b pb-2">
             <Checkbox id="select-all" checked={selections.size === profilesData.length * pileDiameters.length} onCheckedChange={handleSelectAll}/>
             <Label htmlFor="select-all">{selections.size === profilesData.length * pileDiameters.length ? "Deselect All" : "Select All"}</Label>
           </div>
@@ -92,7 +92,7 @@ export function VisualisationSelection({ profilesData, initialDialogOpen }: { pr
               const key = `${profile.id}-${diameter}`
               return (
                 <div key={key} className="space-y-3 p-3 border rounded-md">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-start gap-2">
                     <Checkbox id={key} checked={selections.has(key)} onCheckedChange={(checked: boolean) => handleCheckboxToggle(key, checked)}/>
                     <Label htmlFor={key}>{profile.profile_name ? `${profile.profile_name} - (${diameter} mm)` : `Soil Profile ${index + 1} - (${diameter} mm)`}</Label>
                   </div>
