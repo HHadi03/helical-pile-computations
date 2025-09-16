@@ -24,9 +24,10 @@ async function getProfiles(): Promise<ToverviewSoilProfileSchema[]>{
     if (error) {
       return []
     }
-    return data
 
+    return data
   }
+
   catch {
     return []
   }
@@ -43,9 +44,11 @@ async function getSoils(): Promise<ToverviewSoilSchema[]> {
     if (error) {
       return []
     }
+
     return data 
-    
-  } catch {
+  } 
+  
+  catch {
     return []
   }
 }

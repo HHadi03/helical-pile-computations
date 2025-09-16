@@ -69,6 +69,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
 
   const selectedMethod = form.watch("safety_design_method")
   const selectedCountry = form.watch("country")
+  const showRigid = form.watch("use_characteristic")
 
   const handleClose = () => {
     if (window.history.length > 1) {
@@ -80,36 +81,36 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
 
   async function onSubmit(values: TexportFormSchema) {
     try {
-      console.log(values)
 
-      // const response = await fetch('/export/api', {
-      //   method: 'POST',
-      //   headers: {'Content-Type': 'application/json'},
-      //   body: JSON.stringify(values),
-      // })
+      const response = await fetch('/export/api', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(values),
+      })
  
-      // if (!response.ok) {
-      //   throw new Error('Failed to generate PDF')
-      // }
+      if (!response.ok) {
+        const errorData = await response.json()
+        console.log(errorData.message)
+      }
 
-      // // Get the PDF blob
-      // const pdfBlob = await response.blob()
+      // Get the PDF blob
+      const pdfBlob = await response.blob()
       
-      // // Create download link
-      // const url = window.URL.createObjectURL(pdfBlob)
-      // const a = document.createElement('a')
-      // a.href = url
-      // a.download = `soil-report-${values.job_number || 'export'}.pdf`
-      // document.body.appendChild(a)
-      // a.click()
-      // window.URL.revokeObjectURL(url)
-      // document.body.removeChild(a)
+      // Create download link
+      const url = window.URL.createObjectURL(pdfBlob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `helical-piles-computations-export.pdf`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
 
-      handleClose()
+      // handleClose()
     }
 
-    catch {
-      console.error("SOMETHING WENT WRONG WITH PDF EXPORT SUBMIT")
+    catch (error) {
+      console.error("SOMETHING WENT WRONG WITH PDF EXPORT SUBMIT" + error)
     }
   }
   
@@ -292,20 +293,6 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                 <>
                   <FormField
                     control={form.control}
-                    name="structure_rigid"
-                    render={({ field }) => (
-                      <FormItem className="flex items-center border py-3 px-2 rounded-md">
-                        <FormControl>
-                          <Checkbox checked={field.value} onCheckedChange={field.onChange} name={field.name} id="structure_rigid"/>
-                        </FormControl>
-                          <FormLabel htmlFor="structure_rigid">Structure Rigid</FormLabel>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
                     name="use_characteristic"
                     render={({ field }) => (
                       <FormItem className="flex items-center border py-3 px-2 rounded-md">
@@ -317,6 +304,22 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                       </FormItem>
                     )}
                   />
+
+                  {showRigid && (
+                    <FormField
+                      control={form.control}
+                      name="structure_rigid"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center border py-3 px-2 rounded-md">
+                          <FormControl>
+                            <Checkbox checked={field.value} onCheckedChange={field.onChange} name={field.name} id="structure_rigid"/>
+                          </FormControl>
+                            <FormLabel htmlFor="structure_rigid">Is the Structure Rigid?</FormLabel>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
                 </>
               )}
 

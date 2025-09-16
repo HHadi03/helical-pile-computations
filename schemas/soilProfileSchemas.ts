@@ -47,3 +47,13 @@ export const selectionsSoilProfileSchema = z.object({
   stroke_width: z.number(),
 })
 export type TselectionsSoilProfileSchema = z.infer<typeof selectionsSoilProfileSchema>
+
+//export soil profile schema
+export const exportSoilProfileSchema = z.object({
+  profile_name: z.string().optional(),
+  pile_stick_out: z.number(),
+  effective_pile_length: z.number(),
+  water_depth: z.number(),
+})
+export type TexportSoilProfileSchema = z.infer<typeof exportSoilProfileSchema>
+

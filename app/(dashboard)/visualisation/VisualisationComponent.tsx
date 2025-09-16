@@ -457,7 +457,7 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
           <AlertDialogHeader>
             <AlertDialogTitle>Edit Visualisation Selections</AlertDialogTitle>
             <AlertDialogDescription>
-              Modify your current selections, colours, and stroke widths.
+              Modify your current selections line colour and width.
             </AlertDialogDescription>
           </AlertDialogHeader>
           
@@ -478,7 +478,7 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
                   {isSelected && (
                     <div className="flex flex-col gap-4 sm:flex-row">
                       <div className="flex items-center gap-2">
-                        <Label className="text-muted-foreground">Line Color:</Label>
+                        <Label className="text-muted-foreground">Line Colour:</Label>
                         <Popover>
                           <PopoverTrigger asChild>
                             <Button variant="outline" className="size-6 p-0 rounded-full" style={{ backgroundColor: displayColor }}></Button>
