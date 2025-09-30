@@ -116,8 +116,8 @@ export function InsertProfileForm() {
               />
             </div>
 
-            <div className="pt-2 flex justify-between">
-              <Button type="button" variant="outline" onClick={handleClose}>Close</Button>
+            <div className="pt-2 flex justify-end gap-2">
+              <Button type="button" className="w-18" variant="outline" onClick={handleClose}>Close</Button>
               <Button type="button" className="w-32" onClick={() => waterDepth && setActiveTab("pile")} disabled={!waterDepth}>Next</Button>
             </div>
           </TabsContent>
@@ -153,8 +153,8 @@ export function InsertProfileForm() {
               />
             </div>
             
-            <div className="pt-2 flex justify-between">
-              <Button type="button" variant="outline" disabled={isSubmitting} onClick={() => setActiveTab("profile")}>Back</Button>
+            <div className="pt-2 flex justify-end gap-2">
+              <Button type="button" className="w-18" variant="outline" disabled={isSubmitting} onClick={() => setActiveTab("profile")}>Back</Button>
               <Button type="submit" className="w-32" disabled={isSubmitting}> {isSubmitting ? (<> <Loader2 className="size-5 animate-spin"/> Submitting... </>) : ("Submit")}</Button>
             </div>
           </TabsContent>

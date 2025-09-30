@@ -9,13 +9,13 @@ export const NumberInput = <T extends FieldValues, K extends Path<T>>({field, pl
       type="number"
       {...field}
       {...props}
-      value={field.value === undefined ? "" : field.value}
+      value={field.value === 0 ? "" : field.value}
       step={0.1}
       min={0}
       disabled={disabled}
       onKeyDown={(e) => {if (["e", "E", "-", "+", "="].includes(e.key)) e.preventDefault()}}
       onPaste={(e) => e.preventDefault()}
-      onChange={(e) => {const value = e.target.value; if (/^\d{0,4}(\.\d{0,2})?$/.test(value)) {field.onChange(value)}}}
+      onChange={(e) => {const value = e.target.value; if (/^\d{0,5}(\.\d{0,2})?$/.test(value)) {field.onChange(value)}}}
       placeholder={placeholder}
     />
   )

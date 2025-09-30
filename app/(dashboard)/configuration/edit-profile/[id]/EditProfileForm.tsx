@@ -109,8 +109,8 @@ export function EditProfileForm({ profile, profileId }: { profile: TinsertSoilPr
               />
             </div>
 
-            <div className="pt-2 flex justify-between">
-              <Button type="button" variant="outline" disabled={isSubmitting} onClick={handleClose}>Close</Button>
+            <div className="pt-2 flex justify-end gap-2">
+              <Button type="button" className="w-18" variant="outline" disabled={isSubmitting} onClick={handleClose}>Cancel</Button>
               <Button type="submit" className="w-28" disabled={!isDirty || isSubmitting}>{isSubmitting ? (<><Loader2 className="size-5 animate-spin" />Saving...</>) : ("Save")}</Button>
             </div>
           </TabsContent>
@@ -146,8 +146,8 @@ export function EditProfileForm({ profile, profileId }: { profile: TinsertSoilPr
               />
             </div>
 
-            <div className="pt-2 flex justify-between">
-              <Button type="button" variant="outline" disabled={isSubmitting} onClick={handleClose}>Close</Button>
+            <div className="pt-2 flex justify-end gap-2">
+              <Button type="button" className="w-18" variant="outline" disabled={isSubmitting} onClick={handleClose}>Cancel</Button>
               <Button type="submit" className="w-28" disabled={!isDirty || isSubmitting}> {isSubmitting ? (<><Loader2 className="size-5 animate-spin" />Saving...</>) : ("Save")}</Button>
             </div>
           </TabsContent>

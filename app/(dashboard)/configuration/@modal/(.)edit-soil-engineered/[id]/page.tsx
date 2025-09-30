@@ -8,7 +8,7 @@ export default async function EditSoilEngineeredModal({params}:{params: Promise<
   const supabase = await createClient()
   const { data, error } = await supabase
   .from('soils')
-  .select("su, t, angle, qult, soil_type")
+  .select("su, t, angle, qult, soil_type, test_type")
   .eq('id', id)
   .single()
     

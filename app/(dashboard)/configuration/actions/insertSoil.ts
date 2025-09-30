@@ -1,6 +1,6 @@
 "use server"
 import { TinsertSoilSchema } from "@/schemas/soilSchemas"
-import { calculateResultsForFineSoil, calculateResultsForSoils } from "@/lib/equations"
+import { calculateResultsForFineSoil, calculateResultsForSoils, calculateResultsForFineSoilCPT, calculateResultsForSoilsCPT } from "@/lib/equations"
 import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
 
@@ -9,15 +9,36 @@ export async function insertSoil(soil: TinsertSoilSchema, profileId: string) {
   if (soil.soil_name) {
     soil = {...soil, soil_name: soil.soil_name.charAt(0).toUpperCase() + soil.soil_name.slice(1)}
   }
-
-  if (soil.soil_type === "fine") {
+  
+  if (soil.test_type === "spt") {
+    if (soil.soil_type === "fine") {
     soil = { ...soil,...await calculateResultsForFineSoil(soil, profileId)}
+    }
+
+    else {
+      soil = { ...soil,...await calculateResultsForSoils(soil, profileId)}
+    }
   }
 
   else {
-    soil = { ...soil,...await calculateResultsForSoils(soil, profileId)}
-  }
+    if (soil.soil_type === "fine") {
+      const calculatedResults = await calculateResultsForFineSoilCPT(soil, profileId)
 
+      if (calculatedResults.su < 0) {
+        return { 
+          message: `Cone tip resistance value is too low, leading to invalid (negative) results.`, 
+          errors: { qc: [`Cone tip resistance value is too low`] }
+        }
+      }
+
+      soil = { ...soil, ...calculatedResults }
+    }
+
+    else {
+     soil = { ...soil,...await calculateResultsForSoilsCPT(soil, profileId)}
+    }
+  }
+  
   try {
     const supabase = await createClient()
     const { data } = await supabase.auth.getClaims()

@@ -23,7 +23,6 @@ export function EditSoilInformation({ soil, soilId }: { soil: TeditSoilInformati
   })
   
   const { formState: { isDirty, isSubmitting, dirtyFields } } = form
-  
   const soilType = form.watch("soil_type")
 
   const handleClose = () => {
@@ -39,6 +38,7 @@ export function EditSoilInformation({ soil, soilId }: { soil: TeditSoilInformati
       const result = await updateSoilInformation(values, soilId, dirtyFields)
 
       if (result.errors) {
+        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TeditSoilInformationSchema, {message: Array.isArray(value) ? value[0] : String(value)})})
         toast.error(result.message)
       } 
       
@@ -56,53 +56,51 @@ export function EditSoilInformation({ soil, soilId }: { soil: TeditSoilInformati
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
         <div className="space-y-6 border-y-2 py-3">
-          <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
-            <FormField
-              control={form.control}
-              name="soil_type"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel htmlFor="soil_type">Soil Type</FormLabel>
-                  <Select onValueChange={(value) => {field.onChange(value); form.setValue("soil", "")}} defaultValue={field.value} name={field.name}>
-                    <FormControl>
-                      <SelectTrigger className="w-full" id="soil_type">
-                        <SelectValue placeholder="Select type"/>
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="coarse">Coarse Grain</SelectItem>
-                      <SelectItem value="fine">Fine Grain</SelectItem>
-                      <SelectItem value="manmade">Man Made</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <FormField
+            control={form.control}
+            name="soil_type"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel htmlFor="soil_type">Soil Type</FormLabel>
+                <Select onValueChange={(value) => {field.onChange(value); form.setValue("soil", "")}} defaultValue={field.value} name={field.name}>
+                  <FormControl>
+                    <SelectTrigger className="w-full" id="soil_type">
+                      <SelectValue placeholder="Select type"/>
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="coarse">Coarse Grain</SelectItem>
+                    <SelectItem value="fine">Fine Grain</SelectItem>
+                    <SelectItem value="manmade">Man Made</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <FormField
-              control={form.control}
-              name="density"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel htmlFor="density">Soil Density</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value} name={field.name}>
-                    <FormControl>
-                      <SelectTrigger className="w-full" id="density">
-                        <SelectValue placeholder="Select density"/>
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="loose">Loose</SelectItem>
-                      <SelectItem value="dense">Dense</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
+          <FormField
+            control={form.control}
+            name="density"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel htmlFor="density">Soil Density</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value} name={field.name}>
+                  <FormControl>
+                    <SelectTrigger className="w-full" id="density">
+                      <SelectValue placeholder="Select density"/>
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="loose">Loose</SelectItem>
+                    <SelectItem value="dense">Dense</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        
           <FormField
             control={form.control}
             name="soil"
@@ -129,7 +127,7 @@ export function EditSoilInformation({ soil, soilId }: { soil: TeditSoilInformati
             name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Soil Description <span className="font-semibold -ml-1">(optional)</span></FormLabel>
+                <FormLabel>Description <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                 <FormControl>
                   <Input type="text" placeholder="Brief description of soil composition" {...field} className="text-sm"/>
                 </FormControl>
@@ -177,8 +175,8 @@ export function EditSoilInformation({ soil, soilId }: { soil: TeditSoilInformati
           </div>
         </div>
 
-        <div className="pt-2 flex justify-between">
-          <Button type="button" variant="outline" disabled={isSubmitting} onClick={handleClose}>Close</Button>
+        <div className="pt-2 flex justify-end gap-2">
+          <Button type="button" className="w-18" variant="outline" disabled={isSubmitting} onClick={handleClose}>Cancel</Button>
           <Button type="submit" className="w-28" disabled={!isDirty || isSubmitting}>{isSubmitting ? (<><Loader2 className="size-5 animate-spin" />Saving...</>) : ("Save")}</Button>
         </div>
       </form>

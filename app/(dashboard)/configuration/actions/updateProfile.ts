@@ -2,7 +2,7 @@
 import { TinsertSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
-import { calculateResultsForFineSoilNoFetch, calculateResultsForSoilsNoFetch } from "@/lib/equations"
+import { calculateResultsForFineSoilNoFetch, calculateResultsForSoilsNoFetch, calculateResultsForSoilsCPTNoFetch, calculateResultsForFineSoilCPTNoFetch } from "@/lib/equations"
 
 type DirtyFields = Partial<Record<keyof TinsertSoilProfileSchema, boolean>>
 
@@ -19,7 +19,7 @@ export async function updateProfile(profile: TinsertSoilProfileSchema, profileId
     const supabase = await createClient()
     const { data, error } = await supabase
     .from("soils")
-    .select("id, start_depth, end_depth, y_moist, y_sat, n_value, soil_type")
+    .select("id, start_depth, end_depth, y_moist, y_sat, n_value, soil_type, test_type, qs, qc, kc, ks, nk, nc, a")
     .eq("soil_profile_id", profileId)
       
     if (error) {
@@ -31,16 +31,28 @@ export async function updateProfile(profile: TinsertSoilProfileSchema, profileId
       try {
         let result
         
-        if (dirtyFields.water_depth && !pileParametersChanged && soil.soil_type === "fine") {
+        if (dirtyFields.water_depth && !pileParametersChanged && soil.soil_type === "fine" && soil.test_type === "spt") {
           return true 
         }
         
-        if (soil.soil_type !== "fine") {
-          result = await calculateResultsForSoilsNoFetch(soil, roundedEffectivePileLength, profile.water_depth)
+        if (soil.test_type === "spt") {
+          if (soil.soil_type === "fine") {
+            result = await calculateResultsForFineSoilNoFetch(soil, roundedEffectivePileLength)
+          } 
+          
+          else {
+            result = await calculateResultsForSoilsNoFetch(soil, roundedEffectivePileLength, profile.water_depth)
+          }
         } 
         
         else {
-          result = await calculateResultsForFineSoilNoFetch(soil, roundedEffectivePileLength)
+          if (soil.soil_type === "fine") {
+            result = await calculateResultsForFineSoilCPTNoFetch(soil, roundedEffectivePileLength, profile.water_depth)
+          } 
+          
+          else {
+            result = await calculateResultsForSoilsCPTNoFetch(soil, roundedEffectivePileLength)
+          }
         }
 
         const { error } = await supabase
@@ -77,6 +89,7 @@ export async function updateProfile(profile: TinsertSoilProfileSchema, profileId
     revalidatePath("/configuration")
     return {message: `${profile.profile_name ? profile.profile_name: `Soil Profile`} has been successfully edited`}
   }
+
   catch {
    return { message: `Failed to edit ${profile.profile_name ? profile.profile_name: `soil profile`}, please try again later.`, errors: {}}
   }

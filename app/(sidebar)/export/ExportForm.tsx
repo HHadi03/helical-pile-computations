@@ -32,6 +32,8 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
       variable_actions: "",
       structure_rigid: false,
       use_characteristic: false,
+      standardTension: "",
+      standardCompression: "",
       number_of_tests: "",
       mean_tensile_rcm: "",
       min_tensile_rcm: "",
@@ -66,10 +68,9 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
   })
 
   const { formState: { isSubmitting } } = form
-
   const selectedMethod = form.watch("safety_design_method")
   const selectedCountry = form.watch("country")
-  const showRigid = form.watch("use_characteristic")
+  const showCharacteristic = form.watch("use_characteristic")
 
   const handleClose = () => {
     if (window.history.length > 1) {
@@ -81,7 +82,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
 
   async function onSubmit(values: TexportFormSchema) {
     try {
-
+      
       const response = await fetch('/export/api', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -89,28 +90,26 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
       })
  
       if (!response.ok) {
-        const errorData = await response.json()
-        console.log(errorData.message)
+        console.log(response.json())
       }
 
-      // Get the PDF blob
-      const pdfBlob = await response.blob()
-      
-      // Create download link
-      const url = window.URL.createObjectURL(pdfBlob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `helical-piles-computations-export.pdf`
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
-
-      // handleClose()
+      else {
+        const pdfBlob = await response.blob()
+        const url = window.URL.createObjectURL(pdfBlob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `helical-piles-computations-export.pdf`
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(a)
+        
+        // handleClose()
+      }
     }
 
-    catch (error) {
-      console.error("SOMETHING WENT WRONG WITH PDF EXPORT SUBMIT" + error)
+    catch {
+      console.log("Unexpected error occured")
     }
   }
   
@@ -305,7 +304,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                     )}
                   />
 
-                  {showRigid && (
+                  {showCharacteristic && (
                     <FormField
                       control={form.control}
                       name="structure_rigid"
@@ -325,75 +324,125 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
 
               {selectedMethod === "method_test" && (
                 <>
-                  <FormField
-                    control={form.control}
-                    name="number_of_tests"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Number Of Tests</FormLabel>
-                        <FormControl>
-                          <NumberInput field={field} placeholder="0" className="text-sm"/>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {!showCharacteristic && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="standardTension"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Define Tension Capacity</FormLabel>
+                          <FormControl>
+                            <NumberInput field={field} placeholder="0" className="text-sm"/>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="standardCompression"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Define Compression Capacity</FormLabel>
+                          <FormControl>
+                            <NumberInput field={field} placeholder="0" className="text-sm"/>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                  )}
 
                   <FormField
                     control={form.control}
-                    name="mean_tensile_rcm"
+                    name="use_characteristic"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Mean Tensile Capacity <span className="font-semibold -ml-1">(kN)</span></FormLabel>
+                      <FormItem className="flex items-center border py-3 px-2 rounded-md">
                         <FormControl>
-                          <NumberInput field={field} placeholder="0" className="text-sm"/>
+                          <Checkbox checked={field.value} onCheckedChange={field.onChange} name={field.name} id="use_characteristic"/>
                         </FormControl>
+                          <FormLabel htmlFor="use_characteristic">Use Characteristic Values</FormLabel>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+                  
+                  {showCharacteristic && (
+                    <>
+                      <FormField
+                        control={form.control}
+                        name="number_of_tests"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Number Of Tests</FormLabel>
+                            <FormControl>
+                              <NumberInput field={field} placeholder="0" className="text-sm"/>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                  <FormField
-                    control={form.control}
-                    name="min_tensile_rcm"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Minimum Tensile Capacity <span className="font-semibold -ml-1">(kN)</span></FormLabel>
-                        <FormControl>
-                          <NumberInput field={field} placeholder="0" className="text-sm"/>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      <FormField
+                        control={form.control}
+                        name="mean_tensile_rcm"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Mean Tensile Capacity <span className="font-semibold -ml-1">(kN)</span></FormLabel>
+                            <FormControl>
+                              <NumberInput field={field} placeholder="0" className="text-sm"/>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                  <FormField
-                    control={form.control}
-                    name="mean_compression_rcm"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Mean Compression Capacity <span className="font-semibold -ml-1">(kN)</span></FormLabel>
-                        <FormControl>
-                          <NumberInput field={field} placeholder="0" className="text-sm"/>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      <FormField
+                        control={form.control}
+                        name="min_tensile_rcm"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Minimum Tensile Capacity <span className="font-semibold -ml-1">(kN)</span></FormLabel>
+                            <FormControl>
+                              <NumberInput field={field} placeholder="0" className="text-sm"/>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                  <FormField
-                    control={form.control}
-                    name="min_compression_rcm"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Minimum Compression Capacity <span className="font-semibold -ml-1">(kN)</span></FormLabel>
-                        <FormControl>
-                          <NumberInput field={field} placeholder="0" className="text-sm"/>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      <FormField
+                        control={form.control}
+                        name="mean_compression_rcm"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Mean Compression Capacity <span className="font-semibold -ml-1">(kN)</span></FormLabel>
+                            <FormControl>
+                              <NumberInput field={field} placeholder="0" className="text-sm"/>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="min_compression_rcm"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Minimum Compression Capacity <span className="font-semibold -ml-1">(kN)</span></FormLabel>
+                            <FormControl>
+                              <NumberInput field={field} placeholder="0" className="text-sm"/>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </>
+                  )}
                 </>
               )}
 
@@ -426,7 +475,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                       </FormItem>
                     )}
                   />
-                  
+
                   <div className="flex flex-col sm:flex-row gap-4 sm:items-end">
                     <FormField
                       control={form.control}

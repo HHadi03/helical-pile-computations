@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useRouter } from "next/navigation"
 import { NumberInput } from "@/components/NumberInput"
 import Image from 'next/image'
@@ -37,23 +38,23 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
       soil_name: "",
       description: "",
       colour: "#000000",
+      qc: "",
+      qs: "",
+      ks: 1,
+      kc: 0.45,
+      a: 1,
+      nk: 15,
+      nc: 7,
+      test_type: "spt",
     }
   })
   
   const { formState: { isSubmitting } } = form
-  
   const soilType = form.watch("soil_type")
   const soil = form.watch("soil")
   const density = form.watch("density")
   const showParametersTab = Boolean(soilType && soil && density)
-  
-  const handleClose = () => {
-    if (window.history.length > 1) {
-      router.back()
-    } else {
-      router.replace('/configuration') 
-    }
-  }
+  const testType = form.watch("test_type")
 
   useEffect(() => {
     const errorFields = Object.keys(form.formState.errors)
@@ -82,11 +83,20 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
     }
   }, [soil, density, form])
 
+  const handleClose = () => {
+    if (window.history.length > 1) {
+      router.back()
+    } else {
+      router.replace('/configuration') 
+    }
+  }
+
   async function onSubmit(values: TinsertSoilSchema) {
     try {
       const result = await insertSoil(values, profileId)
 
       if (result.errors) {
+        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TinsertSoilSchema, {message: Array.isArray(value) ? value[0] : String(value)})})
         toast.error(result.message)
       }
 
@@ -111,53 +121,51 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
       
           <TabsContent value="soil" className="focus-visible:ring-transparent">
             <div className="space-y-6 border-y-2 py-3">
-              <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
-                <FormField
-                  control={form.control}
-                  name="soil_type"
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormLabel htmlFor="soil_type">Soil Type</FormLabel>
-                      <Select onValueChange={(value) => {field.onChange(value); form.setValue("soil", "")}} defaultValue={field.value} name={field.name}>
-                        <FormControl>
-                          <SelectTrigger className="w-full" id="soil_type">
-                            <SelectValue placeholder="Select type"/>
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="coarse">Coarse Grain</SelectItem>
-                          <SelectItem value="fine">Fine Grain</SelectItem>
-                          <SelectItem value="manmade">Man Made</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage/>
-                    </FormItem>
-                  )}
-                />
+              <FormField
+                control={form.control}
+                name="soil_type"
+                render={({ field }) => (
+                  <FormItem >
+                    <FormLabel htmlFor="soil_type">Soil Type</FormLabel>
+                    <Select onValueChange={(value) => {field.onChange(value); form.setValue("soil", "")}} defaultValue={field.value} name={field.name}>
+                      <FormControl>
+                        <SelectTrigger className="w-full" id="soil_type">
+                          <SelectValue placeholder="Select type"/>
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="coarse">Coarse Grain</SelectItem>
+                        <SelectItem value="fine">Fine Grain</SelectItem>
+                        <SelectItem value="manmade">Man Made</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage/>
+                  </FormItem>
+                )}
+              />
 
-                <FormField
-                  control={form.control}
-                  name="density"
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormLabel htmlFor="density">Soil Density</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value} name={field.name}>
-                        <FormControl>
-                          <SelectTrigger className="w-full" id="density">
-                            <SelectValue placeholder="Select density"/>
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="loose">Loose</SelectItem>
-                          <SelectItem value="dense">Dense</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
+              <FormField
+                control={form.control}
+                name="density"
+                render={({ field }) => (
+                  <FormItem >
+                    <FormLabel htmlFor="density">Soil Density</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value} name={field.name}>
+                      <FormControl>
+                        <SelectTrigger className="w-full" id="density">
+                          <SelectValue placeholder="Select density"/>
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="loose">Loose</SelectItem>
+                        <SelectItem value="dense">Dense</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
               <FormField
                 control={form.control}
                 name="soil"
@@ -185,9 +193,9 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Soil Description <span className="font-semibold -ml-1">(optional)</span></FormLabel>
+                    <FormLabel>Description <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                     <FormControl>
-                      <Input type="text" placeholder="Brief description of soil composition" {...field} className="text-sm"/>
+                      <Input type="text" placeholder="Brief description of the soils composition" {...field} className="text-sm"/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -233,8 +241,8 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
               </div>
             </div>
 
-            <div className="pt-2 flex justify-between">
-              <Button type="button" variant="outline" onClick={handleClose}>Close</Button>
+            <div className="pt-2 flex justify-end gap-2">
+              <Button type="button" className="w-18" variant="outline" onClick={handleClose}>Close</Button>
               <Button type="button" className="w-32" onClick={() => showParametersTab && setActiveTab("parameters")} disabled={!showParametersTab}>Next</Button>
             </div>
           </TabsContent>
@@ -270,13 +278,13 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                   )}
                 />
               </div>
-
+              
               <FormField
                 control={form.control}
                 name="y_moist"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Moist Unit Weight <span className="font-semibold -ml-1">(kN/m³)</span></FormLabel>  
+                    <FormLabel>Moist Weight <span className="font-semibold -ml-1">(kN/m³)</span></FormLabel>  
                     <FormControl>
                       <NumberInput field={field} placeholder="0" className="text-sm"/>
                     </FormControl>
@@ -290,7 +298,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                 name="y_sat"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Sat Unit Weight <span className="font-semibold -ml-1">(kN/m³)</span></FormLabel>
+                    <FormLabel>Saturated Weight <span className="font-semibold -ml-1">(kN/m³)</span></FormLabel>
                     <FormControl>
                       <NumberInput field={field} placeholder="0" className="text-sm"/>
                     </FormControl>
@@ -299,31 +307,189 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="n_value"
-                render={({ field }) => (
-                  <FormItem className="relative">
-                    <FormLabel>SPT N-Value</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button variant="link" className="absolute -top-3 -right-2 text-blue-500 text-xs">I dont have SPT N-Value</Button>
-                        </PopoverTrigger>
-                        <PopoverContent align="end" side="top" sideOffset={-2} className="w-sm m:w-lg md:w-xl lg:w-2xl dark:bg-black rounded-none p-1">
-                          <Image src={resolvedTheme === "dark" ? darkSPTImage : lightSPTImage} placeholder="blur" alt="SPT N-Value Guide Picture"/>
-                        </PopoverContent>
-                      </Popover>
-                    <FormControl>
-                      <NumberInput field={field} placeholder="0" className="text-sm"/>
-                    </FormControl>
-                    <FormMessage/>
-                  </FormItem>
+              <p className="text-sm leading-none mb-1.5 ml-1">Soil Test Method</p>
+              <div className="border rounded-sm p-2 space-y-4">
+                <FormField
+                  control={form.control}
+                  name="test_type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <RadioGroup onValueChange={field.onChange} defaultValue={field.value} name={field.name} className="flex flex-col space-x-4 sm:flex-row pt-1 px-2">
+                          <FormItem className="flex items-center">
+                            <FormControl>
+                              <RadioGroupItem value="spt" id="spt"/>
+                            </FormControl>
+                            <FormLabel htmlFor="spt">Standard Penetration Test</FormLabel>
+                          </FormItem>
+                          
+                          <FormItem className="flex items-center">
+                            <FormControl>
+                              <RadioGroupItem value="cpt" id="cpt"/>
+                            </FormControl>
+                            <FormLabel htmlFor="cpt">Cone Penetration Test</FormLabel>
+                          </FormItem>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              
+                {testType === "spt" && (
+                  <FormField
+                    control={form.control}
+                    name="n_value"
+                    render={({ field }) => (
+                      <FormItem className="relative pt-2">
+                        <FormLabel>SPT N-Value</FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button variant="link" className="absolute -top-0.5 -right-2 text-blue-500 text-xs">I dont have SPT N-Value</Button>
+                            </PopoverTrigger>
+                            <PopoverContent align="end" side="top" sideOffset={-2} className="w-sm m:w-lg md:w-xl lg:w-2xl dark:bg-black rounded-none p-1">
+                              <Image src={resolvedTheme === "dark" ? darkSPTImage : lightSPTImage} placeholder="blur" alt="SPT N-Value Guide Picture"/>
+                            </PopoverContent>
+                          </Popover>
+                        <FormControl>
+                          <NumberInput field={field} placeholder="0" className="text-sm"/>
+                        </FormControl>
+                        <FormMessage/>
+                      </FormItem>
+                    )}
+                  />
                 )}
-              />
+
+                {testType === "cpt" && (
+                  <>  
+                    {soilType === "fine" ? (
+                      <>
+                        <FormField
+                          control={form.control}
+                          name="qc"
+                          render={({ field }) => (
+                            <FormItem className="pt-2">
+                              <FormLabel>Cone Tip Resistance<span className="font-semibold -ml-1">(kPa)</span></FormLabel>
+                              <FormControl>
+                                <NumberInput field={field} placeholder="0" className="text-sm"/>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <div className="flex gap-4 items-start">
+                          <FormField
+                            control={form.control}
+                            name="nk"
+                            render={({ field }) => (
+                              <FormItem className="flex-1">
+                                <FormLabel className="text-xs -mb-1.5">Cone Factor</FormLabel>
+                                <FormControl>
+                                  <NumberInput field={field} placeholder="0" className="text-sm"/>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="nc"
+                            render={({ field }) => (
+                              <FormItem className="flex-1">
+                                <FormLabel className="text-xs -mb-1.5">Capacity Factor</FormLabel>
+                                <FormControl>
+                                  <NumberInput field={field} placeholder="0" className="text-sm"/>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="a"
+                            render={({ field }) => (
+                              <FormItem className="flex-1">
+                                <FormLabel className="text-xs -mb-1.5">Pore Factor</FormLabel>
+                                <FormControl>
+                                  <NumberInput field={field} placeholder="0" className="text-sm"/>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <FormField
+                          control={form.control}
+                          name="qs"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Cone Sleeve Resistance<span className="font-semibold -ml-1">(kPa)</span></FormLabel>
+                              <FormControl>
+                                <NumberInput field={field} placeholder="0" className="text-sm"/>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="qc"
+                          render={({ field }) => (
+                            <FormItem className="pt-2">
+                              <FormLabel>Cone Tip Resistance<span className="font-semibold -ml-1">(kPa)</span></FormLabel>
+                              <FormControl>
+                                <NumberInput field={field} placeholder="0" className="text-sm"/>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <div className="flex gap-4 items-start">
+                          <FormField
+                            control={form.control}
+                            name="ks"
+                            render={({ field }) => (
+                              <FormItem className="flex-1">
+                                <FormLabel className="text-xs -mb-1.5">Cone Factor</FormLabel>
+                                <FormControl>
+                                  <NumberInput field={field} placeholder="0" className="text-sm"/>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={form.control}
+                            name="kc"
+                            render={({ field }) => (
+                              <FormItem className="flex-1">
+                                <FormLabel className="text-xs -mb-1.5">Capacity Factor</FormLabel>
+                                <FormControl>
+                                  <NumberInput field={field} placeholder="0" className="text-sm"/>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
 
-            <div className="pt-2 flex justify-between">
-              <Button type="button" variant="outline" disabled={isSubmitting} onClick={() => setActiveTab("soil")}>Back</Button>
+            <div className="pt-2 flex justify-end gap-2">
+              <Button type="button" className="w-18" variant="outline" disabled={isSubmitting} onClick={() => setActiveTab("soil")}>Back</Button>
               <Button type="submit" className="w-32" disabled={isSubmitting}> {isSubmitting ? (<> <Loader2 className="size-5 animate-spin"/> Submitting... </>) : ("Submit")}</Button>
             </div>
           </TabsContent>

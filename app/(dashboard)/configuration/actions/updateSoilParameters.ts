@@ -1,8 +1,8 @@
 "use server"
-import { TeditSoilParametersSchema, TsoilCalculationsSchema } from "@/schemas/soilSchemas"
+import { TeditSoilParametersSchema } from "@/schemas/soilSchemas"
 import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
-import { calculateResultsForFineSoil, calculateResultsForSoils } from "@/lib/equations"
+import { calculateResultsForFineSoil, calculateResultsForSoils, calculateResultsForFineSoilCPT, calculateResultsForSoilsCPT } from "@/lib/equations"
 
 type DirtyFields = Partial<Record<keyof TeditSoilParametersSchema, boolean>>
 
@@ -37,7 +37,7 @@ export async function updateSoilParameters(soil: TeditSoilParametersSchema, soil
 
       const {data: proceedingSoilData, error: proceedingSoilError} = await supabase
       .from("soils")
-      .select("y_moist, y_sat, n_value, soil_type")
+      .select("y_moist, y_sat, n_value, soil_type, test_type, qs, qc, kc, ks, nk, nc, a")
       .eq("id", proceedingSoil.id)
       .single()
       
@@ -45,24 +45,44 @@ export async function updateSoilParameters(soil: TeditSoilParametersSchema, soil
         return { message: `Failed to edit ${soil.soil_name ? soil.soil_name : soil.soil}, please try again later.`, errors: {}}
       }
 
-      const fullObject = {
+      let fullObject = {
+        start_depth: soil.end_depth,
         ...proceedingSoil,
-        start_depth: soil.end_depth, 
         ...proceedingSoilData,
       }
 
-      let dataToSubmit: TsoilCalculationsSchema
-      if (proceedingSoilData.soil_type === "fine") {
-        dataToSubmit = {...fullObject, ...await calculateResultsForFineSoil(fullObject, soil.soil_profile_id!)}
+      if (proceedingSoilData.test_type === "spt") {
+        if (proceedingSoilData.soil_type === "fine") {
+          fullObject = {...fullObject, ...await calculateResultsForFineSoil(fullObject, soil.soil_profile_id)}
+        }
+
+        else {
+          fullObject = {...fullObject, ...await calculateResultsForSoils(fullObject, soil.soil_profile_id)}
+        }
       }
 
       else {
-        dataToSubmit = {...fullObject, ...await calculateResultsForSoils(fullObject, soil.soil_profile_id!)}
+        if (proceedingSoilData.soil_type === "fine") {
+          const calculatedResults = await calculateResultsForFineSoilCPT(fullObject, soil.soil_profile_id)
+
+          if (calculatedResults.su < 0) {
+            return { 
+              message: `Unable to modify end depth as proceeding layer has negative results, please modify its parameters.`,
+              errors: { end_depth: ["End depth change leads to negative results"] }
+            }
+          }
+
+          fullObject = { ...fullObject, ...calculatedResults }
+        }
+
+        else {
+          fullObject = {...fullObject, ...await calculateResultsForSoilsCPT(fullObject, soil.soil_profile_id)}
+        }
       }
   
       const { error: proceedingSoilSubmitError } = await supabase
       .from('soils')
-      .update(dataToSubmit)
+      .update(fullObject)
       .eq('id', proceedingSoil.id)
 
       if (proceedingSoilSubmitError){
@@ -70,13 +90,34 @@ export async function updateSoilParameters(soil: TeditSoilParametersSchema, soil
       }
     }
   }
+  
+  if (soil.test_type === "spt") {
+    if (soil.soil_type === "fine") {
+      soil = { ...soil,...await calculateResultsForFineSoil(soil,  soil.soil_profile_id)}
+    }
 
-  if (soil.soil_type === "fine") {
-    soil = { ...soil,...await calculateResultsForFineSoil(soil, soil.soil_profile_id!)}
+    else {
+      soil = { ...soil,...await calculateResultsForSoils(soil,  soil.soil_profile_id)}
+    }
   }
   
   else {
-    soil = { ...soil,...await calculateResultsForSoils(soil, soil.soil_profile_id!)}
+    if (soil.soil_type === "fine") {
+      const calculatedResults = await calculateResultsForFineSoilCPT(soil, soil.soil_profile_id)
+
+      if (calculatedResults.su < 0) {
+        return { 
+          message: `Cone tip resistance value is too low, leading to negative results.`, 
+          errors: { qc: [`Cone tip resistance value is too low`] }
+        }
+      }
+
+      soil = { ...soil, ...calculatedResults }
+    }
+
+    else {
+      soil = { ...soil,...await calculateResultsForSoilsCPT(soil,  soil.soil_profile_id)}
+    }
   }
   
   try {

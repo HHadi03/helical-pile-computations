@@ -5,15 +5,14 @@ import { useTheme } from "next-themes"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { roundToTwoDecimals } from "@/lib/utils"
 
-export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, hideBearingCapacity, needsHorizontalScroll}: { profileSoils: ToverviewSoilSchema[], profile: ToverviewSoilProfileSchema, profileIndex?: number, pileDiameter: string, hideBearingCapacity: boolean, needsHorizontalScroll?: boolean }) {
-  
+export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, hideBearingCapacity, needsHorizontalScroll}: { profileSoils: ToverviewSoilSchema[], profile: ToverviewSoilProfileSchema, profileIndex: number, pileDiameter: string, hideBearingCapacity: boolean, needsHorizontalScroll?: boolean }) {
   const { resolvedTheme } = useTheme()
   
   if (profileSoils.length === 0) {
     return (
       <ScrollArea className="overflow-auto grid grid-cols-1 border-2">
         <div className="p-2 bg-sky-50 dark:bg-sky-900/50 whitespace-nowrap"> 
-          <h1 className="text-base font-semibold mb-2">{profile.profile_name || `Soil Profile${profileIndex != null ? ` ${profileIndex + 1}` : ""}`}</h1>
+          <h1 className="text-base font-semibold mb-2">{profile.profile_name || `Soil Profile ${profileIndex + 1}`}</h1>
           <p className="text-sm text-muted-foreground">No soil layers detected, add soil layers in configuration to begin analysis.</p>
         </div>
         <ScrollBar orientation="horizontal" className="h-2"/>
@@ -22,37 +21,68 @@ export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, 
   }
 
   const filteredSoils = profileSoils.filter(soil => soil.start_depth < profile.effective_pile_length)
-  
+
   const shaftCapacityKey = pileDiameter === "60" ? "shaft_capacity60" : "shaft_capacity100"
   const bearingCapacity = pileDiameter === "60" ? filteredSoils[filteredSoils.length - 1].bearing_capacity60 : filteredSoils[filteredSoils.length - 1].bearing_capacity100
 
-  const chartData = filteredSoils.reduce((accumulator, soil, index) => {
+  const baseChartData = filteredSoils.reduce((accumulator, soil, index) => {
     const prevShaft = index === 0 ? 0 : accumulator[index - 1][shaftCapacityKey]
-
     const cumulativeShaft = prevShaft + soil[shaftCapacityKey]
 
     accumulator.push({ 
       end_depth: soil.end_depth,
-      [shaftCapacityKey]: cumulativeShaft
+      [shaftCapacityKey]: cumulativeShaft,
     })
 
     return accumulator
   }, [] as { end_depth: number; [key: string]: number }[])
+
+  const lastBaseChartEntry = baseChartData[baseChartData.length - 1]
+
+  if (!hideBearingCapacity) {lastBaseChartEntry[shaftCapacityKey] += bearingCapacity}
+  lastBaseChartEntry[shaftCapacityKey] = roundToTwoDecimals(lastBaseChartEntry[shaftCapacityKey])
+  if (lastBaseChartEntry.end_depth > profile.effective_pile_length) {lastBaseChartEntry.end_depth = profile.effective_pile_length}
   
-  const lastChartDataSoil = chartData[chartData.length - 1]
-  
-  if ( lastChartDataSoil.end_depth > profile.effective_pile_length) {
-    lastChartDataSoil.end_depth = profile.effective_pile_length
-  }
-  
-  if (!hideBearingCapacity) {
-    lastChartDataSoil[shaftCapacityKey] += bearingCapacity
+  const interpolateCapacity = (targetDepth: number): number => {
+    for (let i = 0; i < baseChartData.length; i++) {
+      const currentLayer = baseChartData[i]
+      
+      const prevDepth = i === 0 ? 0 : baseChartData[i - 1].end_depth
+      const prevCapacity = i === 0 ? 0 : baseChartData[i - 1][shaftCapacityKey]
+      
+      if (targetDepth <= currentLayer.end_depth) {
+        const depthRange = currentLayer.end_depth - prevDepth
+        const capacityRange = currentLayer[shaftCapacityKey] - prevCapacity
+        const progress = (targetDepth - prevDepth) / depthRange
+        
+        return prevCapacity + (capacityRange * progress)
+      }
+    }
+    
+    return lastBaseChartEntry[shaftCapacityKey]
   }
 
-  lastChartDataSoil[shaftCapacityKey] = roundToTwoDecimals(lastChartDataSoil[shaftCapacityKey])
+  const createDenseChartData = () => {
+    const denseData = []
+    const step = 0.1 
+    
+    denseData.push({ end_depth: 0, [shaftCapacityKey]: 0 })
+
+    const maxDepth = lastBaseChartEntry.end_depth
+
+    let i = 1
+    while (i * step < maxDepth) {
+      const depth = roundToTwoDecimals(i * step)
+      denseData.push({ end_depth: depth, [shaftCapacityKey]: roundToTwoDecimals(interpolateCapacity(depth)) })
+      i++
+    }
+
+    denseData.push({ end_depth: roundToTwoDecimals(maxDepth), [shaftCapacityKey]: roundToTwoDecimals(interpolateCapacity(maxDepth)) })
+
+    return denseData
+  }
   
-  chartData.unshift({ end_depth: 0, [shaftCapacityKey]: 0 })
-  
+  const chartData = createDenseChartData()
   return (
     <ScrollArea className={`overflow-auto grid grid-cols-1 ${needsHorizontalScroll ? 'border' : ''}`}>
       <div className="min-w-[634px]">
@@ -61,14 +91,14 @@ export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, 
           <div className="flex justify-between">
 
             <div className="flex flex-col">
-              <h1 className="text-base font-semibold">{profile.profile_name|| `Soil Profile${profileIndex != null ? ` ${profileIndex + 1}` : ""}`}</h1>
+              <h1 className="text-base font-semibold">{profile.profile_name || `Soil Profile ${profileIndex + 1}`}</h1>
               <p className="text-sm mt-auto text-muted-foreground">Pile Diameter: {pileDiameter} mm</p>
             </div>
 
             <div className="text-right text-sm">
-              <p><span className="font-semibold">Maximum Depth:</span> {lastChartDataSoil.end_depth > profile.effective_pile_length ? profile.effective_pile_length : lastChartDataSoil.end_depth} m</p>
-              <p><span className="font-semibold">Maximum Total Capacity:</span> {lastChartDataSoil[shaftCapacityKey]} kN</p>
-              {!hideBearingCapacity && (<p><span className="font-semibold">Bearing Capacity Contribution:</span> {bearingCapacity} kN</p>)}
+              <p><span className="font-semibold">Maximum Depth:</span> {lastBaseChartEntry.end_depth} m</p>
+              <p><span className="font-semibold">Maximum Total Capacity:</span> {lastBaseChartEntry[shaftCapacityKey].toFixed(2)} kN</p>
+              {!hideBearingCapacity && (<p><span className="font-semibold">Bearing Capacity Contribution:</span> {bearingCapacity.toFixed(2)} kN</p>)}
             </div>
 
           </div>
@@ -103,9 +133,9 @@ export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, 
 
               <YAxis
                 dataKey="end_depth" 
-                domain={[0, 'dataMax']}
+                domain={['dataMin', 'dataMax']}
                 type="number"
-                label={{ fill: resolvedTheme === 'dark' ? "oklch(0.985 0.002 247.839)" : "oklch(0.13 0.028 261.692)", value: 'Depth / m', angle: -90, position: 'insideLeft', offset: 20, fontSize: '0.875rem', letterSpacing: '0.05em' }}
+                label={{ fill: resolvedTheme === 'dark' ? "oklch(0.985 0.002 247.839)" : "oklch(0.13 0.028 261.692)", value: 'Depth (m)', angle: -91, position: 'insideLeft', offset: 20, fontSize: '0.875rem' }}
                 tick={{ fontSize: '0.875rem', fill: resolvedTheme === 'dark' ? "oklch(0.707 0.022 261.325)" : "oklch(0.551 0.027 264.364)" }}
                 axisLine={{ stroke: resolvedTheme === 'dark' ? "oklch(0.92 0.00 49)" : "oklch(0.56 0.00 0)", strokeWidth: 2, strokeOpacity: 0.8}}
                 tickLine={{ stroke: resolvedTheme === 'dark' ? "oklch(0.707 0.022 261.325)" : "oklch(0.551 0.027 264.364)", strokeWidth: 0.5}}
@@ -114,21 +144,22 @@ export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, 
               <XAxis 
                 dataKey={shaftCapacityKey}
                 type="number"
-                domain={[0, 'dataMax']}
-                label={{ fill: resolvedTheme === 'dark' ? "oklch(0.985 0.002 247.839)" : "oklch(0.13 0.028 261.692)", value: 'Capacity / kN', position: 'insideBottom', offset: -10, fontSize: '0.875rem' }}
+                domain={['dataMin', 'dataMax']}
+                label={{ fill: resolvedTheme === 'dark' ? "oklch(0.985 0.002 247.839)" : "oklch(0.13 0.028 261.692)", value: 'Capacity (kN)', position: 'insideBottom', offset: -10, fontSize: '0.875rem' }}
                 tick={{ fontSize: '0.875rem', fill: resolvedTheme === 'dark' ? "oklch(0.707 0.022 261.325)" : "oklch(0.551 0.027 264.364)" }}
                 axisLine={{ stroke: resolvedTheme === 'dark' ? "oklch(0.92 0.00 49)" : "oklch(0.56 0.00 0)", strokeWidth: 2, strokeOpacity: 0.8}}
                 tickLine={{ stroke: resolvedTheme === 'dark' ? "oklch(0.707 0.022 261.325)" : "oklch(0.551 0.027 264.364)", strokeWidth: 0.5}}
               />
               
               <Line 
-                type={"monotone"}
+                type={"linear"}
                 dataKey={shaftCapacityKey}
                 {...resolvedTheme === 'dark' ? { stroke: "oklch(0.62 0.19 260)" } : { stroke: "oklch(0.696 0.17 162.48)" } }
                 strokeWidth={2.5}
                 animationDuration={1200}
                 name="Total Capacity"
                 activeDot={{ r: 6 }}
+                dot={false} 
               />
               
             </LineChart>
@@ -140,3 +171,7 @@ export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, 
     </ScrollArea>
   )
 }
+
+//review new soil graph - change tooltip in visualisation
+//add cpt route
+//sort out general changes

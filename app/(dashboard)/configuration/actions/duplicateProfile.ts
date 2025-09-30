@@ -11,16 +11,20 @@ export async function duplicateProfile(profileId: string) {
     .eq("id", profileId)
     .single()
     
-    const { data: soilData, error: soilFetchError } = await supabase
-    .from('soils')
-    .select("user_id, soil_type, density, soil, soil_name, description, colour, start_depth, end_depth, n_value, y_moist, y_sat, h, po, angle, ko, t, su, qult, shaft_capacity60, shaft_capacity100, bearing_capacity60, bearing_capacity100")
-    .eq("soil_profile_id", profileId)
-    
-    if (soilFetchError || profilFetchError) {
-      return { message: "Failed to fetch relevant soil layers/soil profile please try again later.", errors: {}}
+    if (profilFetchError) {
+      return { message: "Failed to fetch relevant soil profile, please try again later.", errors: {}}
     }
 
-    if (profileData.profile_name){
+    const { data: soilData, error: soilFetchError } = await supabase
+    .from('soils')
+    .select("user_id, soil_type, density, soil, soil_name, description, colour, start_depth, end_depth, test_type, n_value, y_moist, y_sat, qs, qc, kc, ks, nk, nc, a, po, angle, t, su, qult, shaft_capacity60, shaft_capacity100, bearing_capacity60, bearing_capacity100")
+    .eq("soil_profile_id", profileId)
+    
+    if (soilFetchError) {
+      return { message: "Failed to fetch relevant soil layers, please try again later.", errors: {}}
+    }
+
+    if (profileData.profile_name) {
       profileData.profile_name = `${profileData.profile_name} ✦`
     }
 

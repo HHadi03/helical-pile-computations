@@ -1,8 +1,7 @@
 "use server"
 import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
-import { TsoilCalculationsSchema } from "@/schemas/soilSchemas"
-import { calculateResultsForFineSoil, calculateResultsForSoils } from "@/lib/equations"
+import { calculateResultsForFineSoil, calculateResultsForSoils, calculateResultsForFineSoilCPT, calculateResultsForSoilsCPT } from "@/lib/equations"
 
 export async function deleteSoil(id: string, name: string, profileId: string) {
 
@@ -28,7 +27,7 @@ export async function deleteSoil(id: string, name: string, profileId: string) {
 
     const {data: proceedingSoilData, error: proceedingSoilError} = await supabase
     .from("soils")
-    .select("end_depth, y_moist, y_sat, n_value, soil_type")
+    .select("end_depth, y_moist, y_sat, n_value, soil_type, test_type, qs, qc, kc, ks, nk, nc, a")
     .eq("id", proceedingSoil.id)
     .single()
     
@@ -36,24 +35,40 @@ export async function deleteSoil(id: string, name: string, profileId: string) {
       return { message: `Failed to delete ${name}, please try again later.`, errors: {}}
     }
 
-    const fullObject = {
-      ...proceedingSoil,
+    let fullObject = {
       start_depth: profileSoils[currentSoilIndex].start_depth,
       ...proceedingSoilData,
     }
 
-    let dataToSubmit: TsoilCalculationsSchema
-    if (proceedingSoilData.soil_type === "fine") {
-      dataToSubmit = {...fullObject, ...await calculateResultsForFineSoil(fullObject, profileId)}
+    if (proceedingSoilData.test_type === "spt") {
+      if (proceedingSoilData.soil_type === "fine") {
+        fullObject = {...fullObject, ...await calculateResultsForFineSoil(fullObject, profileId)}
+      }
+
+      else {
+        fullObject = {...fullObject, ...await calculateResultsForSoils(fullObject, profileId)}
+      }
     }
 
     else {
-      dataToSubmit = {...fullObject, ...await calculateResultsForSoils(fullObject, profileId)}
+      if (proceedingSoilData.soil_type === "fine") {
+        const calculatedResults = await calculateResultsForFineSoilCPT(fullObject, profileId)
+
+        if (calculatedResults.su < 0) {
+          return { message: `Unable to delete soil layer as proceeding layer has negative results, please modify its parameters.`, errors: {}}
+        }
+
+        fullObject = { ...fullObject, ...calculatedResults }
+      }
+
+      else {
+        fullObject = {...fullObject, ...await calculateResultsForSoilsCPT(fullObject, profileId)}
+      }
     }
 
     const { error: proceedingSoilSubmitError } = await supabase
     .from('soils')
-    .update(dataToSubmit)
+    .update(fullObject)
     .eq('id', proceedingSoil.id)
 
     if (proceedingSoilSubmitError){

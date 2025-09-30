@@ -198,8 +198,8 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
                           <TableHead>Soil Name</TableHead>
                           <TableHead>Start Depth</TableHead>
                           <TableHead>End Depth</TableHead>
-                          <TableHead>Sat Unit Weight</TableHead>
-                          <TableHead>Moist Unit Weight</TableHead>
+                          <TableHead>Sat Weight</TableHead>
+                          <TableHead>Moist Weight</TableHead>
                           <TableHead>SPT N-Value</TableHead>
                           <TableHead className='hidden 2xl:table-cell'>Description</TableHead>
                           <TableHead></TableHead>
@@ -211,13 +211,13 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
                             <TableCell>{index + 1}</TableCell>
                             <TableCell>{soilTypeCapitalisation[soil.soil_type]}</TableCell>
                             <TableCell>{soilDensityCapitalisation[soil.density]}</TableCell>
-                            <TableCell>{soil.soil_name || soil.soil}</TableCell>
+                            <TableCell className='truncate max-w-[120px]'>{soil.soil_name || soil.soil}</TableCell>
                             <TableCell>{`${soil.start_depth} m`}</TableCell>
                             <TableCell>{`${soil.end_depth} m`}</TableCell>
                             <TableCell>{`${soil.y_sat} kN/m³`}</TableCell>
                             <TableCell>{`${soil.y_moist} kN/m³`}</TableCell>
-                            <TableCell>{soil.n_value}</TableCell>        
-                            <TableCell className='hidden 2xl:table-cell'>{soil.description}</TableCell>
+                            <TableCell>{soil.test_type === "spt" ? soil.n_value : '—'}</TableCell>
+                            <TableCell className='hidden 2xl:table-cell'>{soil.description ? soil.description : 'N/A'}</TableCell>
                             <TableCell className="text-right">
                               <DropdownMenu>
                                 

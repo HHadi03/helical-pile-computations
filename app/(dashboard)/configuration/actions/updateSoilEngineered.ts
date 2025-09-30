@@ -2,49 +2,43 @@
 import { TeditSoilEngineeredSchema } from "@/schemas/soilSchemas"
 import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
-import { calculateSoilHeight } from "@/lib/equations"
-import { roundToTwoDecimals } from "@/lib/utils"
+import { roundToTwoDecimals, calculateSoilHeight, roundToOneDecimal } from "@/lib/utils"
+import { pileDiameter60, pileDiameter100, pileAreaDiameter60, pileAreaDiameter100 } from "@/lib/equations"
 
 type SoilWithCalculations = TeditSoilEngineeredSchema & {
   bearing_capacity60: number
   bearing_capacity100: number
-  shaft_capacity60?: number
-  shaft_capacity100?: number
-  ko?: number
-  t?: number | null  
+  shaft_capacity60: number
+  shaft_capacity100: number
 }
 
 type DirtyFields = Partial<Record<keyof TeditSoilEngineeredSchema, boolean>>
 
-const pileDiameter60 = 0.1884
-const pileDiameter100 = 0.314
-const pileAreaDiameter60 = 0.001223
-const pileAreaDiameter100 = 0.002463
-
 export async function updateSoilEngineered(soil: TeditSoilEngineeredSchema, soilId: string, dirtyFields: DirtyFields = {}) {
+  
   const supabase = await createClient()
-
-  const { data: soilData, error: soilError } = await supabase
+  const { data, error } = await supabase
   .from('soils')
-  .select("soil, soil_name, soil_profile_id, start_depth, end_depth, po, h")
+  .select(`soil, soil_name, start_depth, end_depth, po, soil_profile_id`)
   .eq('id', soilId)
   .single()
 
-  if (soilError) {
-    return { message: `Failed to fetch soil layer.`, errors: {}}
+  if (error) {
+    return { message: `Failed to fetch neccessary soil data, please try again later.`, errors: {}}
   }
 
-  const { data: pileData, error: pileError } = await supabase
+  const { data: pileLength, error: pileLengthError } = await supabase
   .from('soil_profiles')
-  .select("effective_pile_length")
-  .eq('id', soilData.soil_profile_id)
+  .select(`effective_pile_length`)
+  .eq('id', data.soil_profile_id)
   .single()
-
-  if (pileError) {
-    return { message: `Failed to fetch pile data.`, errors: {}}
+  
+  if (pileLengthError) {
+    return { message: `Failed to fetch effective pile length, please try again later.`, errors: {}}
   }
 
-  const soilHeight = calculateSoilHeight(soilData.start_depth, soilData.end_depth, soilData.h, pileData.effective_pile_length)
+  const h = roundToOneDecimal(data.end_depth - data.start_depth)
+  const soilHeight = calculateSoilHeight(data.start_depth, data.end_depth, h, pileLength.effective_pile_length)
 
   const updatePayload: Partial<SoilWithCalculations> = { ...soil }
   if (soilHeight > 0) {
@@ -61,9 +55,8 @@ export async function updateSoilEngineered(soil: TeditSoilEngineeredSchema, soil
       } 
       
       else if (dirtyFields.angle) {
-        const Ko = 0.09 * Math.exp(0.08 * soil.angle!)
-        const newT = Ko * soilData.po * Math.tan(soil.angle! * (Math.PI / 180))
-        updatePayload.ko = roundToTwoDecimals(Ko)
+        const Ko = roundToTwoDecimals(0.09 * Math.exp(0.08 * soil.angle!))
+        const newT = roundToTwoDecimals(Ko * data.po * Math.tan(soil.angle! * (Math.PI / 180)))
         updatePayload.t = roundToTwoDecimals(newT)
         updatePayload.shaft_capacity60 = roundToTwoDecimals(newT * soilHeight * pileDiameter60)
         updatePayload.shaft_capacity100 = roundToTwoDecimals(newT * soilHeight * pileDiameter100)
@@ -85,7 +78,7 @@ export async function updateSoilEngineered(soil: TeditSoilEngineeredSchema, soil
     updatePayload.shaft_capacity60 = 0
     updatePayload.shaft_capacity100 = 0
   }
-
+  
   try {
     const { error } = await supabase
     .from('soils')
@@ -93,14 +86,14 @@ export async function updateSoilEngineered(soil: TeditSoilEngineeredSchema, soil
     .eq('id', soilId)
     
     if (error) {
-      return { message: `Failed to edit ${soilData.soil_name ? soilData.soil_name: soilData.soil}, please try again later.`, errors: {}}
+      return { message: `Failed to edit ${data.soil_name ? data.soil_name: data.soil}, please try again later.`, errors: {}}
     }
 
     revalidatePath('/configuration')
-    return { message: `${soilData.soil_name ? soilData.soil_name: soilData.soil} has been successfully edited` }
+    return { message: `${data.soil_name ? data.soil_name: data.soil} has been successfully edited` }
   } 
   
   catch {
-    return { message: `Failed to edit ${soilData.soil_name ? soilData.soil_name: soilData.soil}, please try again later.`, errors: {}}
+    return { message: `Failed to edit ${data.soil_name ? data.soil_name: data.soil}, please try again later.`, errors: {}}
   }
 }

@@ -6,12 +6,15 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { useRouter } from "next/navigation"
 import { NumberInput } from "@/components/NumberInput"
-import { Loader2 } from "lucide-react"
+import { Loader2, RotateCcw } from "lucide-react"
 import { toast } from "sonner"
 import { editSoilEngineeredSchema, TeditSoilEngineeredSchema } from "@/schemas/soilSchemas"
+import { recalculateResults } from "../../actions/recalculateResults"
+import { useState } from "react"
 
 export function EditSoilEngineered({ soil, soilId }: { soil: TeditSoilEngineeredSchema, soilId: string }) {
   const router = useRouter()
+  const [isRecalculating, setIsRecalculating] = useState(false)
 
   const form = useForm({
     resolver: zodResolver(editSoilEngineeredSchema),
@@ -28,6 +31,38 @@ export function EditSoilEngineered({ soil, soilId }: { soil: TeditSoilEngineered
     }
   }
 
+  const handleRecalculate = async () => {
+    setIsRecalculating(true)
+    
+    try {
+      const result = await recalculateResults(soilId, soil.test_type, soil.soil_type)
+      
+      if (result.errors || !result.data) {
+        throw new Error()
+      }
+      
+      if (result.data.soilType === "fine") {
+        form.setValue('su', result.data.su, { shouldDirty: true })
+        form.setValue('qult', result.data.qult, { shouldDirty: true })
+      } 
+      
+      else {
+        if (result.data.testType === "spt") {
+          form.setValue('angle', result.data.angle, { shouldDirty: true })
+        }
+
+        form.setValue('t', result.data.t, { shouldDirty: true })
+        form.setValue('qult', result.data.qult, { shouldDirty: true })
+      }
+
+    } catch {
+      toast.error("Failed to recalculate values", { description: "Please try again later." })
+
+    } finally {
+      setIsRecalculating(false)
+    }
+  }
+  
   async function onSubmit(values: TeditSoilEngineeredSchema) {
     try {
       const result = await updateSoilEngineered(values, soilId, dirtyFields)
@@ -50,7 +85,7 @@ export function EditSoilEngineered({ soil, soilId }: { soil: TeditSoilEngineered
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
         <div className="space-y-6 border-y-2 py-3">
-          {soil.soil_type === "fine" ? (
+          {soil.soil_type === "fine" && (
             <FormField
               control={form.control}
               name="su"
@@ -64,21 +99,25 @@ export function EditSoilEngineered({ soil, soilId }: { soil: TeditSoilEngineered
                 </FormItem>
               )}
             />
-          ) : (
+          )}
+
+          {soil.soil_type !== "fine" && (
             <>
-              <FormField
-                control={form.control}
-                name="angle"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Angle of Internal Friction <span className="font-semibold -ml-1">(°)</span></FormLabel>
-                    <FormControl>
-                      <NumberInput field={field} placeholder="0" className="text-sm"/>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {soil.test_type === "spt" && (
+                <FormField
+                  control={form.control}
+                  name="angle"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Angle of Internal Friction <span className="font-semibold -ml-1">(°)</span></FormLabel>
+                      <FormControl>
+                        <NumberInput field={field} placeholder="0" className="text-sm"/>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <FormField
                 control={form.control}
@@ -95,7 +134,7 @@ export function EditSoilEngineered({ soil, soilId }: { soil: TeditSoilEngineered
               />
             </>
           )}
-
+          
           <FormField
             control={form.control}
             name="qult"
@@ -109,11 +148,15 @@ export function EditSoilEngineered({ soil, soilId }: { soil: TeditSoilEngineered
               </FormItem>
             )}
           />
+
+          <Button type="button" variant="outline" className="w-full" onClick={handleRecalculate} disabled={isSubmitting || !isDirty || isRecalculating}>
+            {isRecalculating ? <><Loader2 className="animate-spin size-5 text-destructive"/>Reset</> : <><RotateCcw className="size-5 text-destructive"/>Reset</>}
+          </Button>
         </div>
 
-        <div className="pt-2 flex justify-between">
-          <Button type="button" variant="outline" disabled={isSubmitting} onClick={handleClose}>Close</Button>
-          <Button type="submit" className="w-28" disabled={!isDirty || isSubmitting}>{isSubmitting ? (<><Loader2 className="size-5 animate-spin" />Saving...</>) : ("Save")}</Button>
+        <div className="pt-2 flex justify-end gap-2">
+          <Button type="button" className="w-18" variant="outline" disabled={isSubmitting} onClick={handleClose}>Cancel</Button>
+          <Button type="submit" className="w-28" disabled={!isDirty || isSubmitting || isRecalculating}>{isSubmitting ? (<><Loader2 className="size-5 animate-spin" />Saving...</>) : ("Save")}</Button>
         </div>
       </form>
     </Form>

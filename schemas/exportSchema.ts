@@ -14,6 +14,8 @@ export const exportFormSchema = z.object({
   variable_actions: z.coerce.number().optional(),
   structure_rigid: z.boolean().optional(),
   use_characteristic: z.boolean().optional(),
+  standardTension: z.coerce.number().optional(),
+  standardCompression: z.coerce.number().optional(),
   number_of_tests: z.coerce.number().optional(),
   mean_tensile_rcm: z.coerce.number().optional(),
   min_tensile_rcm: z.coerce.number().optional(),
@@ -44,7 +46,9 @@ export const exportFormSchema = z.object({
   nl_safety_factor_compression_yG: z.coerce.number(),
   nl_safety_factor_compression_yQ: z.coerce.number(),
   nl_safety_factor_compression_yT: z.coerce.number()
-}).refine(
+})
+
+.refine(
   (data) => data.additional_information === undefined || data.additional_information.length <= 200,
   {
     path: ["additional_information"],

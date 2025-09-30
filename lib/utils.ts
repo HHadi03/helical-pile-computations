@@ -28,4 +28,21 @@ export function roundToTwoDecimals (value: number): number {
   return Math.round(value * 100) / 100
 }
 
+export function roundToOneDecimal (value: number): number {
+  return Math.round(value * 10) / 10
+}
+
+export function calculateSoilHeight(start_depth: number, end_depth: number, h: number, effective_pile_length: number): number {
+  if (end_depth <= effective_pile_length) {
+    return roundToOneDecimal(h)
+  } 
+  
+  else if (start_depth < effective_pile_length) {
+    return roundToOneDecimal(effective_pile_length - start_depth)
+  } 
+  
+  else {
+    return 0
+  }
+}
 

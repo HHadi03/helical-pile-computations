@@ -13,7 +13,7 @@ export default async function EditSoilParametersPage({params}:{params: Promise<{
   const { id } =  await params
   const { data: soilData, error: soilError } = await supabase
   .from('soils')
-  .select("start_depth, end_depth, y_moist, y_sat, n_value, soil, soil_name, soil_type, soil_profile_id")
+  .select("start_depth, end_depth, y_moist, y_sat, n_value, soil, soil_name, soil_type, soil_profile_id, test_type, qs, qc, kc, ks, nk, nc, a")
   .eq('id', id)
   .single()
 

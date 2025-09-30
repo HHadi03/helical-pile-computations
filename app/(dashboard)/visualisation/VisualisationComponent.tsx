@@ -1,9 +1,9 @@
 "use client"
-import { TconfigSoilProfileSchema, TselectionsSoilProfileSchema } from "@/schemas/soilProfileSchemas"
+import { TconfigSoilProfileSchema, TvisualisationSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { TvisualisationSoilSchema } from "@/schemas/soilSchemas"
 import { useState, useEffect } from "react" 
 import { createClient } from "@/utils/supabase/client"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend } from "recharts"
+import { LineChart, Tooltip as RechartsTooltip, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend } from "recharts"
 import { useTheme } from "next-themes"
 import { Toggle } from "@/components/ui/toggle"
 import { MoveUp, Download, RotateCcw, SquarePen, Loader2 } from "lucide-react"
@@ -20,9 +20,10 @@ import { Slider } from "@/components/ui/slider"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { ChromePicker } from "react-color"
 import html2canvas from 'html2canvas-pro'
+import { roundToTwoDecimals } from "@/lib/utils"
 
 type ChartDataItem = {
-  selection: TselectionsSoilProfileSchema & { selection_name: string }
+  selection: TvisualisationSoilProfileSchema & { selection_name: string }
   soilsData: TvisualisationSoilSchema[]
 }
 
@@ -31,7 +32,7 @@ type ChartDataPoint = {
   [key: string]: number
 }
 
-export function VisualisationComponent({ profilesData, selectionsData }: { profilesData: TconfigSoilProfileSchema[], selectionsData: TselectionsSoilProfileSchema[] }) {
+export function VisualisationComponent({ profilesData, selectionsData }: { profilesData: TconfigSoilProfileSchema[], selectionsData: TvisualisationSoilProfileSchema[] }) {
   const [isFetchingData, setIsFetchingData] = useState(false)
   const [chartData, setChartData] = useState<ChartDataItem[]>([])
   const [hideBearingCapacity, setHideBearingCapacity] = useState(false)
@@ -90,7 +91,7 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
           const selectFields = selection.pile_diameter === 60 ? "end_depth, shaft_capacity60, bearing_capacity60" : "end_depth, shaft_capacity100, bearing_capacity100"
           const capacityField = selection.pile_diameter === 60 ? "shaft_capacity60" : "shaft_capacity100"
           
-            const supabase = createClient()
+          const supabase = createClient()
           const { data, error } = await supabase
           .from("soils")
           .select(selectFields)
@@ -138,7 +139,7 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
     const shaftCapacityKey = selection.pile_diameter === 60 ? 'shaft_capacity60' : 'shaft_capacity100'
     const bearingCapacity = selection.pile_diameter === 60 ? soilsData[soilsData.length - 1].bearing_capacity60 : soilsData[soilsData.length - 1].bearing_capacity100
 
-    const cumulativeData = soilsData.reduce((accumulator, soil, index) => {
+    const baseChartData = soilsData.reduce((accumulator, soil, index) => {
       const prevShaft = index === 0 ? 0 : accumulator[index - 1][shaftCapacityKey]
       const cumulativeShaft = prevShaft + soil[shaftCapacityKey]!
       
@@ -150,15 +151,50 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
       return accumulator
     }, [] as ChartDataPoint[])
 
-    const lastCumulativeDataSoil = cumulativeData[cumulativeData.length - 1]
-
-    if (!hideBearingCapacity) {
-      lastCumulativeDataSoil[shaftCapacityKey] = lastCumulativeDataSoil[shaftCapacityKey]! += bearingCapacity!
+    const lastBaseChartEntry = baseChartData[baseChartData.length - 1]
+    if (!hideBearingCapacity) {lastBaseChartEntry[shaftCapacityKey] = lastBaseChartEntry[shaftCapacityKey] += bearingCapacity!}
+    lastBaseChartEntry[shaftCapacityKey] = roundToTwoDecimals(lastBaseChartEntry[shaftCapacityKey])
+    
+    const interpolateCapacity = (targetDepth: number): number => {
+      for (let i = 0; i < baseChartData.length; i++) {
+        const currentLayer = baseChartData[i]
+        
+        const prevDepth = i === 0 ? 0 : baseChartData[i - 1].end_depth
+        const prevCapacity = i === 0 ? 0 : baseChartData[i - 1][shaftCapacityKey]
+        
+        if (targetDepth <= currentLayer.end_depth) {
+          const depthRange = currentLayer.end_depth - prevDepth
+          const capacityRange = currentLayer[shaftCapacityKey] - prevCapacity
+          const progress = (targetDepth - prevDepth) / depthRange
+          
+          return prevCapacity + (capacityRange * progress)
+        }
+      }
+      
+      return lastBaseChartEntry[shaftCapacityKey]
     }
 
-    lastCumulativeDataSoil[shaftCapacityKey] = Math.round(lastCumulativeDataSoil[shaftCapacityKey] * 100) / 100
+    const createDenseChartData = () => {
+      const denseData = []
+      const step = 0.1 
+      
+      denseData.push({ end_depth: 0, [shaftCapacityKey]: 0 })
+
+      const maxDepth = lastBaseChartEntry.end_depth
+
+      let i = 1
+      while (i * step < maxDepth) {
+        const depth = roundToTwoDecimals(i * step)
+        denseData.push({ end_depth: depth, [shaftCapacityKey]: roundToTwoDecimals(interpolateCapacity(depth)) })
+        i++
+      }
+
+      denseData.push({ end_depth: roundToTwoDecimals(maxDepth), [shaftCapacityKey]: roundToTwoDecimals(interpolateCapacity(maxDepth)) })
+
+      return denseData
+    }
     
-    cumulativeData.unshift({ end_depth: 0, [shaftCapacityKey]: 0 })
+    const cumulativeData = createDenseChartData()
 
     return {
       selection,
@@ -187,11 +223,6 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
       return dataPoint
     })
   })()
-
-  const handleReset = async () => {
-    setActiveAction("reset")
-    await resetSelections()
-  }
 
   //edit selection handlers
   const editSelections = () => {
@@ -258,63 +289,32 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
     try {
       const element = document.getElementById("VisualisationGraph")
       
-      if (!element) {throw Error}
+      if (!element) {throw Error()}
 
-      // Capture the element with html2canvas
       const canvas = await html2canvas(element, {
-        backgroundColor: '#ffffff', // Force white background
-        scale: 2, // Higher resolution (2x)
-        useCORS: true, // Allow cross-origin images if any
-        logging: false, // Disable console logs
-        width: element.offsetWidth,
-        height: element.offsetHeight,
-        onclone: (clonedDoc) => {
-          // Force light theme styling on the cloned document
-          const chartElement = clonedDoc.getElementById("VisualisationGraph");
-          if (chartElement) {
-            // Add light theme class or data attribute to force light styling
-            chartElement.setAttribute('data-theme', 'light');
-            
-            // Override any dark theme styles by adding inline styles
-            const style = clonedDoc.createElement('style');
-            style.textContent = `
-              #VisualisationGraph * {
-                color: #000000 !important;
-                fill: #000000 !important;
-              }
-              #VisualisationGraph [stroke] {
-                stroke: #666666 !important;
-              }
-              #VisualisationGraph .recharts-cartesian-grid line {
-                stroke: #e0e0e0 !important;
-              }
-              #VisualisationGraph .recharts-text {
-                fill: #333333 !important;
-              }
-            `;
-            clonedDoc.head.appendChild(style);
-          }
-        }
-      });
+        scale: 2,
+        backgroundColor: resolvedTheme === "dark" ? "#11111a" : "#ffffff",
+        logging: false, 
+        x: -20,  
+        y: -20,  
+        width: element.offsetWidth + 40,  
+        height: element.offsetHeight + 40, 
+      })
 
-      // Convert canvas to blob
       canvas.toBlob((blob) => {
         if (blob) {
-          // Create download link
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = `chart-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.png`;
+          const url = URL.createObjectURL(blob)
+          const link = document.createElement('a')
+          link.href = url
+          link.download = "pile-capacity-chart.png"
           
-          // Trigger download
-          document.body.appendChild(link);
-          link.click();
+          document.body.appendChild(link)
+          link.click()
           
-          // Cleanup
-          document.body.removeChild(link);
-          URL.revokeObjectURL(url);
+          document.body.removeChild(link)
+          URL.revokeObjectURL(url)
         }
-      }, 'image/png', 1.0); // PNG format with max quality
+      }, 'image/png', 1.0)
 
     } catch {
       toast.error("An unexpected error has occurred.", { description: "Please try again later." })
@@ -324,8 +324,9 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
     }
   }
 
-  const handleHover = () => {
-    console.log("DOT HOVERED")
+  const handleReset = async () => {
+    setActiveAction("reset")
+    await resetSelections()
   }
 
   if (isFetchingData) {
@@ -370,9 +371,9 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
 
               <YAxis
                 dataKey="end_depth" 
-                domain={[0, 'dataMax']}
+                domain={['dataMin', 'dataMax']}
                 type="number"
-                label={{ fill: resolvedTheme === 'dark' ? "oklch(0.985 0.002 247.839)" : "oklch(0.13 0.028 261.692)", value: 'Depth / m', angle: -90, position: 'insideLeft', offset: 20, fontSize: '0.875rem', letterSpacing: '0.05em' }}
+                label={{ fill: resolvedTheme === 'dark' ? "oklch(0.985 0.002 247.839)" : "oklch(0.13 0.028 261.692)", value: 'Pile Depth (m)', angle: -91, position: 'insideLeft', offset: 15, fontSize: '0.875rem' }}
                 tick={{ fontSize: '0.875rem', fill: resolvedTheme === 'dark' ? "oklch(0.707 0.022 261.325)" : "oklch(0.551 0.027 264.364)" }}
                 axisLine={{ stroke: resolvedTheme === 'dark' ? "oklch(0.92 0.00 49)" : "oklch(0.56 0.00 0)", strokeWidth: 2, strokeOpacity: 0.8}}
                 tickLine={{ stroke: resolvedTheme === 'dark' ? "oklch(0.707 0.022 261.325)" : "oklch(0.551 0.027 264.364)", strokeWidth: 0.5}}
@@ -380,8 +381,8 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
 
               <XAxis
                 type="number"
-                domain={[0, 'dataMax']}
-                label={{ fill: resolvedTheme === 'dark' ? "oklch(0.985 0.002 247.839)" : "oklch(0.13 0.028 261.692)", value: 'Capacity / kN', position: 'insideBottom', offset: -10, fontSize: '0.875rem' }}
+                domain={['dataMin', 'dataMax']}
+                label={{ fill: resolvedTheme === 'dark' ? "oklch(0.985 0.002 247.839)" : "oklch(0.13 0.028 261.692)", value: 'Pile Capacity (kN)', position: 'insideBottom', offset: -10, fontSize: '0.875rem' }}
                 tick={{ fontSize: '0.875rem', fill: resolvedTheme === 'dark' ? "oklch(0.707 0.022 261.325)" : "oklch(0.551 0.027 264.364)" }}
                 axisLine={{ stroke: resolvedTheme === 'dark' ? "oklch(0.92 0.00 49)" : "oklch(0.56 0.00 0)", strokeWidth: 2, strokeOpacity: 0.8}}
                 tickLine={{ stroke: resolvedTheme === 'dark' ? "oklch(0.707 0.022 261.325)" : "oklch(0.551 0.027 264.364)", strokeWidth: 0.5}}
@@ -390,15 +391,36 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
               {transformedChartData.map((item) => (
                 <Line 
                   key={item.selection.id}
-                  type={"monotone"}
+                  type={"linear"}
                   dataKey={item.selection.id}
                   stroke={item.selection.colour}
                   strokeWidth={item.selection.stroke_width}
-                  animationDuration={1000}
+                  animationDuration={1200}
                   name={item.selection.selection_name}
-                  activeDot={{r: 6, onMouseOver: handleHover }}
+                  activeDot={{ r: 4 }}
+                  dot={false}
                 />
               ))}
+
+              <RechartsTooltip
+                cursor={{ stroke: "oklch(0.55 0.04 257)", strokeWidth: 1 }}
+                content={({ active, payload }) => {
+                  if (!active || !payload?.length) return null
+                  const { end_depth } = payload[0].payload
+                  return (
+                    <div className="bg-secondary text-primary p-3 rounded border border-foreground/30 text-sm">
+                      {payload.map((entry, idx) => (
+                        <div key={idx} style={{ color: entry.color }}>
+                          <span className="font-semibold">Pile Capacity:</span> {entry.value.toFixed(2)} kN
+                        </div>
+                      ))}
+                      <div className="mt-1 pt-1 border-t">
+                        <span className="font-semibold">Pile Depth:</span> {end_depth} m
+                      </div>
+                    </div>
+                  )
+                }}
+              />
 
               {chartDisplayData.length === 0 && (
                 <text x="50%" y="50%" textAnchor="middle" fill={resolvedTheme === 'dark' ? "oklch(0.985 0.002 247.839)" : "oklch(0.13 0.028 261.692)"} className="text-sm">
@@ -455,7 +477,7 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
       <AlertDialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Edit Visualisation Selections</AlertDialogTitle>
+            <AlertDialogTitle>Edit Selections</AlertDialogTitle>
             <AlertDialogDescription>
               Modify your current selections line colour and width.
             </AlertDialogDescription>
