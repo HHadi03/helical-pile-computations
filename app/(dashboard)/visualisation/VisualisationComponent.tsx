@@ -333,7 +333,8 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
     return (
       <div className="flex flex-col md:flex-row max-w-5xl mx-auto gap-5">
         <div className="flex-auto h-140 border-2 p-5 relative">
-          <Skeleton className="size-[90%] ml-15 mt-5"/>
+          <Skeleton className="h-4 w-auto mx-10"/>
+          <Skeleton className="absolute inset-15"/>
           <Skeleton className="h-4 w-18 absolute left-2 top-1/2 -translate-y-1/2 -rotate-90"/>
           <Skeleton className="h-4 w-30 absolute left-1/2 -translate-x-1/2 bottom-5"/>  
         </div>
