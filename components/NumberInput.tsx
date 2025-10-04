@@ -35,6 +35,7 @@ export const SafetyNumberInput = <T extends FieldValues, K extends Path<T>>({fie
       onPaste={(e) => e.preventDefault()}
       onChange={(e) => {const value = e.target.value; if (/^\d{0,5}(\.\d{0,2})?$/.test(value)) {field.onChange(value)}}}
       placeholder={placeholder}
+      className="text-base sm:text-sm"
     />
   )
 }

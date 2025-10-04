@@ -196,7 +196,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                   <FormItem>
                     <FormLabel>Description <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                     <FormControl>
-                      <Input type="text" placeholder="Brief description of the soils composition" {...field} className="text-sm"/>
+                      <Input type="text" placeholder="Brief description of the soils composition" {...field}/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -211,7 +211,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                     <FormItem className="flex-1">
                       <FormLabel>Soil Name <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                       <FormControl>
-                        <Input type="text" placeholder="Custom label for soil layer" {...field} className="text-sm"/>
+                        <Input type="text" placeholder="Custom label for soil layer" {...field}/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -258,7 +258,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                     <FormItem className="sm:w-27">
                       <FormLabel>Start Depth <span className="font-semibold -ml-1">(m)</span></FormLabel>
                       <FormControl>
-                        <NumberInput field={field} placeholder="0" disabled className="text-sm font-semibold"/>
+                        <NumberInput field={field} placeholder="0" disabled className="font-semibold"/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -272,7 +272,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                     <FormItem className="flex-1">
                       <FormLabel>End Depth <span className="font-semibold -ml-1">(m)</span></FormLabel>
                       <FormControl>
-                        <NumberInput field={field} placeholder="0" className="text-sm"/>
+                        <NumberInput field={field} placeholder="0"/>
                       </FormControl>
                       <FormMessage/>
                     </FormItem>
@@ -287,7 +287,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                   <FormItem>
                     <FormLabel>Moist Weight <span className="font-semibold -ml-1">(kN/m³)</span></FormLabel>  
                     <FormControl>
-                      <NumberInput field={field} placeholder="0" className="text-sm"/>
+                      <NumberInput field={field} placeholder="0"/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -301,7 +301,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                   <FormItem>
                     <FormLabel>Saturated Weight <span className="font-semibold -ml-1">(kN/m³)</span></FormLabel>
                     <FormControl>
-                      <NumberInput field={field} placeholder="0" className="text-sm"/>
+                      <NumberInput field={field} placeholder="0"/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
