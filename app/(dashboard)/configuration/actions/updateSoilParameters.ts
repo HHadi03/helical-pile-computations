@@ -65,7 +65,7 @@ export async function updateSoilParameters(soil: TeditSoilParametersSchema, soil
         if (proceedingSoilData.soil_type === "fine") {
           const calculatedResults = await calculateResultsForFineSoilCPT(fullObject, soil.soil_profile_id)
 
-          if (calculatedResults.su < 0) {
+          if (calculatedResults.su < 1) {
             return { 
               message: `Unable to modify end depth as proceeding layer has negative results, please modify its parameters.`,
               errors: { end_depth: ["End depth change leads to negative results"] }
@@ -105,7 +105,7 @@ export async function updateSoilParameters(soil: TeditSoilParametersSchema, soil
     if (soil.soil_type === "fine") {
       const calculatedResults = await calculateResultsForFineSoilCPT(soil, soil.soil_profile_id)
 
-      if (calculatedResults.su < 0) {
+      if (calculatedResults.su < 1) {
         return { 
           message: `Cone tip resistance value is too low, leading to negative results.`, 
           errors: { qc: [`Cone tip resistance value is too low`] }

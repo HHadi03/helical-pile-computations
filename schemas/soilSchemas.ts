@@ -1,7 +1,7 @@
 import { roundToOneDecimal } from "@/lib/utils"
 import * as z from "zod"
 
-//configuration page schema
+//configuration soil schema
 export const configSoilSchema = z.object({
   id: z.uuid(),
   soil_profile_id: z.uuid(),
@@ -20,7 +20,7 @@ export const configSoilSchema = z.object({
 export type TconfigSoilSchema = z.infer<typeof configSoilSchema>
 
 
-//overview page schema
+//overview soil schema
 export const overviewSoilSchema = z.object({
   id: z.uuid(),
   soil_profile_id: z.uuid(),
@@ -45,7 +45,31 @@ export const overviewSoilSchema = z.object({
 export type ToverviewSoilSchema = z.infer<typeof overviewSoilSchema>
 
 
-//visualisation page schema
+//export soil schema
+export const exportSoilSchema = z.object({
+  id: z.uuid(),
+  soil: z.string(),
+  soil_name: z.string().optional(),
+  description: z.string().optional(),
+  soil_type: z.enum(["coarse", "fine", "manmade"]),
+  colour: z.string(),
+  start_depth: z.number(),
+  end_depth: z.number(),
+  test_type: z.string(),
+  n_value: z.number(),
+  y_moist: z.number(),
+  y_sat: z.number(),
+  su: z.number(),
+  t: z.number(),
+  shaft_capacity60: z.number(),
+  shaft_capacity100: z.number(),
+  bearing_capacity60: z.number(),
+  bearing_capacity100: z.number(),
+})
+export type TexportSoilSchema = z.infer<typeof exportSoilSchema>
+
+
+//visualisation soil schema
 export const visualisationSoilSchema = z.object({
   end_depth: z.number(),
   shaft_capacity60: z.number().optional(),

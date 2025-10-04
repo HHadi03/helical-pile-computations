@@ -42,7 +42,7 @@ export function EditSoilParameters({ soil, soilId }: { soil: TeditSoilParameters
       const result = await updateSoilParameters(values, soilId, dirtyFields)
 
       if (result.errors) {
-        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TeditSoilParametersSchema, {message: Array.isArray(value) ? value[0] : String(value)})})
+        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TeditSoilParametersSchema, {message: value[0]})})
         toast.error(result.message)
       } 
       
@@ -68,7 +68,7 @@ export function EditSoilParameters({ soil, soilId }: { soil: TeditSoilParameters
                 <FormItem className="sm:w-27">
                   <FormLabel>Start Depth <span className="font-semibold -ml-1">(m)</span></FormLabel>
                   <FormControl>
-                    <NumberInput field={field} placeholder="0" disabled className="text-sm"/>
+                    <NumberInput field={field} placeholder="0" disabled className="text-sm font-semibold"/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -119,7 +119,7 @@ export function EditSoilParameters({ soil, soilId }: { soil: TeditSoilParameters
           />
 
           <p className="text-sm leading-none mb-1.5 ml-1">Soil Test Method</p>
-          <div className="border rounded-sm p-2 space-y-4">
+          <div className="border border-input rounded-sm p-2 space-y-4">
             <FormField
               control={form.control}
               name="test_type"
@@ -197,7 +197,7 @@ export function EditSoilParameters({ soil, soilId }: { soil: TeditSoilParameters
                           <FormItem className="flex-1">
                             <FormLabel className="text-xs -mb-1.5">Cone Factor</FormLabel>
                             <FormControl>
-                              <NumberInput field={field} placeholder="0" className="text-sm"/>
+                              <NumberInput field={field} placeholder="15" className="text-sm"/>
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -211,7 +211,7 @@ export function EditSoilParameters({ soil, soilId }: { soil: TeditSoilParameters
                           <FormItem className="flex-1">
                             <FormLabel className="text-xs -mb-1.5">Capacity Factor</FormLabel>
                             <FormControl>
-                              <NumberInput field={field} placeholder="0" className="text-sm"/>
+                              <NumberInput field={field} placeholder="7" className="text-sm"/>
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -225,7 +225,7 @@ export function EditSoilParameters({ soil, soilId }: { soil: TeditSoilParameters
                           <FormItem className="flex-1">
                             <FormLabel className="text-xs -mb-1.5">Pore Factor</FormLabel>
                             <FormControl>
-                              <NumberInput field={field} placeholder="0" className="text-sm"/>
+                              <NumberInput field={field} placeholder="1" className="text-sm"/>
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -271,7 +271,7 @@ export function EditSoilParameters({ soil, soilId }: { soil: TeditSoilParameters
                           <FormItem className="flex-1">
                             <FormLabel className="text-xs -mb-1.5">Cone Factor</FormLabel>
                             <FormControl>
-                              <NumberInput field={field} placeholder="0" className="text-sm"/>
+                              <NumberInput field={field} placeholder="1" className="text-sm"/>
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -285,7 +285,7 @@ export function EditSoilParameters({ soil, soilId }: { soil: TeditSoilParameters
                           <FormItem className="flex-1">
                             <FormLabel className="text-xs -mb-1.5">Capacity Factor</FormLabel>
                             <FormControl>
-                              <NumberInput field={field} placeholder="0" className="text-sm"/>
+                              <NumberInput field={field} placeholder="0.45" className="text-sm"/>
                             </FormControl>
                             <FormMessage />
                           </FormItem>

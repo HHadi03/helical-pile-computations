@@ -149,8 +149,8 @@ export function EditSoilEngineered({ soil, soilId }: { soil: TeditSoilEngineered
             )}
           />
 
-          <Button type="button" variant="outline" className="w-full" onClick={handleRecalculate} disabled={isSubmitting || !isDirty || isRecalculating}>
-            {isRecalculating ? <><Loader2 className="animate-spin size-5 text-destructive"/>Reset</> : <><RotateCcw className="size-5 text-destructive"/>Reset</>}
+          <Button type="button" variant="outline" className="w-full -mt-1" onClick={handleRecalculate} disabled={isSubmitting || isRecalculating}>
+            {isRecalculating ? <><Loader2 className="animate-spin size-5 text-destructive"/>Restore Defaults</> : <><RotateCcw className="size-5 text-destructive"/>Restore Defaults</>}
           </Button>
         </div>
 

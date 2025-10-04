@@ -38,7 +38,7 @@ export function EditSoilInformation({ soil, soilId }: { soil: TeditSoilInformati
       const result = await updateSoilInformation(values, soilId, dirtyFields)
 
       if (result.errors) {
-        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TeditSoilInformationSchema, {message: Array.isArray(value) ? value[0] : String(value)})})
+        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TeditSoilInformationSchema, {message: value[0]})})
         toast.error(result.message)
       } 
       
@@ -56,50 +56,52 @@ export function EditSoilInformation({ soil, soilId }: { soil: TeditSoilInformati
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
         <div className="space-y-6 border-y-2 py-3">
-          <FormField
-            control={form.control}
-            name="soil_type"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel htmlFor="soil_type">Soil Type</FormLabel>
-                <Select onValueChange={(value) => {field.onChange(value); form.setValue("soil", "")}} defaultValue={field.value} name={field.name}>
-                  <FormControl>
-                    <SelectTrigger className="w-full" id="soil_type">
-                      <SelectValue placeholder="Select type"/>
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="coarse">Coarse Grain</SelectItem>
-                    <SelectItem value="fine">Fine Grain</SelectItem>
-                    <SelectItem value="manmade">Man Made</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
+            <FormField
+              control={form.control}
+              name="soil_type"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel htmlFor="soil_type">Soil Type</FormLabel>
+                  <Select onValueChange={(value) => {field.onChange(value); form.setValue("soil", "")}} defaultValue={field.value} name={field.name}>
+                    <FormControl>
+                      <SelectTrigger className="w-full" id="soil_type">
+                        <SelectValue placeholder="Select type"/>
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="coarse">Coarse Grain</SelectItem>
+                      <SelectItem value="fine">Fine Grain</SelectItem>
+                      <SelectItem value="manmade">Man Made</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage/>
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="density"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel htmlFor="density">Soil Density</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value} name={field.name}>
-                  <FormControl>
-                    <SelectTrigger className="w-full" id="density">
-                      <SelectValue placeholder="Select density"/>
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="loose">Loose</SelectItem>
-                    <SelectItem value="dense">Dense</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="density"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel htmlFor="density">Soil Density</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value} name={field.name}>
+                    <FormControl>
+                      <SelectTrigger className="w-full" id="density">
+                        <SelectValue placeholder="Select density"/>
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="loose">Loose</SelectItem>
+                      <SelectItem value="dense">Dense</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         
           <FormField
             control={form.control}

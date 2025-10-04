@@ -54,7 +54,7 @@ export async function deleteSoil(id: string, name: string, profileId: string) {
       if (proceedingSoilData.soil_type === "fine") {
         const calculatedResults = await calculateResultsForFineSoilCPT(fullObject, profileId)
 
-        if (calculatedResults.su < 0) {
+        if (calculatedResults.su < 1) {
           return { message: `Unable to delete soil layer as proceeding layer has negative results, please modify its parameters.`, errors: {}}
         }
 

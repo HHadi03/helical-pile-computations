@@ -84,7 +84,7 @@ export function VisualisationSelection({ profilesData, initialDialogOpen }: { pr
         <div className="flex flex-col gap-3 border p-3 max-h-86 overflow-y-auto -mt-1">
           <div className="flex items-start gap-2 border-b pb-2">
             <Checkbox id="select-all" checked={selections.size === profilesData.length * pileDiameters.length} onCheckedChange={handleSelectAll}/>
-            <Label htmlFor="select-all">{selections.size === profilesData.length * pileDiameters.length ? "Deselect All" : "Select All"}</Label>
+            <Label htmlFor="select-all">Select All</Label>
           </div>
 
           {profilesData.map((profile, index) => (

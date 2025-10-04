@@ -112,18 +112,33 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
             )
           })}
 
-          <div 
-            className="absolute top-0 z-20 duration-300"
-            style={{
-              top: "-25px",
-              left: "220px",
-              transform: "translateX(-50%)",
-              height: `${pileHeight + 25}px`,
-              width: `${pileDiameter === "60" ? '30px' : '40px'}`, 
-              backgroundImage: `url(/${pileDiameter}mm-pile.png)`,
-              backgroundSize: `${pileDiameter === "60" ? '30px auto' : '40px auto'}`,
-            }}
-          />
+          <>
+            <div 
+              className={`absolute top-0 z-20 ${pileDiameter === "60" ? 'block' : 'hidden'}`}
+              style={{
+                top: "-25px",
+                left: "220px",
+                transform: "translateX(-50%)",
+                height: `${pileHeight + 25}px`,
+                width: '30px',
+                backgroundImage: 'url(/60mm-pile.png)',
+                backgroundSize: '30px',
+              }}
+            />
+            
+            <div 
+              className={`absolute top-0 z-20 ${pileDiameter === "60" ? 'hidden' : 'block'}`}
+              style={{
+                top: "-25px",
+                left: "220px",
+                transform: "translateX(-50%)",
+                height: `${pileHeight + 25}px`,
+                width: '40px',
+                backgroundImage: 'url(/100mm-pile.png)',
+                backgroundSize: '40px',
+              }}
+            />
+          </>
         </div>
         
       </div>

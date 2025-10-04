@@ -45,7 +45,6 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
       a: 1,
       nk: 15,
       nc: 7,
-      test_type: "spt",
     }
   })
   
@@ -121,51 +120,53 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
       
           <TabsContent value="soil" className="focus-visible:ring-transparent">
             <div className="space-y-6 border-y-2 py-3">
-              <FormField
-                control={form.control}
-                name="soil_type"
-                render={({ field }) => (
-                  <FormItem >
-                    <FormLabel htmlFor="soil_type">Soil Type</FormLabel>
-                    <Select onValueChange={(value) => {field.onChange(value); form.setValue("soil", "")}} defaultValue={field.value} name={field.name}>
-                      <FormControl>
-                        <SelectTrigger className="w-full" id="soil_type">
-                          <SelectValue placeholder="Select type"/>
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="coarse">Coarse Grain</SelectItem>
-                        <SelectItem value="fine">Fine Grain</SelectItem>
-                        <SelectItem value="manmade">Man Made</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage/>
-                  </FormItem>
-                )}
-              />
+              <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
+                <FormField
+                  control={form.control}
+                  name="soil_type"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel htmlFor="soil_type">Soil Type</FormLabel>
+                      <Select onValueChange={(value) => {field.onChange(value); form.setValue("soil", "")}} defaultValue={field.value} name={field.name}>
+                        <FormControl>
+                          <SelectTrigger className="w-full" id="soil_type">
+                            <SelectValue placeholder="Select type"/>
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="coarse">Coarse Grain</SelectItem>
+                          <SelectItem value="fine">Fine Grain</SelectItem>
+                          <SelectItem value="manmade">Man Made</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage/>
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="density"
-                render={({ field }) => (
-                  <FormItem >
-                    <FormLabel htmlFor="density">Soil Density</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value} name={field.name}>
-                      <FormControl>
-                        <SelectTrigger className="w-full" id="density">
-                          <SelectValue placeholder="Select density"/>
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="loose">Loose</SelectItem>
-                        <SelectItem value="dense">Dense</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
+                <FormField
+                  control={form.control}
+                  name="density"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel htmlFor="density">Soil Density</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value} name={field.name}>
+                        <FormControl>
+                          <SelectTrigger className="w-full" id="density">
+                            <SelectValue placeholder="Select density"/>
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="loose">Loose</SelectItem>
+                          <SelectItem value="dense">Dense</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
               <FormField
                 control={form.control}
                 name="soil"
@@ -257,7 +258,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                     <FormItem className="sm:w-27">
                       <FormLabel>Start Depth <span className="font-semibold -ml-1">(m)</span></FormLabel>
                       <FormControl>
-                        <NumberInput field={field} placeholder="0" disabled className="text-sm"/>
+                        <NumberInput field={field} placeholder="0" disabled className="text-sm font-semibold"/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -308,7 +309,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
               />
 
               <p className="text-sm leading-none mb-1.5 ml-1">Soil Test Method</p>
-              <div className="border rounded-sm p-2 space-y-4">
+              <div className="border border-input rounded-sm p-2 space-y-4">
                 <FormField
                   control={form.control}
                   name="test_type"
@@ -331,7 +332,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                           </FormItem>
                         </RadioGroup>
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="mt-2"/>
                     </FormItem>
                   )}
                 />
@@ -386,7 +387,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                               <FormItem className="flex-1">
                                 <FormLabel className="text-xs -mb-1.5">Cone Factor</FormLabel>
                                 <FormControl>
-                                  <NumberInput field={field} placeholder="0" className="text-sm"/>
+                                  <NumberInput field={field} placeholder="15" className="text-sm"/>
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -400,7 +401,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                               <FormItem className="flex-1">
                                 <FormLabel className="text-xs -mb-1.5">Capacity Factor</FormLabel>
                                 <FormControl>
-                                  <NumberInput field={field} placeholder="0" className="text-sm"/>
+                                  <NumberInput field={field} placeholder="7" className="text-sm"/>
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -414,7 +415,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                               <FormItem className="flex-1">
                                 <FormLabel className="text-xs -mb-1.5">Pore Factor</FormLabel>
                                 <FormControl>
-                                  <NumberInput field={field} placeholder="0" className="text-sm"/>
+                                  <NumberInput field={field} placeholder="1" className="text-sm"/>
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -460,7 +461,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                               <FormItem className="flex-1">
                                 <FormLabel className="text-xs -mb-1.5">Cone Factor</FormLabel>
                                 <FormControl>
-                                  <NumberInput field={field} placeholder="0" className="text-sm"/>
+                                  <NumberInput field={field} placeholder="1" className="text-sm"/>
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -474,7 +475,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                               <FormItem className="flex-1">
                                 <FormLabel className="text-xs -mb-1.5">Capacity Factor</FormLabel>
                                 <FormControl>
-                                  <NumberInput field={field} placeholder="0" className="text-sm"/>
+                                  <NumberInput field={field} placeholder="0.45" className="text-sm"/>
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
