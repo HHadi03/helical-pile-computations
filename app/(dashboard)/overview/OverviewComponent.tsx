@@ -10,6 +10,7 @@ import { SoilGraph } from "./SoilGraph"
 import { ChartLine, CircleSlash2, MoveUp } from "lucide-react"
 import { type CarouselApi } from "@/components/ui/carousel"
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { Fragment } from "react"
 
 export function OverviewComponent({ soilsData, profilesData }: { soilsData: ToverviewSoilSchema[], profilesData: ToverviewSoilProfileSchema[] }) {
   const [showGraph, setShowGraph] = useState(false)
@@ -123,8 +124,16 @@ export function OverviewComponent({ soilsData, profilesData }: { soilsData: Tove
               const profileSoils = soilsByProfile[profile.id] || []
               return (
                 <CarouselItem key={profile.id}>
-                  {showGraph ? (<SoilGraph profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter} hideBearingCapacity={hideBearingCapacity}/>)
-                  : (<SoilDiagram profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter} hideBearingCapacity={hideBearingCapacity}/>)}
+                  {profileSoils.length === 0 ? (
+                    <div className="p-2 bg-sky-50 dark:bg-sky-900/50 border-2" key={profile.id}> 
+                      <h2 className="font-semibold mb-4">{profile.profile_name || `Soil Profile ${index + 1}`}</h2>
+                      <p className="text-sm text-muted-foreground">No soil layers detected, add soil layers in configuration to begin analysis.</p>
+                    </div>
+                  ) : showGraph ? (
+                      <SoilGraph profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter} hideBearingCapacity={hideBearingCapacity}/>)
+                    : (
+                      <SoilDiagram profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter} hideBearingCapacity={hideBearingCapacity}/>)
+                  }
                 </CarouselItem>
               )
             })} 
@@ -137,12 +146,18 @@ export function OverviewComponent({ soilsData, profilesData }: { soilsData: Tove
           {profilesData.map((profile, index) => {
             const profileSoils = soilsByProfile[profile.id] || []
             return (
-              <div key={profile.id}>
-                {showGraph ? (
-                  <SoilGraph profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter} hideBearingCapacity={hideBearingCapacity} needsHorizontalScroll={needsHorizontalScroll}/>)
-                  : (<SoilDiagram profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter} hideBearingCapacity={hideBearingCapacity} needsHorizontalScroll={needsHorizontalScroll}/>
-                )}
-              </div>
+              <Fragment key={profile.id}>
+                {profileSoils.length === 0 ? (
+                  <div className="p-2 bg-sky-50 dark:bg-sky-900/50 border-2" key={profile.id}> 
+                    <h2 className="font-semibold sm:mb-4">{profile.profile_name || `Soil Profile ${index + 1}`}</h2>
+                    <p className="text-sm text-muted-foreground">No soil layers detected, add soil layers in configuration to begin analysis.</p>
+                  </div>
+                ) : showGraph ? (
+                    <SoilGraph profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter} hideBearingCapacity={hideBearingCapacity}/>)
+                  : (
+                    <SoilDiagram profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter} hideBearingCapacity={hideBearingCapacity} needsHorizontalScroll={needsHorizontalScroll}/>)
+                }
+              </Fragment>
             )
           })}
         </section>

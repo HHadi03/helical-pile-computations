@@ -424,9 +424,9 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
               />
 
               {chartDisplayData.length === 0 && (
-                <text x="50%" y="50%" textAnchor="middle" fill={resolvedTheme === 'dark' ? "oklch(0.985 0.002 247.839)" : "oklch(0.13 0.028 261.692)"} className="text-sm">
+                <text x="50%" y="50%" textAnchor="middle" fill={resolvedTheme === 'dark' ? "oklch(0.985 0.002 247.839)" : "oklch(0.13 0.028 261.692)"} className="text-xs sm:text-sm">
                   <tspan x="50%" dy="0">No soil layers detected</tspan>
-                  <tspan x="50%" dy="1.2em">Add soil layers in configuration to begin analysis.</tspan>
+                  {windowWidth >= 485 && <tspan x="50%" dy="1.2em">Add soil layers in configuration to begin analysis.</tspan>}
                 </text>
               )}
               

@@ -146,7 +146,7 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
               <div className="bg-secondary border-2 shadow-inner flex justify-between items-center">
                 <div className='flex-1'>
                   <AccordionTrigger title={profile.profile_name ? profile.profile_name : `Soil Profile ${index + 1}`}>
-                    <h2 className='line-clamp-1'> {profile.profile_name ? profile.profile_name : `Soil Profile ${index + 1}`}</h2>
+                    <h2 className=' font-semibold line-clamp-1'> {profile.profile_name ? profile.profile_name : `Soil Profile ${index + 1}`}</h2>
                   </AccordionTrigger>
                 </div>
                 
