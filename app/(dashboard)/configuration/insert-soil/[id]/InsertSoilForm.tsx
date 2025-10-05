@@ -258,7 +258,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                     <FormItem className="sm:w-27">
                       <FormLabel>Start Depth <span className="font-semibold -ml-1">(m)</span></FormLabel>
                       <FormControl>
-                        <NumberInput field={field} placeholder="0" disabled className="font-semibold"/>
+                        <NumberInput field={field} placeholder="0" disabled/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -353,7 +353,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                             </PopoverContent>
                           </Popover>
                         <FormControl>
-                          <NumberInput field={field} placeholder="0" className="text-sm"/>
+                          <NumberInput field={field} placeholder="0"/>
                         </FormControl>
                         <FormMessage/>
                       </FormItem>
@@ -372,7 +372,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                             <FormItem className="pt-2">
                               <FormLabel>Cone Tip Resistance<span className="font-semibold -ml-1">(kPa)</span></FormLabel>
                               <FormControl>
-                                <NumberInput field={field} placeholder="0" className="text-sm"/>
+                                <NumberInput field={field} placeholder="0"/>
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -387,7 +387,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                               <FormItem className="flex-1">
                                 <FormLabel className="text-xs -mb-1.5">Cone Factor</FormLabel>
                                 <FormControl>
-                                  <NumberInput field={field} placeholder="15" className="text-sm"/>
+                                  <NumberInput field={field} placeholder="15"/>
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -401,7 +401,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                               <FormItem className="flex-1">
                                 <FormLabel className="text-xs -mb-1.5">Capacity Factor</FormLabel>
                                 <FormControl>
-                                  <NumberInput field={field} placeholder="7" className="text-sm"/>
+                                  <NumberInput field={field} placeholder="7"/>
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -415,7 +415,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                               <FormItem className="flex-1">
                                 <FormLabel className="text-xs -mb-1.5">Pore Factor</FormLabel>
                                 <FormControl>
-                                  <NumberInput field={field} placeholder="1" className="text-sm"/>
+                                  <NumberInput field={field} placeholder="1"/>
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -432,7 +432,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                             <FormItem>
                               <FormLabel>Cone Sleeve Resistance<span className="font-semibold -ml-1">(kPa)</span></FormLabel>
                               <FormControl>
-                                <NumberInput field={field} placeholder="0" className="text-sm"/>
+                                <NumberInput field={field} placeholder="0"/>
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -446,7 +446,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                             <FormItem className="pt-2">
                               <FormLabel>Cone Tip Resistance<span className="font-semibold -ml-1">(kPa)</span></FormLabel>
                               <FormControl>
-                                <NumberInput field={field} placeholder="0" className="text-sm"/>
+                                <NumberInput field={field} placeholder="0"/>
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -461,7 +461,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                               <FormItem className="flex-1">
                                 <FormLabel className="text-xs -mb-1.5">Cone Factor</FormLabel>
                                 <FormControl>
-                                  <NumberInput field={field} placeholder="1" className="text-sm"/>
+                                  <NumberInput field={field} placeholder="1"/>
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -475,7 +475,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                               <FormItem className="flex-1">
                                 <FormLabel className="text-xs -mb-1.5">Capacity Factor</FormLabel>
                                 <FormControl>
-                                  <NumberInput field={field} placeholder="0.45" className="text-sm"/>
+                                  <NumberInput field={field} placeholder="0.45"/>
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>

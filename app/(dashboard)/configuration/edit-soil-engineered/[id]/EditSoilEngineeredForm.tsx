@@ -93,7 +93,7 @@ export function EditSoilEngineered({ soil, soilId }: { soil: TeditSoilEngineered
                 <FormItem>
                   <FormLabel>Undrained Shear Strength <span className="font-semibold -ml-1">(kPa)</span></FormLabel>
                   <FormControl>
-                    <NumberInput field={field} placeholder="0" className="text-sm"/>
+                    <NumberInput field={field} placeholder="0"/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -111,7 +111,7 @@ export function EditSoilEngineered({ soil, soilId }: { soil: TeditSoilEngineered
                     <FormItem>
                       <FormLabel>Angle of Internal Friction <span className="font-semibold -ml-1">(°)</span></FormLabel>
                       <FormControl>
-                        <NumberInput field={field} placeholder="0" className="text-sm"/>
+                        <NumberInput field={field} placeholder="0"/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -126,7 +126,7 @@ export function EditSoilEngineered({ soil, soilId }: { soil: TeditSoilEngineered
                   <FormItem>
                     <FormLabel>Shear Strength <span className="font-semibold -ml-1">(kPa)</span></FormLabel>
                     <FormControl>
-                      <NumberInput field={field} placeholder="0" className="text-sm"/>
+                      <NumberInput field={field} placeholder="0"/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -142,7 +142,7 @@ export function EditSoilEngineered({ soil, soilId }: { soil: TeditSoilEngineered
               <FormItem>
                 <FormLabel>Bearing Pressure <span className="font-semibold -ml-1">(kPa)</span></FormLabel>
                 <FormControl>
-                  <NumberInput field={field} placeholder="0" className="text-sm"/>
+                  <NumberInput field={field} placeholder="0"/>
                 </FormControl>
                 <FormMessage />
               </FormItem>

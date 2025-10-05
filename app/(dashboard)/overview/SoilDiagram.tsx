@@ -8,7 +8,7 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
   
   if (profileSoils.length === 0) {
     return (
-      <ScrollArea className="overflow-auto grid grid-cols-1 border-2">
+      <ScrollArea className="grid grid-cols-1 border-2">
         <div className="p-2 bg-sky-50 dark:bg-sky-900/50 whitespace-nowrap"> 
           <h1 className="text-base font-semibold mb-2">{profile.profile_name || `Soil Profile ${profileIndex + 1}`}</h1>
           <p className="text-sm text-muted-foreground">No soil layers detected, add soil layers in configuration to begin analysis.</p>
@@ -28,7 +28,7 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
 
   let pileHeight = 0
   return (
-    <ScrollArea className={`overflow-auto grid grid-cols-1 ${needsHorizontalScroll ? 'border' : ''}`}>
+    <ScrollArea className={`grid grid-cols-1 ${needsHorizontalScroll ? 'border' : ''}`}>
       <div className="min-w-[634px]">
         
         <div className={`p-2 bg-sky-50 dark:bg-sky-900/50 relative whitespace-nowrap ${needsHorizontalScroll ? '' : 'border-2'}`}> 
@@ -127,7 +127,7 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
             />
             
             <div 
-              className={`absolute top-0 z-20 ${pileDiameter === "60" ? 'hidden' : 'block'}`}
+              className={`absolute top-0 z-20 ${pileDiameter === "100" ? 'block' : 'hidden'}`}
               style={{
                 top: "-25px",
                 left: "220px",

@@ -160,7 +160,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                 <FormItem>
                   <FormLabel>Pile Number</FormLabel>
                   <FormControl>
-                    <Input placeholder="HP-003" {...field} className="text-sm"/>
+                    <Input placeholder="HP-003" {...field}/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -174,7 +174,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                 <FormItem>
                   <FormLabel>Job Location</FormLabel>
                   <FormControl>
-                    <Input placeholder="Farnborough, Hampshire" {...field} className="text-sm"/>
+                    <Input placeholder="Farnborough, Hampshire" {...field}/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -188,7 +188,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                 <FormItem>
                   <FormLabel>Job Number</FormLabel>
                   <FormControl>
-                    <Input placeholder="Project-AX34" {...field} className="text-sm"/>
+                    <Input placeholder="Project-AX34" {...field}/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -202,7 +202,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                 <FormItem>
                   <FormLabel>Checked By</FormLabel>
                   <FormControl>
-                    <Input placeholder="John Doe" {...field} className="text-sm"/>
+                    <Input placeholder="John Doe" {...field}/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -314,7 +314,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                 <FormItem>
                   <FormLabel>Additional Information <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                   <FormControl>
-                    <Textarea {...field} placeholder="Enter any additional information" className="text-sm resize-none"/>
+                    <Textarea {...field} placeholder="Enter any additional information" className="resize-none"/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -360,7 +360,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                     <FormItem>
                       <FormLabel>Total Applied Load <span className="font-semibold -ml-1">(kN)</span></FormLabel>
                       <FormControl>
-                        <NumberInput field={field} placeholder="0" className="text-sm"/>
+                        <NumberInput field={field} placeholder="0"/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -374,7 +374,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                     <FormItem>
                       <FormLabel>Global Safety Factor</FormLabel>
                       <FormControl>
-                        <NumberInput field={field} placeholder="0" className="text-sm"/>
+                        <SafetyNumberInput field={field} placeholder="1.5"/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -392,7 +392,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                     <FormItem>
                       <FormLabel>Permanent Load <span className="font-semibold -ml-1">(kN)</span></FormLabel>
                       <FormControl>
-                        <NumberInput field={field} placeholder="0" className="text-sm"/>
+                        <NumberInput field={field} placeholder="0"/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -406,7 +406,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                     <FormItem>
                       <FormLabel>Variable Load <span className="font-semibold -ml-1">(kN)</span></FormLabel>
                       <FormControl>
-                        <NumberInput field={field} placeholder="0" className="text-sm"/>
+                        <NumberInput field={field} placeholder="0"/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -454,7 +454,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                     <FormItem>
                       <FormLabel>Permanent Load <span className="font-semibold -ml-1">(kN)</span></FormLabel>
                       <FormControl>
-                        <NumberInput field={field} placeholder="0" className="text-sm"/>
+                        <NumberInput field={field} placeholder="0"/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -468,7 +468,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                     <FormItem>
                       <FormLabel>Variable Load <span className="font-semibold -ml-1">(kN)</span></FormLabel>
                       <FormControl>
-                        <NumberInput field={field} placeholder="0" className="text-sm"/>
+                        <NumberInput field={field} placeholder="0"/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -498,7 +498,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                         <FormItem>
                           <FormLabel>Tension Capacity <span className="font-semibold -ml-1">(kN)</span></FormLabel>
                           <FormControl>
-                            <NumberInput field={field} placeholder="0" className="text-sm"/>
+                            <NumberInput field={field} placeholder="0"/>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -512,7 +512,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                         <FormItem>
                           <FormLabel>Compression Capacity <span className="font-semibold -ml-1">(kN)</span></FormLabel>
                           <FormControl>
-                            <NumberInput field={field} placeholder="0" className="text-sm"/>
+                            <NumberInput field={field} placeholder="0"/>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -528,7 +528,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                         <FormItem>
                           <FormLabel>Number Of Tests</FormLabel>
                           <FormControl>
-                            <NumberInput field={field} placeholder="0" className="text-sm"/>
+                            <NumberInput field={field} placeholder="0"/>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -542,7 +542,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                         <FormItem>
                           <FormLabel>Mean Tensile Capacity <span className="font-semibold -ml-1">(kN)</span></FormLabel>
                           <FormControl>
-                            <NumberInput field={field} placeholder="0" className="text-sm"/>
+                            <NumberInput field={field} placeholder="0"/>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -556,7 +556,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                         <FormItem>
                           <FormLabel>Minimum Tensile Capacity <span className="font-semibold -ml-1">(kN)</span></FormLabel>
                           <FormControl>
-                            <NumberInput field={field} placeholder="0" className="text-sm"/>
+                            <NumberInput field={field} placeholder="0"/>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -570,7 +570,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                         <FormItem>
                           <FormLabel>Mean Compression Capacity <span className="font-semibold -ml-1">(kN)</span></FormLabel>
                           <FormControl>
-                            <NumberInput field={field} placeholder="0" className="text-sm"/>
+                            <NumberInput field={field} placeholder="0"/>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -584,7 +584,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                         <FormItem>
                           <FormLabel>Minimum Compression Capacity <span className="font-semibold -ml-1">(kN)</span></FormLabel>
                           <FormControl>
-                            <NumberInput field={field} placeholder="0" className="text-sm"/>
+                            <NumberInput field={field} placeholder="0"/>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1021,7 +1021,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                 <FormItem>
                   <FormLabel>Additional Information <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                   <FormControl>
-                    <Textarea {...field} placeholder="Enter any additional information" className="text-sm resize-none"/>
+                    <Textarea {...field} placeholder="Enter any additional information" className="resize-none"/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

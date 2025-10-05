@@ -94,7 +94,7 @@ export function InsertProfileForm() {
                   <FormItem>
                     <FormLabel>Profile Name <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                     <FormControl>
-                      <Input type="text" placeholder="Custom label for soil profile" {...field} className="text-sm"/>
+                      <Input type="text" placeholder="Custom label for soil profile" {...field}/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -108,7 +108,7 @@ export function InsertProfileForm() {
                   <FormItem>
                     <FormLabel>Water Depth <span className="font-semibold -ml-1">(m)</span></FormLabel>
                     <FormControl>
-                      <NumberInput field={field} placeholder="0" className="text-sm"/>
+                      <NumberInput field={field} placeholder="0"/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -131,7 +131,7 @@ export function InsertProfileForm() {
                   <FormItem>
                     <FormLabel>Pile Length <span className="font-semibold -ml-1">(m)</span></FormLabel>
                     <FormControl>
-                      <NumberInput field={field} placeholder="0" className="text-sm"/>
+                      <NumberInput field={field} placeholder="0"/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -145,7 +145,7 @@ export function InsertProfileForm() {
                   <FormItem>
                     <FormLabel>Pile Stick Out <span className="font-semibold -ml-1">(m)</span></FormLabel>
                     <FormControl>
-                      <NumberInput field={field} placeholder="0" className="text-sm"/>
+                      <NumberInput field={field} placeholder="0"/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

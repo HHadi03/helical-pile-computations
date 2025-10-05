@@ -131,7 +131,7 @@ export function EditSoilInformation({ soil, soilId }: { soil: TeditSoilInformati
               <FormItem>
                 <FormLabel>Description <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                 <FormControl>
-                  <Input type="text" placeholder="Brief description of soil composition" {...field} className="text-sm"/>
+                  <Input type="text" placeholder="Brief description of soil composition" {...field}/>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -146,7 +146,7 @@ export function EditSoilInformation({ soil, soilId }: { soil: TeditSoilInformati
                 <FormItem className="flex-1">
                   <FormLabel>Soil Name <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                   <FormControl>
-                    <Input type="text" placeholder="Custom label for soil layer" {...field} className="text-sm"/>
+                    <Input type="text" placeholder="Custom label for soil layer" {...field}/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
