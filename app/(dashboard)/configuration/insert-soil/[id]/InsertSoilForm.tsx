@@ -175,7 +175,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                     <FormLabel htmlFor="soil">Soil</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value || ""} name={field.name}>
                       <FormControl>
-                        <SelectTrigger className="w-full" id="soil">
+                        <SelectTrigger className="w-full truncate" id="soil">
                           <SelectValue placeholder="Select soil"/>
                         </SelectTrigger>
                       </FormControl>
@@ -346,9 +346,9 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                         <FormLabel>SPT N-Value</FormLabel>
                           <Popover>
                             <PopoverTrigger asChild>
-                              <Button variant="link" className="absolute -top-0.5 -right-2 text-blue-500 text-xs">I dont have SPT N-Value</Button>
+                              <Button variant="link" className="hidden sm:block text-blue-500 text-xs absolute -top-0.5 -right-2">I dont have SPT N-Value</Button>
                             </PopoverTrigger>
-                            <PopoverContent align="end" side="top" sideOffset={-2} className="w-sm m:w-lg md:w-xl lg:w-2xl dark:bg-black rounded-none p-1">
+                            <PopoverContent align="end" side="top" sideOffset={-2} className="w-xl md:w-2xl dark:bg-black rounded-none p-1">
                               <Image src={resolvedTheme === "dark" ? darkSPTImage : lightSPTImage} placeholder="blur" alt="SPT N-Value Guide Picture"/>
                             </PopoverContent>
                           </Popover>
@@ -379,13 +379,13 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                           )}
                         />
 
-                        <div className="flex gap-4 items-start">
+                        <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
                           <FormField
                             control={form.control}
                             name="nk"
                             render={({ field }) => (
                               <FormItem className="flex-1">
-                                <FormLabel className="text-xs -mb-1.5">Cone Factor</FormLabel>
+                                <FormLabel>Cone Factor</FormLabel>
                                 <FormControl>
                                   <NumberInput field={field} placeholder="15"/>
                                 </FormControl>
@@ -399,7 +399,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                             name="nc"
                             render={({ field }) => (
                               <FormItem className="flex-1">
-                                <FormLabel className="text-xs -mb-1.5">Capacity Factor</FormLabel>
+                                <FormLabel >Capacity Factor</FormLabel>
                                 <FormControl>
                                   <NumberInput field={field} placeholder="7"/>
                                 </FormControl>
@@ -413,7 +413,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                             name="a"
                             render={({ field }) => (
                               <FormItem className="flex-1">
-                                <FormLabel className="text-xs -mb-1.5">Pore Factor</FormLabel>
+                                <FormLabel >Pore Factor</FormLabel>
                                 <FormControl>
                                   <NumberInput field={field} placeholder="1"/>
                                 </FormControl>
@@ -453,13 +453,13 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                           )}
                         />
 
-                        <div className="flex gap-4 items-start">
+                        <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
                           <FormField
                             control={form.control}
                             name="ks"
                             render={({ field }) => (
                               <FormItem className="flex-1">
-                                <FormLabel className="text-xs -mb-1.5">Cone Factor</FormLabel>
+                                <FormLabel>Cone Factor</FormLabel>
                                 <FormControl>
                                   <NumberInput field={field} placeholder="1"/>
                                 </FormControl>
@@ -473,7 +473,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                             name="kc"
                             render={({ field }) => (
                               <FormItem className="flex-1">
-                                <FormLabel className="text-xs -mb-1.5">Capacity Factor</FormLabel>
+                                <FormLabel>Capacity Factor</FormLabel>
                                 <FormControl>
                                   <NumberInput field={field} placeholder="0.45"/>
                                 </FormControl>

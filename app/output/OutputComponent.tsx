@@ -387,7 +387,7 @@ export function OutputComponent({
   }
 
   return (
-    <div className="min-h-screen bg-white p-8 print:p-4 max-w-[210mm] mx-auto">
+    <div className="min-h-screen bg-white p-8 print:p-4 max-w-3xl mx-auto overflow-auto">
       <div className="mb-8 border-b-2 border-gray-300 pb-6">
         <h1 className="text-3xl font-bold text-gray-900 mb-6">Heli Pile Foundation</h1>
         <div className="grid grid-cols-2 gap-6 text-sm">
@@ -418,7 +418,7 @@ export function OutputComponent({
         </div>
       </div>
 
-      <div className="mb-8 max-w-3xl no-break-inside">
+      <div className="scale-70 mb-8 no-break-inside">
         <SoilDiagram 
           profile={profileData} 
           profileSoils={soilsData} 
@@ -428,7 +428,7 @@ export function OutputComponent({
         />
       </div>
 
-      <div className="max-w-3xl page-break-before no-break-inside">
+      <div className="page-break-before no-break-inside">
         <SoilGraph 
           profile={profileData} 
           profileSoils={soilsData} 

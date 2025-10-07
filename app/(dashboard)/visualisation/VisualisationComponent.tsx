@@ -345,15 +345,15 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
           <Skeleton className="size-10.5 rounded-md" />
           <Skeleton className="size-10.5 rounded-md" />
         </div>
-    </div>
+      </div>
     )
   }
 
-  const isMd = windowWidth < 768
+  const isMediumScreen = windowWidth < 768
   return (
     <>
       <div className="flex flex-col md:flex-row max-w-5xl mx-auto gap-5">
-        <div className="flex-auto h-140 border-2 p-5" id="VisualisationGraph">
+        <div className="flex-auto h-110 sm:h-140 border-2 p-5" id="VisualisationGraph">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartDisplayData} layout="vertical" margin={{ top: 5, right: 20, left: -5, bottom: 15 }}>
               
@@ -412,11 +412,11 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
                     <div className="bg-secondary text-primary p-3 rounded border border-foreground/30 text-sm">
                       {payload.map((entry, idx) => (
                         <div key={idx} style={{ color: entry.color }}>
-                          <span className="font-semibold">Pile Capacity:</span> {entry.value.toFixed(2)} kN
+                          Pile Capacity: {entry.value.toFixed(2)} kN
                         </div>
                       ))}
                       <div className="mt-1 pt-1 border-t">
-                        <span className="font-semibold">Pile Depth:</span> {end_depth} m
+                        Pile Depth: {end_depth} m
                       </div>
                     </div>
                   )
@@ -425,8 +425,8 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
 
               {chartDisplayData.length === 0 && (
                 <text x="50%" y="50%" textAnchor="middle" fill={resolvedTheme === 'dark' ? "oklch(0.985 0.002 247.839)" : "oklch(0.13 0.028 261.692)"} className="text-xs sm:text-sm">
-                  <tspan x="50%" dy="0">No soil layers detected</tspan>
-                  {windowWidth >= 485 && <tspan x="50%" dy="1.2em">Add soil layers in configuration to begin analysis.</tspan>}
+                  {windowWidth >= 490 ? <tspan x="50%" dy="0">No soil layers detected</tspan> : <tspan x="60%" dy="1.2em">No soil layers detected.</tspan>}
+                  {windowWidth >= 490 && <tspan x="50%" dy="1.2em">Add soil layers in configuration to begin analysis.</tspan>}
                 </text>
               )}
               
@@ -443,7 +443,7 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
                 </Toggle>
               </div>
             </TooltipTrigger>
-            <TooltipContent side={isMd ? "top" : "right"}>Toggle Pullout Only</TooltipContent>
+            <TooltipContent side={isMediumScreen ? "top" : "right"}>Toggle Pullout Only</TooltipContent>
           </Tooltip>
 
           <Tooltip>
@@ -452,7 +452,7 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
                 {activeAction === "download" ? <Loader2 className="animate-spin size-6 text-foreground/70"/> : <Download className="size-6 text-foreground/70" />}
               </Button>
             </TooltipTrigger>
-            <TooltipContent side={isMd ? "top" : "right"}>Save as Image</TooltipContent>
+            <TooltipContent side={isMediumScreen ? "top" : "right"}>Save as Image</TooltipContent>
           </Tooltip>
 
           <Tooltip>
@@ -461,7 +461,7 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
                 <SquarePen className="size-6 text-foreground/70"/>
               </Button>
             </TooltipTrigger>
-            <TooltipContent side={isMd ? "top" : "right"}>Edit Selections</TooltipContent>
+            <TooltipContent side={isMediumScreen ? "top" : "right"}>Edit Selections</TooltipContent>
           </Tooltip>
     
           <Tooltip>
@@ -470,7 +470,7 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
                 {activeAction === "reset" ? <Loader2 className="animate-spin size-6 text-destructive"/> : <RotateCcw className="size-6 text-destructive"/>}
               </Button>
             </TooltipTrigger>
-            <TooltipContent side={isMd ? "top" : "right"}>Reset Selections</TooltipContent>
+            <TooltipContent side={isMediumScreen ? "top" : "right"}>Reset Selections</TooltipContent>
           </Tooltip>
         </div> 
       </div>

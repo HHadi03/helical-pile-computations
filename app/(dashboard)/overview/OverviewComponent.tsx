@@ -72,11 +72,11 @@ export function OverviewComponent({ soilsData, profilesData }: { soilsData: Tove
  
   const soilsByProfile = Object.groupBy(soilsData, soil => soil.soil_profile_id)
 
-  const displayCarousel = windowWidth > 950
-  const needsHorizontalScroll = windowWidth < 760
+  const displayCarousel = windowWidth > 874
+  const showMobileLayout = windowWidth < 640
   return (
     <>
-      <div className="flex mx-auto justify-between max-w-3xl mb-2">
+      <div className="flex mx-auto justify-between mb-2 max-w-2xl lg:max-w-3xl">
        <div className="flex gap-2">
           <Tooltip>
             <TooltipTrigger asChild>
@@ -118,7 +118,7 @@ export function OverviewComponent({ soilsData, profilesData }: { soilsData: Tove
       </div>
       
       {displayCarousel ? (
-        <Carousel className="max-w-3xl mx-auto" setApi={setApi}>
+        <Carousel className="mx-auto max-w-2xl lg:max-w-3xl" setApi={setApi}>
           <CarouselContent>
             {profilesData.map((profile, index) => {
               const profileSoils = soilsByProfile[profile.id] || []
@@ -142,7 +142,7 @@ export function OverviewComponent({ soilsData, profilesData }: { soilsData: Tove
           <CarouselNext/>
         </Carousel>
       ) : (
-        <section className="max-w-3xl mx-auto space-y-6">
+        <section className="max-w-2xl mx-auto space-y-6">
           {profilesData.map((profile, index) => {
             const profileSoils = soilsByProfile[profile.id] || []
             return (
@@ -155,7 +155,7 @@ export function OverviewComponent({ soilsData, profilesData }: { soilsData: Tove
                 ) : showGraph ? (
                     <SoilGraph profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter} hideBearingCapacity={hideBearingCapacity}/>)
                   : (
-                    <SoilDiagram profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter} hideBearingCapacity={hideBearingCapacity} needsHorizontalScroll={needsHorizontalScroll}/>)
+                    <SoilDiagram profile={profile} profileSoils={profileSoils} profileIndex={index} pileDiameter={pileDiameter} hideBearingCapacity={hideBearingCapacity} showMobileLayout={showMobileLayout}/>)
                 }
               </Fragment>
             )

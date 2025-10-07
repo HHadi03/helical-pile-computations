@@ -111,7 +111,7 @@ export function EditSoilInformation({ soil, soilId }: { soil: TeditSoilInformati
                 <FormLabel htmlFor="soil">Soil</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value || ""} name={field.name}>
                   <FormControl>
-                    <SelectTrigger className="w-full" id="soil">
+                    <SelectTrigger className="w-full truncate" id="soil">
                       <SelectValue placeholder="Select soil"/>
                     </SelectTrigger>
                   </FormControl>

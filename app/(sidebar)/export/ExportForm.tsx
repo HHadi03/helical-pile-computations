@@ -32,7 +32,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
       show_shear_strength: true,
       soil_notes: "",
       
-      applied_load: "",
+      applied_tension_load: "",
       permanent_load: "",
       variable_load: "",
       structure_rigid: false,
@@ -355,7 +355,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
               <>
                 <FormField
                   control={form.control}
-                  name="applied_load"
+                  name="applied_tension_load"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Total Applied Load <span className="font-semibold -ml-1">(kN)</span></FormLabel>

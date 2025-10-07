@@ -80,7 +80,7 @@ export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, 
             <p className="text-sm mt-auto text-muted-foreground">Pile Diameter: {pileDiameter} mm</p>
           </div>
 
-          <div className="text-left sm:text-right text-sm whitespace-nowrap">
+          <div className="sm:text-right text-sm sm:whitespace-nowrap">
             <p><span className="font-semibold">Maximum Depth:</span> {lastBaseChartEntry.end_depth} m</p>
             <p><span className="font-semibold">Maximum Total Capacity:</span> {lastBaseChartEntry[shaftCapacityKey].toFixed(2)} kN</p>
             {!hideBearingCapacity && (<p><span className="font-semibold">Bearing Capacity Contribution:</span> {bearingCapacity.toFixed(2)} kN</p>)}
