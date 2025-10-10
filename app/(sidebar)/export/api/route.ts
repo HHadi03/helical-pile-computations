@@ -3,7 +3,6 @@ import { exportFormSchema, TexportFormSchema } from '@/schemas/exportSchema'
 import { createClient } from '@/utils/supabase/server'
 import { TexportSoilProfileSchema } from '@/schemas/soilProfileSchemas'
 import { ToverviewSoilSchema } from '@/schemas/soilSchemas'
-import puppeteer from 'puppeteer'
 import { roundToTwoDecimals } from '@/lib/utils'
 
 async function getProfiles(profileId: string): Promise<TexportSoilProfileSchema> {
@@ -723,12 +722,29 @@ export async function POST(req: NextRequest) {
       throw new Error("Failed to save export data")
     }
     
+    
+    let puppeteer: any, launchOptions: any = {headless: true}
+
+    const isProduction = process.env.NODE_ENV === 'production' ? true : false
+
+    if (isProduction) {
+      const chromium = (await import("@sparticuz/chromium")).default
+      puppeteer = await import ("puppeteer-core")
+      launchOptions = {
+        ...launchOptions,
+        args: chromium.args,
+        executablePath: await chromium.executablePath(),
+      }
+    }
+
+    else {
+      puppeteer = await import ("puppeteer")
+    }
+
+
     const cookie = req.cookies.get('sb-kiasruegemqnakhmbels-auth-token')?.value
 
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
-    })
+    const browser = await puppeteer.launch(launchOptions);
     
     const page = await browser.newPage()
 
