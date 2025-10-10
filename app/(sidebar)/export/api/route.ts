@@ -442,12 +442,10 @@ export async function POST(req: NextRequest) {
             const tensionOutput2 = rckTension / body.uk_safety_factor_tension_yt2
 
             if (compressionCombination1 > compressionOutput1) {
-              console.log({compressionCombination1, compressionOutput1})
               throw new Error("Designed compression load is greater than the designed compressive resistance.")
             }
 
             if (compressionCombination2 > compressionOutput2) {
-              console.log({compressionCombination2, compressionOutput2})
               throw new Error("Designed compression load is greater than the designed compressive resistance.")
             }
 
@@ -722,7 +720,6 @@ export async function POST(req: NextRequest) {
       throw new Error("Failed to save export data")
     }
     
-    
     let puppeteer: any, launchOptions: any = {headless: true}
 
     const isProduction = process.env.NODE_ENV === 'production' ? true : false
@@ -741,33 +738,41 @@ export async function POST(req: NextRequest) {
       puppeteer = await import ("puppeteer")
     }
 
-
     const cookie = req.cookies.get('sb-kiasruegemqnakhmbels-auth-token')?.value
 
     const browser = await puppeteer.launch(launchOptions);
     
     const page = await browser.newPage()
 
+     const baseUrl = process.env.NODE_ENV === 'production' 
+      ? process.env.NEXT_PUBLIC_SITE_URL || `https://${process.env.VERCEL_URL}`
+      : 'http://localhost:3000'
+    
+    // Extract domain from base URL
+    const domain = process.env.NODE_ENV === 'production' 
+      ? new URL(baseUrl).hostname 
+      : 'localhost'
+
+    console.log('Base URL:', baseUrl, 'Domain:', domain, 'VERCEL URL:', process.env.VERCEL_URL, 'SITE URL:', process.env.NEXT_PUBLIC_SITE_URL)
     await browser.setCookie({
       name: 'sb-kiasruegemqnakhmbels-auth-token',
       value: cookie ?? '',
-      domain: process.env.NODE_ENV === 'production' ? new URL(process.env.NEXT_PUBLIC_SITE_URL!).hostname : 'localhost',
+      domain: domain,
       path: '/',
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production'
     })
-
+    
     await page.setViewport({ 
       width: 1280, height: 1080, 
       deviceScaleFactor: 1
     })
     
-    const baseUrl = process.env.NODE_ENV === 'production' ? process.env.VERCEL_URL || process.env.NEXT_PUBLIC_SITE_URL : 'http://localhost:3000'
     await page.goto(`${baseUrl}/output`, { 
       waitUntil: 'networkidle2',
       timeout: 30000 
     })
-    
+   
     const pdf = await page.pdf({
       format: 'A4',
       printBackground: true,
