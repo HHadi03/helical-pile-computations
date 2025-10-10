@@ -128,12 +128,7 @@ export const insertSoilSchema = z.object({
 )
 
 .refine(
-  (data) => {
-    if (data.test_type === "spt") {
-      return data.n_value !== undefined && data.n_value > 0
-    }
-    return true
-  },
+  (data) =>  data.test_type !== "spt" || data.n_value > 0,
   {
     path: ['n_value'],
     error: "SPT N-Value is required",
@@ -141,12 +136,7 @@ export const insertSoilSchema = z.object({
 )
 
 .refine(
-  (data) => {
-    if (data.test_type === "cpt") {
-      return data.qc !== undefined && data.qc > 0
-    }
-    return true
-  },
+  (data) => data.test_type !== "cpt" || data.qc > 0,
   {
     path: ['qc'],
     error: "Cone Tip Resistance is required",
@@ -154,17 +144,13 @@ export const insertSoilSchema = z.object({
 )
 
 .refine(
-  (data) => {
-    if (data.test_type === "cpt" && data.soil_type !== "fine") {
-      return data.qs !== undefined && data.qs > 0
-    }
-    return true
-  },
+  (data) => data.test_type !== "cpt" || data.soil_type === "fine" || data.qs > 0,
   {
     path: ['qs'],
     error: "Cone Sleeve Resistance is required",
   }
 )
+
 export type TinsertSoilSchema = z.infer<typeof insertSoilSchema>
 
 
@@ -228,12 +214,7 @@ export const editSoilParametersSchema = z.object({
 )
 
 .refine(
-  (data) => {
-    if (data.test_type === "spt") {
-      return data.n_value !== undefined && data.n_value > 0
-    }
-    return true
-  },
+  (data) =>  data.test_type !== "spt" || data.n_value > 0,
   {
     path: ['n_value'],
     error: "SPT N-Value is required",
@@ -241,12 +222,7 @@ export const editSoilParametersSchema = z.object({
 )
 
 .refine(
-  (data) => {
-    if (data.test_type === "cpt") {
-      return data.qc !== undefined && data.qc > 0
-    }
-    return true
-  },
+  (data) => data.test_type !== "cpt" || data.qc > 0,
   {
     path: ['qc'],
     error: "Cone Tip Resistance is required",
@@ -254,12 +230,7 @@ export const editSoilParametersSchema = z.object({
 )
 
 .refine(
-  (data) => {
-    if (data.test_type === "cpt" && data.soil_type !== "fine") {
-      return data.qs !== undefined && data.qs > 0
-    }
-    return true
-  },
+  (data) => data.test_type !== "cpt" || data.soil_type === "fine" || data.qs > 0,
   {
     path: ['qs'],
     error: "Cone Sleeve Resistance is required",

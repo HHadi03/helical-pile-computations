@@ -91,11 +91,7 @@ export async function POST(req: NextRequest) {
     
     switch (body.design_method) {
       case "method_bs":
-        
-        if (!body.applied_load) {
-          throw new Error("Applied Load is required for this design method.")
-        }
-      
+       
         soilsData = await getSoils(body.soil_profile_id)
         profileData = await getProfiles(body.soil_profile_id)
 
@@ -104,28 +100,25 @@ export async function POST(req: NextRequest) {
         const lastLayer = soilsData.find(soil => soil.start_depth <= profileData.effective_pile_length && profileData.effective_pile_length <= soil.end_depth) || soilsData[soilsData.length - 1]
         const bearingCapacity = body.pile_diameter === "60" ? lastLayer.bearing_capacity60 : lastLayer.bearing_capacity100
         const compression = tension + bearingCapacity
-        
-        if (body.applied_load <= (tension / body.global_safety_factor)) {
-          throw new Error("Applied Load is less than the calculated tension.")
+          
+        if (body.applied_tension_load > (tension / body.global_safety_factor)) {
+          throw new Error("Designed tension load is greater than the designed tensile resistance.")
         }
         
-        if (body.applied_load <= (compression / body.global_safety_factor)) {
-          throw new Error("Applied Load is less than the calculated compression.")
+        if (body.applied_compression_load > (compression / body.global_safety_factor)) {
+          throw new Error("Designed compression load is greater than the designed compressive resistance.")
         }
 
         dynamicParams = {
           tension: roundToTwoDecimals(tension),
           compression: roundToTwoDecimals(compression),
-          applied_load: (body.applied_load),
+          applied_tension_load: (body.applied_tension_load),
+          applied_compression_load: (body.applied_compression_load),
           global_safety_factor: (body.global_safety_factor)
         }
       break;
 
       case "method_en":
-
-        if (!body.permanent_load || !body.variable_load || !body.country) {
-          throw new Error("Permanent Load, Variable Load and Country are required for this design method.")
-        }
 
         soilsData = await getSoils(body.soil_profile_id)
         profileData = await getProfiles(body.soil_profile_id)
@@ -195,107 +188,113 @@ export async function POST(req: NextRequest) {
           const rckCompression = Math.min(meanCompression / s3, minCompression / s4)
 
           if (body.country === "uk") {
-            const compressionCombination1 = (body.uk_safety_factor_compression_yG1 * body.permanent_load) + (body.uk_safety_factor_compression_yQ1 * body.variable_load)
-            const compressionCombination2 = (body.uk_safety_factor_compression_yG2 * body.permanent_load) + (body.uk_safety_factor_compression_yQ2 * body.variable_load)
-            const compressionOutput1 = rckCompression / body.uk_safety_factor_compression_yT1
-            const compressionOutput2 = rckCompression / body.uk_safety_factor_compression_yT2
+            const compressionCombination1 = (body.uk_safety_factor_compression_yg1 * body.permanent_compression_load) + (body.uk_safety_factor_compression_yq1 * body.variable_compression_load)
+            const compressionCombination2 = (body.uk_safety_factor_compression_yg2 * body.permanent_compression_load) + (body.uk_safety_factor_compression_yq2 * body.variable_compression_load)
+            const compressionOutput1 = rckCompression / body.uk_safety_factor_compression_yt1
+            const compressionOutput2 = rckCompression / body.uk_safety_factor_compression_yt2
 
-            const tensionCombination1 = (body.uk_safety_factor_tension_yG2 * body.permanent_load) + (body.uk_safety_factor_tension_yQ2 * body.variable_load)
-            const tensionCombination2 = (body.uk_safety_factor_tension_yG1 * body.permanent_load) + (body.uk_safety_factor_tension_yQ1 * body.variable_load)
-            const tensionOutput1 = rckTension / body.uk_safety_factor_tension_yT1
-            const tensionOutput2 = rckTension / body.uk_safety_factor_tension_yT2
+            const tensionCombination1 = (body.uk_safety_factor_tension_yg2 * body.permanent_tension_load) + (body.uk_safety_factor_tension_yq2 * body.variable_tension_load)
+            const tensionCombination2 = (body.uk_safety_factor_tension_yg1 * body.permanent_tension_load) + (body.uk_safety_factor_tension_yq1 * body.variable_tension_load)
+            const tensionOutput1 = rckTension / body.uk_safety_factor_tension_yt1
+            const tensionOutput2 = rckTension / body.uk_safety_factor_tension_yt2
 
-            if (compressionCombination1 <= compressionOutput1) {
-              throw new Error("Permanent and Variable Load combination 1 is less than the calculated compression.")
+            if (compressionCombination1 > compressionOutput1) {
+              throw new Error("Designed compression load is greater than the designed compressive resistance.")
             }
 
-            if (compressionCombination2 <= compressionOutput2) {
-              throw new Error("Permanent and Variable Load combination 2 is less than the calculated compression.")
+            if (compressionCombination2 > compressionOutput2) {
+              throw new Error("Designed compression load is greater than the designed compressive resistance.")
             }
 
-            if (tensionCombination1 <= tensionOutput1) {
-              throw new Error("Permanent and Variable Load combination 1 is less than the calculated tension.")
+            if (tensionCombination1 > tensionOutput1) {
+              throw new Error("Designed tension load is greater than the designed tensile resistance.")
             }
 
-            if (tensionCombination2 <= tensionOutput2) {
-              throw new Error("Permanent and Variable Load combination 2 is less than the calculated tension.")
+            if (tensionCombination2 > tensionOutput2) {
+              throw new Error("Designed tension load is greater than the designed tensile resistance.")
             }
-
+            
             dynamicParams = {
-              permanent_load: body.permanent_load,
-              variable_load: body.variable_load,
+              permanent_tension_load: body.permanent_tension_load,
+              variable_tension_load: body.variable_tension_load,
+              permanent_compression_load: body.permanent_compression_load,
+              variable_compression_load: body.variable_compression_load,
               compression: roundToTwoDecimals(rckCompression),
               tension: roundToTwoDecimals(rckTension),
-              uk_safety_factor_compression_yG1: body.uk_safety_factor_compression_yG1,
-              uk_safety_factor_compression_yQ1: body.uk_safety_factor_compression_yQ1,
-              uk_safety_factor_compression_yT1: body.uk_safety_factor_compression_yT1,
-              uk_safety_factor_compression_yG2: body.uk_safety_factor_compression_yG2,
-              uk_safety_factor_compression_yQ2: body.uk_safety_factor_compression_yQ2,
-              uk_safety_factor_compression_yT2: body.uk_safety_factor_compression_yT2,
-              uk_safety_factor_tension_yG1: body.uk_safety_factor_tension_yG1,
-              uk_safety_factor_tension_yQ1: body.uk_safety_factor_tension_yQ1,
-              uk_safety_factor_tension_yT1: body.uk_safety_factor_tension_yT1,
-              uk_safety_factor_tension_yG2: body.uk_safety_factor_tension_yG2,
-              uk_safety_factor_tension_yQ2: body.uk_safety_factor_tension_yQ2,
-              uk_safety_factor_tension_yT2: body.uk_safety_factor_tension_yT2
+              uk_safety_factor_compression_yg1: body.uk_safety_factor_compression_yg1,
+              uk_safety_factor_compression_yq1: body.uk_safety_factor_compression_yq1,
+              uk_safety_factor_compression_yt1: body.uk_safety_factor_compression_yt1,
+              uk_safety_factor_compression_yg2: body.uk_safety_factor_compression_yg2,
+              uk_safety_factor_compression_yq2: body.uk_safety_factor_compression_yq2,
+              uk_safety_factor_compression_yt2: body.uk_safety_factor_compression_yt2,
+              uk_safety_factor_tension_yg1: body.uk_safety_factor_tension_yg1,
+              uk_safety_factor_tension_yq1: body.uk_safety_factor_tension_yq1,
+              uk_safety_factor_tension_yt1: body.uk_safety_factor_tension_yt1,
+              uk_safety_factor_tension_yg2: body.uk_safety_factor_tension_yg2,
+              uk_safety_factor_tension_yq2: body.uk_safety_factor_tension_yq2,
+              uk_safety_factor_tension_yt2: body.uk_safety_factor_tension_yt2,
             }
           }
 
           else if (body.country === "nl") {
-            const compressionCombination1 = (body.nl_safety_factor_compression_yG * body.permanent_load) + (body.nl_safety_factor_compression_yQ * body.variable_load)
-            const compressionOutput1 = rckCompression / body.nl_safety_factor_compression_yT
+            const compressionCombination1 = (body.nl_safety_factor_compression_yg * body.permanent_tension_load) + (body.nl_safety_factor_compression_yq * body.variable_tension_load)
+            const compressionOutput1 = rckCompression / body.nl_safety_factor_compression_yt
 
-            const tensionCombination1 = (body.nl_safety_factor_tension_yG * body.permanent_load) + (body.nl_safety_factor_tension_yQ * body.variable_load)
-            const tensionOutput1 = rckTension / body.nl_safety_factor_tension_yT
+            const tensionCombination1 = (body.nl_safety_factor_tension_yg * body.permanent_compression_load) + (body.nl_safety_factor_tension_yq * body.variable_tension_load)
+            const tensionOutput1 = rckTension / body.nl_safety_factor_tension_yt
 
-            if (compressionCombination1 <= compressionOutput1) {
-              throw new Error("Permanent and Variable Load combination 1 is less than the calculated compression.")
+            if (compressionCombination1 > compressionOutput1) {
+              throw new Error("Designed compression load is greater than the designed compressive resistance.")
             }
 
-            if (tensionCombination1 <= tensionOutput1) {
-              throw new Error("Permanent and Variable Load combination 1 is less than the calculated tension.")
+            if (tensionCombination1 > tensionOutput1) {
+              throw new Error("Designed tension load is greater than the designed tensile resistance.")
             }
 
             dynamicParams = {
-              permanent_load: body.permanent_load,
-              variable_load: body.variable_load,
+              permanent_tension_load: body.permanent_tension_load,
+              variable_tension_load: body.variable_tension_load,
+              permanent_compression_load: body.permanent_compression_load,
+              variable_compression_load: body.variable_compression_load,
               compression: roundToTwoDecimals(rckCompression),
               tension: roundToTwoDecimals(rckTension),
-              nl_safety_factor_compression_yG: body.nl_safety_factor_compression_yG,
-              nl_safety_factor_compression_yQ: body.nl_safety_factor_compression_yQ,
-              nl_safety_factor_compression_yT: body.nl_safety_factor_compression_yT,
-              nl_safety_factor_tension_yG: body.nl_safety_factor_tension_yG,
-              nl_safety_factor_tension_yQ: body.nl_safety_factor_tension_yQ,
-              nl_safety_factor_tension_yT: body.nl_safety_factor_tension_yT
+              nl_safety_factor_compression_yg: body.nl_safety_factor_compression_yg,
+              nl_safety_factor_compression_yq: body.nl_safety_factor_compression_yq,
+              nl_safety_factor_compression_yt: body.nl_safety_factor_compression_yt,
+              nl_safety_factor_tension_yg: body.nl_safety_factor_tension_yg,
+              nl_safety_factor_tension_yq: body.nl_safety_factor_tension_yq,
+              nl_safety_factor_tension_yt: body.nl_safety_factor_tension_yt,
             }
           }
-        
+          
           else {
-            const compressionCombination1 = (body.pl_safety_factor_compression_yG * body.permanent_load) + (body.pl_safety_factor_compression_yQ * body.variable_load)
-            const compressionOutput1 = rckCompression / body.pl_safety_factor_compression_yT
+            const compressionCombination1 = (body.pl_safety_factor_compression_yg * body.permanent_tension_load) + (body.pl_safety_factor_compression_yq * body.variable_tension_load)
+            const compressionOutput1 = rckCompression / body.pl_safety_factor_compression_yt
 
-            const tensionCombination1 = (body.pl_safety_factor_tension_yG * body.permanent_load) + (body.pl_safety_factor_tension_yQ * body.variable_load)
-            const tensionOutput1 = rckTension / body.pl_safety_factor_tension_yT
+            const tensionCombination1 = (body.pl_safety_factor_tension_yg * body.permanent_compression_load) + (body.pl_safety_factor_tension_yq * body.variable_compression_load)
+            const tensionOutput1 = rckTension / body.pl_safety_factor_tension_yt
 
-            if (compressionCombination1 <= compressionOutput1) {
-              throw new Error("Permanent and Variable Load combination 1 is less than the calculated compression.")
+            if (compressionCombination1 > compressionOutput1) {
+              throw new Error("Designed compression load is greater than the designed compressive resistance.")
             }
 
-            if (tensionCombination1 <= tensionOutput1) {
-              throw new Error("Permanent and Variable Load combination 1 is less than the calculated tension.")
+            if (tensionCombination1 > tensionOutput1) {
+              throw new Error("Designed tension load is greater than the designed tensile resistance.")
             }
 
             dynamicParams = {
-              permanent_load: body.permanent_load,
-              variable_load: body.variable_load,
+              permanent_load: body.permanent_tension_load,
+              variable_load: body.variable_tension_load,
+              permanent_compression_load: body.permanent_compression_load,
+              variable_compression_load: body.variable_compression_load,
               compression: roundToTwoDecimals(rckCompression),
               tension: roundToTwoDecimals(rckTension),
-              pl_safety_factor_compression_yG: body.pl_safety_factor_compression_yG,
-              pl_safety_factor_compression_yQ: body.pl_safety_factor_compression_yQ,
-              pl_safety_factor_compression_yT: body.pl_safety_factor_compression_yT,
-              pl_safety_factor_tension_yG: body.pl_safety_factor_tension_yG,
-              pl_safety_factor_tension_yQ: body.pl_safety_factor_tension_yQ,
-              pl_safety_factor_tension_yT: body.pl_safety_factor_tension_yT
+              pl_safety_factor_compression_yg: body.pl_safety_factor_compression_yg,
+              pl_safety_factor_compression_yq: body.pl_safety_factor_compression_yq,
+              pl_safety_factor_compression_yt: body.pl_safety_factor_compression_yt,
+              pl_safety_factor_tension_yg: body.pl_safety_factor_tension_yg,
+              pl_safety_factor_tension_yq: body.pl_safety_factor_tension_yq,
+              pl_safety_factor_tension_yt: body.pl_safety_factor_tension_yt,
             }
           }
         }
@@ -308,107 +307,113 @@ export async function POST(req: NextRequest) {
           const compression = tension + bearingCapacity
           
           if (body.country === "uk") {
-            const compressionCombination1 = (body.uk_safety_factor_compression_yG1 * body.permanent_load) + (body.uk_safety_factor_compression_yQ1 * body.variable_load)
-            const compressionCombination2 = (body.uk_safety_factor_compression_yG2 * body.permanent_load) + (body.uk_safety_factor_compression_yQ2 * body.variable_load)
-            const compressionOutput1 = compression / body.uk_safety_factor_compression_yT1
-            const compressionOutput2 = compression / body.uk_safety_factor_compression_yT2
+            const compressionCombination1 = (body.uk_safety_factor_compression_yg1 * body.permanent_compression_load) + (body.uk_safety_factor_compression_yq1 * body.variable_compression_load)
+            const compressionCombination2 = (body.uk_safety_factor_compression_yg2 * body.permanent_compression_load) + (body.uk_safety_factor_compression_yq2 * body.variable_compression_load)
+            const compressionOutput1 = compression / body.uk_safety_factor_compression_yt1
+            const compressionOutput2 = compression / body.uk_safety_factor_compression_yt2
 
-            const tensionCombination1 = (body.uk_safety_factor_tension_yG2 * body.permanent_load) + (body.uk_safety_factor_tension_yQ2 * body.variable_load)
-            const tensionCombination2 = (body.uk_safety_factor_tension_yG1 * body.permanent_load) + (body.uk_safety_factor_tension_yQ1 * body.variable_load)
-            const tensionOutput1 = tension / body.uk_safety_factor_tension_yT1
-            const tensionOutput2 = tension / body.uk_safety_factor_tension_yT2
+            const tensionCombination1 = (body.uk_safety_factor_tension_yg2 * body.permanent_tension_load) + (body.uk_safety_factor_tension_yq2 * body.variable_tension_load)
+            const tensionCombination2 = (body.uk_safety_factor_tension_yg1 * body.permanent_tension_load) + (body.uk_safety_factor_tension_yq1 * body.variable_tension_load)
+            const tensionOutput1 = tension / body.uk_safety_factor_tension_yt1
+            const tensionOutput2 = tension / body.uk_safety_factor_tension_yt2
 
-            if (compressionCombination1 <= compressionOutput1) {
-              throw new Error("Permanent and Variable Load combination 1 is less than the calculated compression.")
+            if (compressionCombination1 > compressionOutput1) {
+              throw new Error("Designed compression load is greater than the designed compressive resistance.")
             }
 
-            if (compressionCombination2 <= compressionOutput2) {
-              throw new Error("Permanent and Variable Load combination 2 is less than the calculated compression.")
+            if (compressionCombination2 > compressionOutput2) {
+              throw new Error("Designed compression load is greater than the designed compressive resistance.")
             }
 
-            if (tensionCombination1 <= tensionOutput1) {
-              throw new Error("Permanent and Variable Load combination 1 is less than the calculated tension.")
+            if (tensionCombination1 > tensionOutput1) {
+              throw new Error("Designed tension load is greater than the designed tensile resistance.")
             }
 
-            if (tensionCombination2 <= tensionOutput2) {
-              throw new Error("Permanent and Variable Load combination 2 is less than the calculated tension.")
+            if (tensionCombination2 > tensionOutput2) {
+              throw new Error("Designed tension load is greater than the designed tensile resistance.")
             }
             
             dynamicParams = {
-              permanent_load: body.permanent_load,
-              variable_load: body.variable_load,
+              permanent_tension_load: body.permanent_tension_load,
+              variable_tension_load: body.variable_tension_load,
+              permanent_compression_load: body.permanent_compression_load,
+              variable_compression_load: body.variable_compression_load,
               compression: roundToTwoDecimals(compression),
               tension: roundToTwoDecimals(tension),
-              uk_safety_factor_compression_yG1: body.uk_safety_factor_compression_yG1,
-              uk_safety_factor_compression_yQ1: body.uk_safety_factor_compression_yQ1,
-              uk_safety_factor_compression_yT1: body.uk_safety_factor_compression_yT1,
-              uk_safety_factor_compression_yG2: body.uk_safety_factor_compression_yG2,
-              uk_safety_factor_compression_yQ2: body.uk_safety_factor_compression_yQ2,
-              uk_safety_factor_compression_yT2: body.uk_safety_factor_compression_yT2,
-              uk_safety_factor_tension_yG1: body.uk_safety_factor_tension_yG1,
-              uk_safety_factor_tension_yQ1: body.uk_safety_factor_tension_yQ1,
-              uk_safety_factor_tension_yT1: body.uk_safety_factor_tension_yT1,
-              uk_safety_factor_tension_yG2: body.uk_safety_factor_tension_yG2,
-              uk_safety_factor_tension_yQ2: body.uk_safety_factor_tension_yQ2,
-              uk_safety_factor_tension_yT2: body.uk_safety_factor_tension_yT2,
+              uk_safety_factor_compression_yg1: body.uk_safety_factor_compression_yg1,
+              uk_safety_factor_compression_yq1: body.uk_safety_factor_compression_yq1,
+              uk_safety_factor_compression_yt1: body.uk_safety_factor_compression_yt1,
+              uk_safety_factor_compression_yg2: body.uk_safety_factor_compression_yg2,
+              uk_safety_factor_compression_yq2: body.uk_safety_factor_compression_yq2,
+              uk_safety_factor_compression_yt2: body.uk_safety_factor_compression_yt2,
+              uk_safety_factor_tension_yg1: body.uk_safety_factor_tension_yg1,
+              uk_safety_factor_tension_yq1: body.uk_safety_factor_tension_yq1,
+              uk_safety_factor_tension_yt1: body.uk_safety_factor_tension_yt1,
+              uk_safety_factor_tension_yg2: body.uk_safety_factor_tension_yg2,
+              uk_safety_factor_tension_yq2: body.uk_safety_factor_tension_yq2,
+              uk_safety_factor_tension_yt2: body.uk_safety_factor_tension_yt2,
             }
           }
 
           else if (body.country === "nl") {
-            const compressionCombination1 = (body.nl_safety_factor_compression_yG * body.permanent_load) + (body.nl_safety_factor_compression_yQ * body.variable_load)
-            const compressionOutput1 = compression / body.nl_safety_factor_compression_yT
+            const compressionCombination1 = (body.nl_safety_factor_compression_yg * body.permanent_tension_load) + (body.nl_safety_factor_compression_yq * body.variable_tension_load)
+            const compressionOutput1 = compression / body.nl_safety_factor_compression_yt
 
-            const tensionCombination1 = (body.nl_safety_factor_tension_yG * body.permanent_load) + (body.nl_safety_factor_tension_yQ * body.variable_load)
-            const tensionOutput1 = tension / body.nl_safety_factor_tension_yT
-            
-            if (compressionCombination1 <= compressionOutput1) {
-              throw new Error("Permanent and Variable Load combination 1 is less than the calculated compression.")
+            const tensionCombination1 = (body.nl_safety_factor_tension_yg * body.permanent_compression_load) + (body.nl_safety_factor_tension_yq * body.variable_tension_load)
+            const tensionOutput1 = tension / body.nl_safety_factor_tension_yt
+
+            if (compressionCombination1 > compressionOutput1) {
+              throw new Error("Designed compression load is greater than the designed compressive resistance.")
             }
 
-            if (tensionCombination1 <= tensionOutput1) {
-              throw new Error("Permanent and Variable Load combination 1 is less than the calculated tension.")
+            if (tensionCombination1 > tensionOutput1) {
+              throw new Error("Designed tension load is greater than the designed tensile resistance.")
             }
 
             dynamicParams = {
-              permanent_load: body.permanent_load,
-              variable_load: body.variable_load,
+              permanent_tension_load: body.permanent_tension_load,
+              variable_tension_load: body.variable_tension_load,
+              permanent_compression_load: body.permanent_compression_load,
+              variable_compression_load: body.variable_compression_load,
               compression: roundToTwoDecimals(compression),
               tension: roundToTwoDecimals(tension),
-              nl_safety_factor_compression_yG: body.nl_safety_factor_compression_yG,
-              nl_safety_factor_compression_yQ: body.nl_safety_factor_compression_yQ,
-              nl_safety_factor_compression_yT: body.nl_safety_factor_compression_yT,
-              nl_safety_factor_tension_yG: body.nl_safety_factor_tension_yG,
-              nl_safety_factor_tension_yQ: body.nl_safety_factor_tension_yQ,
-              nl_safety_factor_tension_yT: body.nl_safety_factor_tension_yT,
+              nl_safety_factor_compression_yg: body.nl_safety_factor_compression_yg,
+              nl_safety_factor_compression_yq: body.nl_safety_factor_compression_yq,
+              nl_safety_factor_compression_yt: body.nl_safety_factor_compression_yt,
+              nl_safety_factor_tension_yg: body.nl_safety_factor_tension_yg,
+              nl_safety_factor_tension_yq: body.nl_safety_factor_tension_yq,
+              nl_safety_factor_tension_yt: body.nl_safety_factor_tension_yt,
             }
           }
           
           else {
-            const compressionCombination1 = (body.pl_safety_factor_compression_yG * body.permanent_load) + (body.pl_safety_factor_compression_yQ * body.variable_load)
-            const compressionOutput1 = compression / body.pl_safety_factor_compression_yT
+            const compressionCombination1 = (body.pl_safety_factor_compression_yg * body.permanent_tension_load) + (body.pl_safety_factor_compression_yq * body.variable_tension_load)
+            const compressionOutput1 = compression / body.pl_safety_factor_compression_yt
 
-            const tensionCombination1 = (body.pl_safety_factor_tension_yG * body.permanent_load) + (body.pl_safety_factor_tension_yQ * body.variable_load)
-            const tensionOutput1 = tension / body.pl_safety_factor_tension_yT
+            const tensionCombination1 = (body.pl_safety_factor_tension_yg * body.permanent_compression_load) + (body.pl_safety_factor_tension_yq * body.variable_compression_load)
+            const tensionOutput1 = tension / body.pl_safety_factor_tension_yt
 
-            if (compressionCombination1 <= compressionOutput1) {
-              throw new Error("Permanent and Variable Load combination 1 is less than the calculated compression.")
+            if (compressionCombination1 > compressionOutput1) {
+              throw new Error("Designed compression load is greater than the designed compressive resistance.")
             }
 
-            if (tensionCombination1 <= tensionOutput1) {
-              throw new Error("Permanent and Variable Load combination 1 is less than the calculated tension.")
+            if (tensionCombination1 > tensionOutput1) {
+              throw new Error("Designed tension load is greater than the designed tensile resistance.")
             }
 
             dynamicParams = {
-              permanent_load: body.permanent_load,
-              variable_load: body.variable_load,
+              permanent_load: body.permanent_tension_load,
+              variable_load: body.variable_tension_load,
+              permanent_compression_load: body.permanent_compression_load,
+              variable_compression_load: body.variable_compression_load,
               compression: roundToTwoDecimals(compression),
               tension: roundToTwoDecimals(tension),
-              pl_safety_factor_compression_yG: body.pl_safety_factor_compression_yG,
-              pl_safety_factor_compression_yQ: body.pl_safety_factor_compression_yQ,
-              pl_safety_factor_compression_yT: body.pl_safety_factor_compression_yT,
-              pl_safety_factor_tension_yG: body.pl_safety_factor_tension_yG,
-              pl_safety_factor_tension_yQ: body.pl_safety_factor_tension_yQ,
-              pl_safety_factor_tension_yT: body.pl_safety_factor_tension_yT,
+              pl_safety_factor_compression_yg: body.pl_safety_factor_compression_yg,
+              pl_safety_factor_compression_yq: body.pl_safety_factor_compression_yq,
+              pl_safety_factor_compression_yt: body.pl_safety_factor_compression_yt,
+              pl_safety_factor_tension_yg: body.pl_safety_factor_tension_yg,
+              pl_safety_factor_tension_yq: body.pl_safety_factor_tension_yq,
+              pl_safety_factor_tension_yt: body.pl_safety_factor_tension_yt,
             }
           }
         }
@@ -416,240 +421,242 @@ export async function POST(req: NextRequest) {
 
       case "method_test":
 
-        if (!body.permanent_load || !body.variable_load || !body.country) {
-          throw new Error("Permanent Load, Variable Load and Country are required for this design method.")
-        }
-
         soilsData = await getSoils(body.soil_profile_id)
         profileData = await getProfiles(body.soil_profile_id)
         
         if (body.use_characteristic) {
-          if (!body.number_of_tests || !body.mean_tensile_rcm || !body.min_tensile_rcm || !body.mean_compression_rcm || !body.min_compression_rcm) {
-            throw new Error("Number of Tests, Mean Tensile Capacity, Minimum Tensile Capacity, Mean Compression Capacity and Minimum Compression Capacity are required when using characteristic values.")
-          }
-
           const numberOfSoilProfiles = body.number_of_tests > 5 ? 5 : body.number_of_tests
           const s1 = nObjectMethodTest[numberOfSoilProfiles].s1
           const s2 = nObjectMethodTest[numberOfSoilProfiles].s2
-          const rckTension = Math.min(body.mean_tensile_rcm / s1, body.min_tensile_rcm / s2)
-          const rckCompression = Math.min(body.mean_compression_rcm / s1, body.min_compression_rcm / s2)
+          const rckTension = Math.min(body.mean_tensile_resistance / s1, body.min_tensile_resistance / s2)
+          const rckCompression = Math.min(body.mean_compressive_resistance / s1, body.min_compressive_resistance / s2)
 
           if (body.country === "uk") {
-            const compressionCombination1 = (body.uk_safety_factor_compression_yG1 * body.permanent_load) + (body.uk_safety_factor_compression_yQ1 * body.variable_load)
-            const compressionCombination2 = (body.uk_safety_factor_compression_yG2 * body.permanent_load) + (body.uk_safety_factor_compression_yQ2 * body.variable_load)
-            const compressionOutput1 = rckCompression / body.uk_safety_factor_compression_yT1
-            const compressionOutput2 = rckCompression / body.uk_safety_factor_compression_yT2
+            const compressionCombination1 = (body.uk_safety_factor_compression_yg1 * body.permanent_compression_load) + (body.uk_safety_factor_compression_yq1 * body.variable_compression_load)
+            const compressionCombination2 = (body.uk_safety_factor_compression_yg2 * body.permanent_compression_load) + (body.uk_safety_factor_compression_yq2 * body.variable_compression_load)
+            const compressionOutput1 = rckCompression / body.uk_safety_factor_compression_yt1
+            const compressionOutput2 = rckCompression / body.uk_safety_factor_compression_yt2
 
-            const tensionCombination1 = (body.uk_safety_factor_tension_yG2 * body.permanent_load) + (body.uk_safety_factor_tension_yQ2 * body.variable_load)
-            const tensionCombination2 = (body.uk_safety_factor_tension_yG1 * body.permanent_load) + (body.uk_safety_factor_tension_yQ1 * body.variable_load)
-            const tensionOutput1 = rckTension / body.uk_safety_factor_tension_yT1
-            const tensionOutput2 = rckTension / body.uk_safety_factor_tension_yT2
+            const tensionCombination1 = (body.uk_safety_factor_tension_yg2 * body.permanent_tension_load) + (body.uk_safety_factor_tension_yq2 * body.variable_tension_load)
+            const tensionCombination2 = (body.uk_safety_factor_tension_yg1 * body.permanent_tension_load) + (body.uk_safety_factor_tension_yq1 * body.variable_tension_load)
+            const tensionOutput1 = rckTension / body.uk_safety_factor_tension_yt1
+            const tensionOutput2 = rckTension / body.uk_safety_factor_tension_yt2
 
-            if (compressionCombination1 <= compressionOutput1) {
-              throw new Error("Permanent and Variable Load combination 1 is less than the calculated compression.")
+            if (compressionCombination1 > compressionOutput1) {
+              console.log({compressionCombination1, compressionOutput1})
+              throw new Error("Designed compression load is greater than the designed compressive resistance.")
             }
 
-            if (compressionCombination2 <= compressionOutput2) {
-              throw new Error("Permanent and Variable Load combination 2 is less than the calculated compression.")
+            if (compressionCombination2 > compressionOutput2) {
+              console.log({compressionCombination2, compressionOutput2})
+              throw new Error("Designed compression load is greater than the designed compressive resistance.")
             }
 
-            if (tensionCombination1 <= tensionOutput1) {
-              throw new Error("Permanent and Variable Load combination 1 is less than the calculated tension.")
+            if (tensionCombination1 > tensionOutput1) {
+              throw new Error("Designed tension load is greater than the designed tensile resistance.")
             }
 
-            if (tensionCombination2 <= tensionOutput2) {
-              throw new Error("Permanent and Variable Load combination 2 is less than the calculated tension.")
+            if (tensionCombination2 > tensionOutput2) {
+              throw new Error("Designed tension load is greater than the designed tensile resistance.")
             }
-
+            
             dynamicParams = {
-              permanent_load: body.permanent_load,
-              variable_load: body.variable_load,
-              tension: roundToTwoDecimals(rckTension),
+              permanent_tension_load: body.permanent_tension_load,
+              variable_tension_load: body.variable_tension_load,
+              permanent_compression_load: body.permanent_compression_load,
+              variable_compression_load: body.variable_compression_load,
               compression: roundToTwoDecimals(rckCompression),
-              body_uk_safety_factor_compression_yG1: body.uk_safety_factor_compression_yG1,
-              body_uk_safety_factor_compression_yQ1: body.uk_safety_factor_compression_yQ1,
-              body_uk_safety_factor_compression_yT1: body.uk_safety_factor_compression_yT1,
-              body_uk_safety_factor_compression_yG2: body.uk_safety_factor_compression_yG2,
-              body_uk_safety_factor_compression_yQ2: body.uk_safety_factor_compression_yQ2,
-              body_uk_safety_factor_compression_yT2: body.uk_safety_factor_compression_yT2,
-              body_uk_safety_factor_tension_yG1: body.uk_safety_factor_tension_yG1,
-              body_uk_safety_factor_tension_yQ1: body.uk_safety_factor_tension_yQ1,
-              body_uk_safety_factor_tension_yT1: body.uk_safety_factor_tension_yT1,
-              body_uk_safety_factor_tension_yG2: body.uk_safety_factor_tension_yG2,
-              body_uk_safety_factor_tension_yQ2: body.uk_safety_factor_tension_yQ2,
-              body_uk_safety_factor_tension_yT2: body.uk_safety_factor_tension_yT2,
+              tension: roundToTwoDecimals(rckTension),
+              uk_safety_factor_compression_yg1: body.uk_safety_factor_compression_yg1,
+              uk_safety_factor_compression_yq1: body.uk_safety_factor_compression_yq1,
+              uk_safety_factor_compression_yt1: body.uk_safety_factor_compression_yt1,
+              uk_safety_factor_compression_yg2: body.uk_safety_factor_compression_yg2,
+              uk_safety_factor_compression_yq2: body.uk_safety_factor_compression_yq2,
+              uk_safety_factor_compression_yt2: body.uk_safety_factor_compression_yt2,
+              uk_safety_factor_tension_yg1: body.uk_safety_factor_tension_yg1,
+              uk_safety_factor_tension_yq1: body.uk_safety_factor_tension_yq1,
+              uk_safety_factor_tension_yt1: body.uk_safety_factor_tension_yt1,
+              uk_safety_factor_tension_yg2: body.uk_safety_factor_tension_yg2,
+              uk_safety_factor_tension_yq2: body.uk_safety_factor_tension_yq2,
+              uk_safety_factor_tension_yt2: body.uk_safety_factor_tension_yt2,
             }
           }
 
           else if (body.country === "nl") {
-            const compressionCombination1 = (body.nl_safety_factor_compression_yG * body.permanent_load) + (body.nl_safety_factor_compression_yQ * body.variable_load)
-            const compressionOutput1 = rckCompression / body.nl_safety_factor_compression_yT
+            const compressionCombination1 = (body.nl_safety_factor_compression_yg * body.permanent_tension_load) + (body.nl_safety_factor_compression_yq * body.variable_tension_load)
+            const compressionOutput1 = rckCompression / body.nl_safety_factor_compression_yt
 
-            const tensionCombination1 = (body.nl_safety_factor_tension_yG * body.permanent_load) + (body.nl_safety_factor_tension_yQ * body.variable_load)
-            const tensionOutput1 = rckTension / body.nl_safety_factor_tension_yT
+            const tensionCombination1 = (body.nl_safety_factor_tension_yg * body.permanent_compression_load) + (body.nl_safety_factor_tension_yq * body.variable_tension_load)
+            const tensionOutput1 = rckTension / body.nl_safety_factor_tension_yt
 
-            if (compressionCombination1 <= compressionOutput1) {
-              throw new Error("Permanent and Variable Load combination 1 is less than the calculated compression.")
+            if (compressionCombination1 > compressionOutput1) {
+              throw new Error("Designed compression load is greater than the designed compressive resistance.")
             }
 
-            if (tensionCombination1 <= tensionOutput1) {
-              throw new Error("Permanent and Variable Load combination 1 is less than the calculated tension.")
+            if (tensionCombination1 > tensionOutput1) {
+              throw new Error("Designed tension load is greater than the designed tensile resistance.")
             }
 
             dynamicParams = {
-              permanent_load: body.permanent_load,
-              variable_load: body.variable_load,
+              permanent_tension_load: body.permanent_tension_load,
+              variable_tension_load: body.variable_tension_load,
+              permanent_compression_load: body.permanent_compression_load,
+              variable_compression_load: body.variable_compression_load,
               compression: roundToTwoDecimals(rckCompression),
               tension: roundToTwoDecimals(rckTension),
-              nl_safety_factor_compression_yG: body.nl_safety_factor_compression_yG,
-              nl_safety_factor_compression_yQ: body.nl_safety_factor_compression_yQ,
-              nl_safety_factor_compression_yT: body.nl_safety_factor_compression_yT,
-              nl_safety_factor_tension_yG: body.nl_safety_factor_tension_yG,
-              nl_safety_factor_tension_yQ: body.nl_safety_factor_tension_yQ,
-              nl_safety_factor_tension_yT: body.nl_safety_factor_tension_yT,
+              nl_safety_factor_compression_yg: body.nl_safety_factor_compression_yg,
+              nl_safety_factor_compression_yq: body.nl_safety_factor_compression_yq,
+              nl_safety_factor_compression_yt: body.nl_safety_factor_compression_yt,
+              nl_safety_factor_tension_yg: body.nl_safety_factor_tension_yg,
+              nl_safety_factor_tension_yq: body.nl_safety_factor_tension_yq,
+              nl_safety_factor_tension_yt: body.nl_safety_factor_tension_yt,
             }
           }
-        
+          
           else {
-            const compressionCombination1 = (body.pl_safety_factor_compression_yG * body.permanent_load) + (body.pl_safety_factor_compression_yQ * body.variable_load)
-            const compressionOutput1 = rckCompression / body.pl_safety_factor_compression_yT
+            const compressionCombination1 = (body.pl_safety_factor_compression_yg * body.permanent_tension_load) + (body.pl_safety_factor_compression_yq * body.variable_tension_load)
+            const compressionOutput1 = rckCompression / body.pl_safety_factor_compression_yt
 
-            const tensionCombination1 = (body.pl_safety_factor_tension_yG * body.permanent_load) + (body.pl_safety_factor_tension_yQ * body.variable_load)
-            const tensionOutput1 = rckTension / body.pl_safety_factor_tension_yT
+            const tensionCombination1 = (body.pl_safety_factor_tension_yg * body.permanent_compression_load) + (body.pl_safety_factor_tension_yq * body.variable_compression_load)
+            const tensionOutput1 = rckTension / body.pl_safety_factor_tension_yt
 
-            if (compressionCombination1 <= compressionOutput1) {
-              throw new Error("Permanent and Variable Load combination 1 is less than the calculated compression.")
+            if (compressionCombination1 > compressionOutput1) {
+              throw new Error("Designed compression load is greater than the designed compressive resistance.")
             }
 
-            if (tensionCombination1 <= tensionOutput1) {
-              throw new Error("Permanent and Variable Load combination 1 is less than the calculated tension.")
+            if (tensionCombination1 > tensionOutput1) {
+              throw new Error("Designed tension load is greater than the designed tensile resistance.")
             }
 
             dynamicParams = {
-              permanent_load: body.permanent_load,
-              variable_load: body.variable_load,
+              permanent_load: body.permanent_tension_load,
+              variable_load: body.variable_tension_load,
+              permanent_compression_load: body.permanent_compression_load,
+              variable_compression_load: body.variable_compression_load,
               compression: roundToTwoDecimals(rckCompression),
               tension: roundToTwoDecimals(rckTension),
-              pl_safety_factor_compression_yG: body.pl_safety_factor_compression_yG,
-              pl_safety_factor_compression_yQ: body.pl_safety_factor_compression_yQ,
-              pl_safety_factor_compression_yT: body.pl_safety_factor_compression_yT,
-              pl_safety_factor_tension_yG: body.pl_safety_factor_tension_yG,
-              pl_safety_factor_tension_yQ: body.pl_safety_factor_tension_yQ,
-              pl_safety_factor_tension_yT: body.pl_safety_factor_tension_yT,
+              pl_safety_factor_compression_yg: body.pl_safety_factor_compression_yg,
+              pl_safety_factor_compression_yq: body.pl_safety_factor_compression_yq,
+              pl_safety_factor_compression_yt: body.pl_safety_factor_compression_yt,
+              pl_safety_factor_tension_yg: body.pl_safety_factor_tension_yg,
+              pl_safety_factor_tension_yq: body.pl_safety_factor_tension_yq,
+              pl_safety_factor_tension_yt: body.pl_safety_factor_tension_yt,
             }
           }
         }
 
         else {
-          if (!body.standardTension || !body.standardCompression) {
-            throw new Error("Standard Tension and Standard Compression are required when not using characteristic values.")
-          }
-
-          const tension = body.standardTension
-          const compression = body.standardCompression
+          const tension = body.standard_tensile_resistance
+          const compression = body.standard_compressive_resistance
 
           if (body.country === "uk") {
-            const compressionCombination1 = (body.uk_safety_factor_compression_yG1 * body.permanent_load) + (body.uk_safety_factor_compression_yQ1 * body.variable_load)
-            const compressionCombination2 = (body.uk_safety_factor_compression_yG2 * body.permanent_load) + (body.uk_safety_factor_compression_yQ2 * body.variable_load)
-            const compressionOutput1 = compression / body.uk_safety_factor_compression_yT1
-            const compressionOutput2 = compression / body.uk_safety_factor_compression_yT2
+            const compressionCombination1 = (body.uk_safety_factor_compression_yg1 * body.permanent_compression_load) + (body.uk_safety_factor_compression_yq1 * body.variable_compression_load)
+            const compressionCombination2 = (body.uk_safety_factor_compression_yg2 * body.permanent_compression_load) + (body.uk_safety_factor_compression_yq2 * body.variable_compression_load)
+            const compressionOutput1 = compression / body.uk_safety_factor_compression_yt1
+            const compressionOutput2 = compression / body.uk_safety_factor_compression_yt2
 
-            const tensionCombination1 = (body.uk_safety_factor_tension_yG2 * body.permanent_load) + (body.uk_safety_factor_tension_yQ2 * body.variable_load)
-            const tensionCombination2 = (body.uk_safety_factor_tension_yG1 * body.permanent_load) + (body.uk_safety_factor_tension_yQ1 * body.variable_load)
-            const tensionOutput1 = tension / body.uk_safety_factor_tension_yT1
-            const tensionOutput2 = tension / body.uk_safety_factor_tension_yT2
+            const tensionCombination1 = (body.uk_safety_factor_tension_yg2 * body.permanent_tension_load) + (body.uk_safety_factor_tension_yq2 * body.variable_tension_load)
+            const tensionCombination2 = (body.uk_safety_factor_tension_yg1 * body.permanent_tension_load) + (body.uk_safety_factor_tension_yq1 * body.variable_tension_load)
+            const tensionOutput1 = tension / body.uk_safety_factor_tension_yt1
+            const tensionOutput2 = tension / body.uk_safety_factor_tension_yt2
 
-            if (compressionCombination1 <= compressionOutput1) {
-              throw new Error("Permanent and Variable Load combination 1 is less than the calculated compression.")
+            if (compressionCombination1 > compressionOutput1) {
+              throw new Error("Designed compression load is greater than the designed compressive resistance.")
             }
 
-            if (compressionCombination2 <= compressionOutput2) {
-              throw new Error("Permanent and Variable Load combination 2 is less than the calculated compression.")
+            if (compressionCombination2 > compressionOutput2) {
+              throw new Error("Designed compression load is greater than the designed compressive resistance.")
             }
 
-            if (tensionCombination1 <= tensionOutput1) {
-              throw new Error("Permanent and Variable Load combination 1 is less than the calculated tension.")
+            if (tensionCombination1 > tensionOutput1) {
+              throw new Error("Designed tension load is greater than the designed tensile resistance.")
             }
 
-            if (tensionCombination2 <= tensionOutput2) {
-              throw new Error("Permanent and Variable Load combination 2 is less than the calculated tension.")
+            if (tensionCombination2 > tensionOutput2) {
+              throw new Error("Designed tension load is greater than the designed tensile resistance.")
             }
-
+            
             dynamicParams = {
-              permanent_load: body.permanent_load,
-              variable_load: body.variable_load,
+              permanent_tension_load: body.permanent_tension_load,
+              variable_tension_load: body.variable_tension_load,
+              permanent_compression_load: body.permanent_compression_load,
+              variable_compression_load: body.variable_compression_load,
               compression: roundToTwoDecimals(compression),
               tension: roundToTwoDecimals(tension),
-              uk_safety_factor_compression_yG1: body.uk_safety_factor_compression_yG1,
-              uk_safety_factor_compression_yQ1: body.uk_safety_factor_compression_yQ1,
-              uk_safety_factor_compression_yT1: body.uk_safety_factor_compression_yT1,
-              uk_safety_factor_compression_yG2: body.uk_safety_factor_compression_yG2,
-              uk_safety_factor_compression_yQ2: body.uk_safety_factor_compression_yQ2,
-              uk_safety_factor_compression_yT2: body.uk_safety_factor_compression_yT2,
-              uk_safety_factor_tension_yG1: body.uk_safety_factor_tension_yG1,
-              uk_safety_factor_tension_yQ1: body.uk_safety_factor_tension_yQ1,
-              uk_safety_factor_tension_yT1: body.uk_safety_factor_tension_yT1,
-              uk_safety_factor_tension_yG2: body.uk_safety_factor_tension_yG2,
-              uk_safety_factor_tension_yQ2: body.uk_safety_factor_tension_yQ2,
-              uk_safety_factor_tension_yT2: body.uk_safety_factor_tension_yT2,
+              uk_safety_factor_compression_yg1: body.uk_safety_factor_compression_yg1,
+              uk_safety_factor_compression_yq1: body.uk_safety_factor_compression_yq1,
+              uk_safety_factor_compression_yt1: body.uk_safety_factor_compression_yt1,
+              uk_safety_factor_compression_yg2: body.uk_safety_factor_compression_yg2,
+              uk_safety_factor_compression_yq2: body.uk_safety_factor_compression_yq2,
+              uk_safety_factor_compression_yt2: body.uk_safety_factor_compression_yt2,
+              uk_safety_factor_tension_yg1: body.uk_safety_factor_tension_yg1,
+              uk_safety_factor_tension_yq1: body.uk_safety_factor_tension_yq1,
+              uk_safety_factor_tension_yt1: body.uk_safety_factor_tension_yt1,
+              uk_safety_factor_tension_yg2: body.uk_safety_factor_tension_yg2,
+              uk_safety_factor_tension_yq2: body.uk_safety_factor_tension_yq2,
+              uk_safety_factor_tension_yt2: body.uk_safety_factor_tension_yt2,
             }
           }
 
           else if (body.country === "nl") {
-            const compressionCombination1 = (body.nl_safety_factor_compression_yG * body.permanent_load) + (body.nl_safety_factor_compression_yQ * body.variable_load)
-            const compressionOutput1 = compression / body.nl_safety_factor_compression_yT
+            const compressionCombination1 = (body.nl_safety_factor_compression_yg * body.permanent_tension_load) + (body.nl_safety_factor_compression_yq * body.variable_tension_load)
+            const compressionOutput1 = compression / body.nl_safety_factor_compression_yt
 
-            const tensionCombination1 = (body.nl_safety_factor_tension_yG * body.permanent_load) + (body.nl_safety_factor_tension_yQ * body.variable_load)
-            const tensionOutput1 = tension / body.nl_safety_factor_tension_yT
-            
-            if (compressionCombination1 <= compressionOutput1) {
-              throw new Error("Permanent and Variable Load combination 1 is less than the calculated compression.")
+            const tensionCombination1 = (body.nl_safety_factor_tension_yg * body.permanent_compression_load) + (body.nl_safety_factor_tension_yq * body.variable_tension_load)
+            const tensionOutput1 = tension / body.nl_safety_factor_tension_yt
+
+            if (compressionCombination1 > compressionOutput1) {
+              throw new Error("Designed compression load is greater than the designed compressive resistance.")
             }
 
-            if (tensionCombination1 <= tensionOutput1) {
-              throw new Error("Permanent and Variable Load combination 1 is less than the calculated tension.")
+            if (tensionCombination1 > tensionOutput1) {
+              throw new Error("Designed tension load is greater than the designed tensile resistance.")
             }
 
             dynamicParams = {
-              permanent_load: body.permanent_load,
-              variable_load: body.variable_load,
+              permanent_tension_load: body.permanent_tension_load,
+              variable_tension_load: body.variable_tension_load,
+              permanent_compression_load: body.permanent_compression_load,
+              variable_compression_load: body.variable_compression_load,
               compression: roundToTwoDecimals(compression),
               tension: roundToTwoDecimals(tension),
-              nl_safety_factor_compression_yG: body.nl_safety_factor_compression_yG,
-              nl_safety_factor_compression_yQ: body.nl_safety_factor_compression_yQ,
-              nl_safety_factor_compression_yT: body.nl_safety_factor_compression_yT,
-              nl_safety_factor_tension_yG: body.nl_safety_factor_tension_yG,
-              nl_safety_factor_tension_yQ: body.nl_safety_factor_tension_yQ,
-              nl_safety_factor_tension_yT: body.nl_safety_factor_tension_yT,
+              nl_safety_factor_compression_yg: body.nl_safety_factor_compression_yg,
+              nl_safety_factor_compression_yq: body.nl_safety_factor_compression_yq,
+              nl_safety_factor_compression_yt: body.nl_safety_factor_compression_yt,
+              nl_safety_factor_tension_yg: body.nl_safety_factor_tension_yg,
+              nl_safety_factor_tension_yq: body.nl_safety_factor_tension_yq,
+              nl_safety_factor_tension_yt: body.nl_safety_factor_tension_yt,
             }
           }
           
           else {
-            const compressionCombination1 = (body.pl_safety_factor_compression_yG * body.permanent_load) + (body.pl_safety_factor_compression_yQ * body.variable_load)
-            const compressionOutput1 = compression / body.pl_safety_factor_compression_yT
+            const compressionCombination1 = (body.pl_safety_factor_compression_yg * body.permanent_tension_load) + (body.pl_safety_factor_compression_yq * body.variable_tension_load)
+            const compressionOutput1 = compression / body.pl_safety_factor_compression_yt
 
-            const tensionCombination1 = (body.pl_safety_factor_tension_yG * body.permanent_load) + (body.pl_safety_factor_tension_yQ * body.variable_load)
-            const tensionOutput1 = tension / body.pl_safety_factor_tension_yT
+            const tensionCombination1 = (body.pl_safety_factor_tension_yg * body.permanent_compression_load) + (body.pl_safety_factor_tension_yq * body.variable_compression_load)
+            const tensionOutput1 = tension / body.pl_safety_factor_tension_yt
 
-            if (compressionCombination1 <= compressionOutput1) {
-              throw new Error("Permanent and Variable Load combination 1 is less than the calculated compression.")
+            if (compressionCombination1 > compressionOutput1) {
+              throw new Error("Designed compression load is greater than the designed compressive resistance.")
             }
 
-            if (tensionCombination1 <= tensionOutput1) {
-              throw new Error("Permanent and Variable Load combination 1 is less than the calculated tension.")
+            if (tensionCombination1 > tensionOutput1) {
+              throw new Error("Designed tension load is greater than the designed tensile resistance.")
             }
 
             dynamicParams = {
-              permanent_load: body.permanent_load,
-              variable_load: body.variable_load,
+              permanent_load: body.permanent_tension_load,
+              variable_load: body.variable_tension_load,
+              permanent_compression_load: body.permanent_compression_load,
+              variable_compression_load: body.variable_compression_load,
               compression: roundToTwoDecimals(compression),
               tension: roundToTwoDecimals(tension),
-              pl_safety_factor_compression_yG: body.pl_safety_factor_compression_yG,
-              pl_safety_factor_compression_yQ: body.pl_safety_factor_compression_yQ,
-              pl_safety_factor_compression_yT: body.pl_safety_factor_compression_yT,
-              pl_safety_factor_tension_yG: body.pl_safety_factor_tension_yG,
-              pl_safety_factor_tension_yQ: body.pl_safety_factor_tension_yQ,
-              pl_safety_factor_tension_yT: body.pl_safety_factor_tension_yT,
+              pl_safety_factor_compression_yg: body.pl_safety_factor_compression_yg,
+              pl_safety_factor_compression_yq: body.pl_safety_factor_compression_yq,
+              pl_safety_factor_compression_yt: body.pl_safety_factor_compression_yt,
+              pl_safety_factor_tension_yg: body.pl_safety_factor_tension_yg,
+              pl_safety_factor_tension_yq: body.pl_safety_factor_tension_yq,
+              pl_safety_factor_tension_yt: body.pl_safety_factor_tension_yt,
             }
           }
         }
@@ -658,7 +665,13 @@ export async function POST(req: NextRequest) {
       default:
       throw new Error(`Unknown safety design method: ${body.design_method}`)
     }
-    
+
+    const fullDynamicParams = {
+      design_method: body.design_method,
+      country: body.country,
+      ...dynamicParams
+    }
+
     const baseParams = {
       pile_diameter: body.pile_diameter, 
       job_number: body.job_number,
@@ -671,12 +684,25 @@ export async function POST(req: NextRequest) {
       show_moist: body.show_moist,
       show_sat: body.show_sat,
       show_shear_strength: body.show_shear_strength,
+
       soil_notes: body.soil_notes || "",
-      
       design_notes: body.design_notes || "",
+      pile_notes: body.pile_notes || "",
     }
 
-    const fullDynamicParams = {design_method: body.design_method, country: body.country, ...dynamicParams}
+    const pileStructure = {
+      nominal_stress_area: body.nominal_stress_area,
+      ultimate_tensile_strength_a480: body.ultimate_tensile_strength_a480,
+      k2: body.k2,
+      ultimate_tensile_strength_lm25m: body.ultimate_tensile_strength_lm25m,
+      thread_engagement_length: body.thread_engagement_length,
+      pitch_diameter: body.pitch_diameter,
+      pile_gross_area: body.pile_gross_area,
+      proof_strength: body.proof_strength,
+      partial_safety_factor_1: body.partial_safety_factor_1,
+      partial_safety_factor_2: body.partial_safety_factor_2,
+    }
+
     const supabase = await createClient()
     const { data } = await supabase.auth.getClaims()
 
@@ -685,6 +711,7 @@ export async function POST(req: NextRequest) {
       soils_data: soilsData,
       dynamic_params: fullDynamicParams,
       base_params: baseParams,
+      pile_structure: pileStructure,
       user_id: data?.claims.sub
     }
 
@@ -708,9 +735,7 @@ export async function POST(req: NextRequest) {
     await browser.setCookie({
       name: 'sb-kiasruegemqnakhmbels-auth-token',
       value: cookie ?? '',
-      domain: process.env.NODE_ENV === 'production'
-        ? new URL(process.env.NEXT_PUBLIC_SITE_URL!).hostname
-        : 'localhost',
+      domain: process.env.NODE_ENV === 'production' ? new URL(process.env.NEXT_PUBLIC_SITE_URL!).hostname : 'localhost',
       path: '/',
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production'
@@ -754,4 +779,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid Request" }, { status: 500 })
   }
 }
-

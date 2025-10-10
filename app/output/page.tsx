@@ -11,12 +11,22 @@ export default async function ExportOutputPage() {
 
   const { data: exportData, error: exportError } = await supabase
   .from("exports")
-  .select("profile_data, soils_data, dynamic_params, base_params")
+  .select("profile_data, soils_data, dynamic_params, base_params, pile_structure")
   .single()
 
   if (exportError || !exportData) {
-    return <div className="p-6 text-red-600">No export data found</div>
+    return <div className="p-6 text-red-600">An unexpected error has occured, please try again later.</div>
   }
 
-  return <OutputComponent soilsData={exportData.soils_data} profileData={exportData.profile_data} dynamicParams={exportData.dynamic_params} baseParams={exportData.base_params} />
+  return (
+    <OutputComponent 
+      soilsData={exportData.soils_data} 
+      profileData={exportData.profile_data} 
+      dynamicParams={exportData.dynamic_params} 
+      baseParams={exportData.base_params} 
+      pileStructure={exportData.pile_structure} 
+    />
+  )
 }
+
+
