@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server'
 import { TexportSoilProfileSchema } from '@/schemas/soilProfileSchemas'
 import { ToverviewSoilSchema } from '@/schemas/soilSchemas'
 import { roundToTwoDecimals } from '@/lib/utils'
+import type { Browser } from 'puppeteer'
 
 async function getProfiles(profileId: string): Promise<TexportSoilProfileSchema> {
   try {
@@ -22,7 +23,7 @@ async function getProfiles(profileId: string): Promise<TexportSoilProfileSchema>
   }
 
   catch {
-    throw new Error("Failed to fetch neccessary soil profile data, please try again later.")
+    throw new Error("Failed to export data, please try again later.")
   }
 }
 
@@ -43,7 +44,7 @@ async function getSoils(profileId: string): Promise<ToverviewSoilSchema[]> {
   }
 
   catch {
-   throw new Error('Please insert soil layers before attempting to export analysis.')
+   throw new Error('Please insert soil layers before attempting to export data.')
   }
 }
 
@@ -660,7 +661,7 @@ export async function POST(req: NextRequest) {
       break;
 
       default:
-      throw new Error(`Unknown safety design method: ${body.design_method}`)
+      throw new Error(`Unknown design method: ${body.design_method}`)
     }
 
     const fullDynamicParams = {
@@ -698,6 +699,8 @@ export async function POST(req: NextRequest) {
       proof_strength: body.proof_strength,
       partial_safety_factor_1: body.partial_safety_factor_1,
       partial_safety_factor_2: body.partial_safety_factor_2,
+      horizontal_load: body.horizontal_load,
+      horizontal_load_safety_factor: body.horizontal_load_safety_factor
     }
 
     const supabase = await createClient()
@@ -717,74 +720,68 @@ export async function POST(req: NextRequest) {
     .upsert(finalObject)
 
     if (error) {
-      throw new Error("Failed to save export data")
+      throw new Error("Failed to export data, please try again later.")
     }
     
-    let puppeteer: any, launchOptions: any = {headless: true}
+    let browser: Browser | undefined | null
 
-    const isProduction = process.env.NODE_ENV === 'production' ? true : false
+    const viewPort = {width: 1280, height: 1080, deviceScaleFactor: 1}
 
-    if (isProduction) {
+    if (process.env.NODE_ENV === "production") {
       const chromium = (await import("@sparticuz/chromium")).default
-      puppeteer = await import ("puppeteer-core")
-      launchOptions = {
-        ...launchOptions,
+      const puppeteer = await import ("puppeteer-core")
+      browser = await puppeteer.launch({
         args: chromium.args,
         executablePath: await chromium.executablePath(),
-      }
+        defaultViewport: viewPort
+      })
     }
 
     else {
-      puppeteer = await import ("puppeteer")
+      const puppeteer = await import ("puppeteer")
+      browser = await puppeteer.launch({
+        defaultViewport: viewPort
+      })
     }
 
     const cookie = req.cookies.get('sb-kiasruegemqnakhmbels-auth-token')?.value
-
-    const browser = await puppeteer.launch(launchOptions);
-    
-    const page = await browser.newPage()
-
-     const baseUrl = process.env.NODE_ENV === 'production' 
-      ? process.env.NEXT_PUBLIC_SITE_URL || `https://${process.env.VERCEL_URL}`
-      : 'http://localhost:3000'
-    
-    // Extract domain from base URL
-    const domain = process.env.NODE_ENV === 'production' 
-      ? new URL(baseUrl).hostname 
-      : 'localhost'
-
-    console.log('Base URL:', baseUrl, 'Domain:', domain, 'VERCEL URL:', process.env.VERCEL_URL, 'SITE URL:', process.env.NEXT_PUBLIC_SITE_URL)
     await browser.setCookie({
       name: 'sb-kiasruegemqnakhmbels-auth-token',
       value: cookie ?? '',
-      domain: domain,
-      path: '/',
+      domain: process.env.NODE_ENV === 'production' ? "helical-pile-computations.vercel.app" : 'localhost',
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production'
     })
     
-    await page.setViewport({ 
-      width: 1280, height: 1080, 
-      deviceScaleFactor: 1
+    const page = await browser.newPage()
+    await page.goto(`${process.env.NODE_ENV === 'production'  ? "https://helical-pile-computations.vercel.app" : 'http://localhost:3000'}/output`, { 
+      waitUntil: 'networkidle0',
     })
     
-    await page.goto(`${baseUrl}/output`, { 
-      waitUntil: 'networkidle2',
-      timeout: 30000 
-    })
-   
+    const footerTemplate = `
+      <div style="width:100%; padding:10px 0px; margin: 0px 20px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid #ccc;">
+        <div style="text-align:left; line-height:1.3; font-size:10px;">
+          Version 1.0.0 @ Target Fixings<br/>
+          Helical Pile Computations
+        </div>
+        <div style="text-align:right; font-size:12px;">
+          <span class="pageNumber"></span>
+        </div>
+      </div>
+    `
+    const headerTemplate = ` 
+      <div style="width:100%; padding: 10px 0px; margin: 0px 20px; font-size: 12px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #ccc;">
+        My Header
+      </div>
+    `
+
     const pdf = await page.pdf({
       format: 'A4',
       printBackground: true,
-      margin: {
-        top: '20px',
-        right: '20px',
-        bottom: '20px',
-        left: '20px'
-      },
+      margin: {top: '20px', right: '20px', bottom: '20px', left: '20px'},
       displayHeaderFooter: true,
-      headerTemplate: `<div>My Header</div>`,
-      footerTemplate: `<div style="font-size:8px; width:100%; text-align:center; margin-bottom:5px;"><span class="pageNumber"></span> / <span class="totalPages"></span></div>`,
+      headerTemplate: headerTemplate,
+      footerTemplate: footerTemplate,
     })
     
     await browser.close()

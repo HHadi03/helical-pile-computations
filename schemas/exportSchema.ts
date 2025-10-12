@@ -2,10 +2,10 @@ import * as z from "zod"
 
 export const exportFormSchema = z.object({
   pile_diameter: z.enum(["60", "100"], { error: "Pile Diameter is required" }),
-  job_number: z.string().optional(),
-  job_location: z.string().optional(),
-  pile_number: z.string().optional(),
-  checked_by: z.string().optional(),
+  job_number: z.string().max(20, { error: "Job Number must be less than 20 characters" }).optional(),
+  job_location: z.string().max(30, { error: "Job Location must be less than 30 characters" }).optional(),
+  pile_number: z.string().max(20, { error: "Pile Number must be less than 20 characters" }).optional(),
+  checked_by: z.string().max(30, { error: "Checked By must be less than 30 characters" }).optional(),
 
   soil_profile_id: z.uuid({ error: "Soil Profile is required" }),
   show_description: z.boolean(),
