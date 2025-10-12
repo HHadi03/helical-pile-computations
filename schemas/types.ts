@@ -78,4 +78,6 @@ export type PileStructureType = {
   proof_strength: number,
   partial_safety_factor_1: number,
   partial_safety_factor_2: number,
+  horizontal_load: number,
+  horizontal_load_safety_factor: number
 }
