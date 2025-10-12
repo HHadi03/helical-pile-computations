@@ -142,7 +142,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
         window.URL.revokeObjectURL(url)
         document.body.removeChild(a)
         
-        // handleClose()
+        handleClose()
       }
     }
 
