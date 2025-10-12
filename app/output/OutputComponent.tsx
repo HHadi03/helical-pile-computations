@@ -2,25 +2,24 @@
 import { ToverviewSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { DynamicParamsType, PileStructureType, BaseParamsType } from "@/schemas/types"
 import { ToverviewSoilSchema } from "@/schemas/soilSchemas"
-import { roundToTwoDecimals } from "@/lib/utils"
 
 export function OutputComponent({ baseParams, dynamicParams, soilsData, profileData, pileStructure }: { baseParams: BaseParamsType, dynamicParams: DynamicParamsType, pileStructure: PileStructureType, soilsData: ToverviewSoilSchema[], profileData: ToverviewSoilProfileSchema }) {
-  
-  const totalTensionLoad = dynamicParams.design_method === "method_bs" ? dynamicParams.applied_tension_load : dynamicParams.permanent_tension_load + dynamicParams.variable_tension_load
-  const totalCompressionLoad = dynamicParams.design_method === "method_bs" ? dynamicParams.applied_compression_load : dynamicParams.permanent_compression_load + dynamicParams.variable_compression_load
-  const totalHorizontalLoad = pileStructure.horizontal_load * pileStructure.horizontal_load_safety_factor
 
-  const Ftra = roundToTwoDecimals(pileStructure.k2 * pileStructure.ultimate_tensile_strength_a480 * pileStructure.nominal_stress_area / (pileStructure.partial_safety_factor_2 * 1000))
+  // const totalTensionLoad = dynamicParams.design_method === "method_bs" ? dynamicParams.applied_tension_load : dynamicParams.permanent_tension_load + dynamicParams.variable_tension_load
+  // const totalCompressionLoad = dynamicParams.design_method === "method_bs" ? dynamicParams.applied_compression_load : dynamicParams.permanent_compression_load + dynamicParams.variable_compression_load
+  // const totalHorizontalLoad = pileStructure.horizontal_load * pileStructure.horizontal_load_safety_factor
+
+  // const Ftra = roundToTwoDecimals(pileStructure.k2 * pileStructure.ultimate_tensile_strength_a480 * pileStructure.nominal_stress_area / (pileStructure.partial_safety_factor_2 * 1000))
  
-  const Fvra = roundToTwoDecimals(0.6 * pileStructure.ultimate_tensile_strength_a480 * pileStructure.nominal_stress_area / (pileStructure.partial_safety_factor_2 * 1000))
+  // const Fvra = roundToTwoDecimals(0.6 * pileStructure.ultimate_tensile_strength_a480 * pileStructure.nominal_stress_area / (pileStructure.partial_safety_factor_2 * 1000))
 
-  const Ftvra = roundToTwoDecimals(Math.PI * pileStructure.pitch_diameter * pileStructure.thread_engagement_length / 2 * 0.65 * pileStructure.ultimate_tensile_strength_lm25m / (pileStructure.partial_safety_factor_2 * 1000))
+  // const Ftvra = roundToTwoDecimals(Math.PI * pileStructure.pitch_diameter * pileStructure.thread_engagement_length / 2 * 0.65 * pileStructure.ultimate_tensile_strength_lm25m / (pileStructure.partial_safety_factor_2 * 1000))
 
-  const Ntra = roundToTwoDecimals(Math.min(pileStructure.pile_gross_area * pileStructure.proof_strength / (pileStructure.partial_safety_factor_1 * 1000), 0.9 * 242 * pileStructure.ultimate_tensile_strength_lm25m / (pileStructure.partial_safety_factor_2 * 1000)))
+  // const Ntra = roundToTwoDecimals(Math.min(pileStructure.pile_gross_area * pileStructure.proof_strength / (pileStructure.partial_safety_factor_1 * 1000), 0.9 * 242 * pileStructure.ultimate_tensile_strength_lm25m / (pileStructure.partial_safety_factor_2 * 1000)))
 
-  const Nura = roundToTwoDecimals(242 * pileStructure.ultimate_tensile_strength_lm25m / (pileStructure.partial_safety_factor_2 * 1000))
+  // const Nura = roundToTwoDecimals(242 * pileStructure.ultimate_tensile_strength_lm25m / (pileStructure.partial_safety_factor_2 * 1000))
   
-
+console.log({baseParams, dynamicParams, soilsData, profileData, pileStructure})
   return (
     <>
       {/* --- PAGE 1: Title Page --- */}

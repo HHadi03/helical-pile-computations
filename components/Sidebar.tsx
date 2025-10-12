@@ -63,7 +63,7 @@ export const Sidebar = () => {
 
   const allNavigationItems = navigationSections.flatMap(section => section.items)
   return (
-    <aside className={`bg-sidebar flex flex-col shrink-0 border-r border-sidebar-border p-2 shadow-inner overflow-y-auto overflow-x-clip scrollbar-thin scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-500 ${expanded ? 'w-[260px] animate-in ease-in-out duration-500' : 'w-[70px] animate-out ease-out duration-500'}`}>
+    <aside className={`bg-sidebar flex flex-col shrink-0 border-r border-sidebar-border p-2 shadow-inner overflow-y-auto overflow-x-clip scrollbar-thin scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-500 ${isResizing ? 'opacity-50' : 'opacity-100'} ${expanded ? 'w-[260px] animate-in ease-in-out duration-500' : 'w-[70px] animate-out ease-out duration-500'}`}>
       {expanded ? (
         <div className="flex flex-row items-center justify-between mt-2">
           <Image src='/logo.png' alt='Company Logo' width={195} height={40}/>
