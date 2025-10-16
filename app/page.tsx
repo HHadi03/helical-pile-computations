@@ -3,7 +3,7 @@ import { LoginForm } from './LoginForm'
 
 export default function LandingPage() {
   return (
-    <main className="h-screen bg-cover bg-center overflow-y-auto overflow-x-clip" style={{backgroundImage: "url('/pageBackground.jpg')"}}>
+    <main className="h-screen bg-cover bg-center bg-[url('/pageBackground.jpg')] overflow-y-auto overflow-x-clip">
       
       <header className="bg-background dark:bg-secondary p-3 flex flex-col items-center space-y-2 shadow-lg sm:flex-row sm:space-y-0 sm:gap-5 sm:justify-center">
         <Image src='/logo.png' alt='Company Logo' width={195} height={40} priority={true}/>
@@ -13,7 +13,7 @@ export default function LandingPage() {
       <div className="flex justify-center sm:justify-end px-5 mt-15 mb-5 sm:pr-20">
         <LoginForm />
       </div>
-
+      
     </main>
   )
 }

@@ -306,7 +306,7 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
           const url = URL.createObjectURL(blob)
           const link = document.createElement('a')
           link.href = url
-          link.download = "pile-capacity-chart.png"
+          link.download = "helical-pile-capacities-chart.png"
           
           document.body.appendChild(link)
           link.click()
@@ -501,10 +501,10 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
                   {isSelected && (
                     <div className="flex flex-col gap-4 sm:flex-row">
                       <div className="flex items-center gap-2">
-                        <Label className="text-muted-foreground">Line Colour:</Label>
+                        <Label htmlFor="color-picker" className="text-muted-foreground">Line Colour:</Label>
                         <Popover>
                           <PopoverTrigger asChild>
-                            <Button variant="outline" className="size-6 p-0 rounded-full" style={{ backgroundColor: displayColor }}></Button>
+                            <Button id="color-picker" variant="outline" className="size-6 p-0 rounded-full" style={{ backgroundColor: displayColor }}></Button>
                           </PopoverTrigger>
                           <PopoverContent className="p-0 w-auto rounded-sm" align="center" side="right">
                             <ChromePicker color={displayColor} onChangeComplete={(color) => handleColorChange(selection.id, color.hex)} className="text-black" disableAlpha={true}/>
@@ -513,8 +513,8 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
                       </div>
                       
                       <div className="flex items-center gap-2 flex-1">
-                        <Label className="text-muted-foreground">Line Width:</Label>
-                        <Slider value={[displayStrokeWidth]} onValueChange={(value) => handleStrokeWidthChange(selection.id, value)} max={10} min={1} step={1} className="flex-1 max-w-[66%]"/>
+                        <span className="text-muted-foreground text-sm">Line Width:</span>
+                        <Slider  value={[displayStrokeWidth]} onValueChange={(value) => handleStrokeWidthChange(selection.id, value)} max={10} min={1} step={1} className="flex-1 max-w-[66%]"/>
                         <span className="text-sm text-muted-foreground">{displayStrokeWidth}</span>
                       </div>
                     </div>

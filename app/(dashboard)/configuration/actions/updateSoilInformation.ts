@@ -3,13 +3,14 @@ import { TeditSoilInformationSchema } from "@/schemas/soilSchemas"
 import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
 import { calculateResultsForFineSoil, calculateResultsForSoils, calculateResultsForFineSoilCPT, calculateResultsForSoilsCPT } from "@/lib/equations"
+import { capitaliseFirstLetter } from "@/lib/utils"
 
 type DirtyFields = Partial<Record<keyof TeditSoilInformationSchema, boolean>>
 
 export async function updateSoilInformation(soil: TeditSoilInformationSchema, soilId: string,  dirtyFields: DirtyFields = {}) {
 
   if (soil.soil_name && dirtyFields.soil_name) {
-    soil = {...soil, soil_name: soil.soil_name.charAt(0).toUpperCase() + soil.soil_name.slice(1)}
+    soil = {...soil, soil_name: capitaliseFirstLetter(soil.soil_name)}
   }
 
   if (dirtyFields.soil_type) {

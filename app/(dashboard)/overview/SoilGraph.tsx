@@ -71,8 +71,8 @@ export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, 
   
   const chartData = createDenseChartData()
   return (
-    <div className="border">
-      <div className="p-2 bg-sky-50 dark:bg-sky-900/50 border"> 
+    <div>
+      <div className="p-2 bg-sky-50 dark:bg-sky-900/50 border-2"> 
         <div className="flex flex-col space-y-3 sm:flex-row sm:justify-between sm:space-y-0">
 
           <div className="flex flex-col">
@@ -89,7 +89,7 @@ export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, 
         </div>
       </div>
 
-      <div className={`h-110 border-t`}>
+      <div className="h-110 border-x border-b">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} layout="vertical" margin={{ top: 15, right: 40, left: 0, bottom: 30 }}>
             
@@ -139,7 +139,7 @@ export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, 
             <Line 
               type={"linear"}
               dataKey={shaftCapacityKey}
-              {...resolvedTheme === 'dark' ? { stroke: "oklch(0.62 0.19 260)" } : { stroke: "oklch(0.696 0.17 162.48)" } }
+              stroke={resolvedTheme === 'dark' ? "oklch(0.62 0.19 260)" : "oklch(0.696 0.17 162.48)"}
               strokeWidth={2.5}
               animationDuration={1200}
               name="Total Capacity"

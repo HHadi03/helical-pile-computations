@@ -60,6 +60,7 @@ export const exportSoilSchema = z.object({
   y_moist: z.number(),
   y_sat: z.number(),
   su: z.number(),
+  qult: z.number(),
   t: z.number(),
   shaft_capacity60: z.number(),
   shaft_capacity100: z.number(),

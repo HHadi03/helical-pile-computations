@@ -2,11 +2,12 @@
 import { TinsertSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
+import { capitaliseFirstLetter } from "@/lib/utils"
 
 export async function insertProfile(profile: TinsertSoilProfileSchema) {
  
   if (profile.profile_name) {
-    profile = {...profile, profile_name: profile. profile_name.charAt(0).toUpperCase() + profile. profile_name.slice(1)}
+    profile = {...profile, profile_name: capitaliseFirstLetter(profile.profile_name)}
   }
 
   const effectivePileLength = profile.pile_length - profile.pile_stick_out

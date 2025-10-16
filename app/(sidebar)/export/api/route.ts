@@ -2,16 +2,19 @@ import { NextRequest, NextResponse } from 'next/server'
 import { exportFormSchema, TexportFormSchema } from '@/schemas/exportSchema'
 import { createClient } from '@/utils/supabase/server'
 import { TexportSoilProfileSchema } from '@/schemas/soilProfileSchemas'
-import { ToverviewSoilSchema } from '@/schemas/soilSchemas'
-import { roundToTwoDecimals } from '@/lib/utils'
+import { TexportSoilSchema } from '@/schemas/soilSchemas'
+import { roundToTwoDecimals, capitaliseFirstLetter } from '@/lib/utils'
 import type { Browser } from 'puppeteer'
+import fs from 'fs'
+import path from 'path'
+import { PDFDocument } from 'pdf-lib'
 
 async function getProfiles(profileId: string): Promise<TexportSoilProfileSchema> {
   try {
     const supabase = await createClient()
     const {data, error} = await supabase
     .from("soil_profiles")
-    .select("profile_name, water_depth, effective_pile_length, pile_stick_out")
+    .select("profile_name, water_depth, effective_pile_length")
     .eq("id", profileId)
     .single()
 
@@ -27,22 +30,22 @@ async function getProfiles(profileId: string): Promise<TexportSoilProfileSchema>
   }
 }
 
-async function getSoils(profileId: string): Promise<ToverviewSoilSchema[]> {
+async function getSoils(profileId: string): Promise<TexportSoilSchema[]> {
   try {
     const supabase = await createClient()
     const { data, error } = await supabase
     .from('soils')
-    .select("id, soil, soil_name, soil_type, soil_profile_id, description, test_type, colour, start_depth, end_depth, n_value, y_moist, y_sat, su, t, shaft_capacity60, shaft_capacity100, bearing_capacity60, bearing_capacity100")
+    .select("id, soil, soil_name, soil_type, soil_profile_id, description, test_type, colour, start_depth, end_depth, n_value, y_moist, y_sat, su, t, qult, shaft_capacity60, shaft_capacity100, bearing_capacity60, bearing_capacity100")
     .order('start_depth', { ascending: true })
     .eq("soil_profile_id", profileId)
 
     if (error || data.length === 0) {
       throw new Error()
     }
- 
+    
     return data 
   }
-
+  
   catch {
    throw new Error('Please insert soil layers before attempting to export data.')
   }
@@ -85,7 +88,7 @@ export async function POST(req: NextRequest) {
     const json = await req.json()
     const body: TexportFormSchema = exportFormSchema.parse(json)
 
-    let soilsData: ToverviewSoilSchema[]
+    let soilsData: TexportSoilSchema[]
     let profileData: TexportSoilProfileSchema 
     let dynamicParams
     
@@ -283,8 +286,8 @@ export async function POST(req: NextRequest) {
             }
 
             dynamicParams = {
-              permanent_load: body.permanent_tension_load,
-              variable_load: body.variable_tension_load,
+              permanent_tension_load: body.permanent_tension_load,
+              variable_tension_load: body.variable_tension_load,
               permanent_compression_load: body.permanent_compression_load,
               variable_compression_load: body.variable_compression_load,
               compression: roundToTwoDecimals(rckCompression),
@@ -402,8 +405,8 @@ export async function POST(req: NextRequest) {
             }
 
             dynamicParams = {
-              permanent_load: body.permanent_tension_load,
-              variable_load: body.variable_tension_load,
+              permanent_tension_load: body.permanent_tension_load,
+              variable_tension_load: body.variable_tension_load,
               permanent_compression_load: body.permanent_compression_load,
               variable_compression_load: body.variable_compression_load,
               compression: roundToTwoDecimals(compression),
@@ -527,8 +530,8 @@ export async function POST(req: NextRequest) {
             }
 
             dynamicParams = {
-              permanent_load: body.permanent_tension_load,
-              variable_load: body.variable_tension_load,
+              permanent_tension_load: body.permanent_tension_load,
+              variable_tension_load: body.variable_tension_load,
               permanent_compression_load: body.permanent_compression_load,
               variable_compression_load: body.variable_compression_load,
               compression: roundToTwoDecimals(rckCompression),
@@ -643,8 +646,8 @@ export async function POST(req: NextRequest) {
             }
 
             dynamicParams = {
-              permanent_load: body.permanent_tension_load,
-              variable_load: body.variable_tension_load,
+              permanent_tension_load: body.permanent_tension_load,
+              variable_tension_load: body.variable_tension_load,
               permanent_compression_load: body.permanent_compression_load,
               variable_compression_load: body.variable_compression_load,
               compression: roundToTwoDecimals(compression),
@@ -672,9 +675,9 @@ export async function POST(req: NextRequest) {
 
     const baseParams = {
       pile_diameter: body.pile_diameter, 
-      job_number: body.job_number,
-      pile_number: body.pile_number,
-      job_location: body.job_location,
+      job_number: capitaliseFirstLetter(body.job_number),
+      pile_number: capitaliseFirstLetter(body.pile_number),
+      job_location: capitaliseFirstLetter(body.job_location),
       checked_by: body.checked_by,
 
       show_description: body.show_description,
@@ -754,39 +757,73 @@ export async function POST(req: NextRequest) {
     })
     
     const page = await browser.newPage()
-    await page.goto(`${process.env.NODE_ENV === 'production'  ? "https://helical-pile-computations.vercel.app" : 'http://localhost:3000'}/output`, { 
-      waitUntil: 'networkidle0',
+    await page.goto(`${process.env.NODE_ENV === 'production'  ? "https://helical-pile-computations.vercel.app" : 'http://localhost:3000'}/fplhcpwsxxeroemntljhzsio`, { 
+      waitUntil: 'networkidle2',
     })
     
+    const imagePath = path.join(process.cwd(), 'public', 'logo.png');
+    const imageBase64 = fs.readFileSync(imagePath, 'base64');
+    const imageDataUri = `data:image/png;base64,${imageBase64}`;
+
+    const imagePath2 = path.join(process.cwd(), 'public', 'logo-2.jpg');
+    const imageBase64_2 = fs.readFileSync(imagePath2, 'base64');
+    const imageDataUri2 = `data:image/jpeg;base64,${imageBase64_2}`;
+
+
     const footerTemplate = `
-      <div style="width:100%; padding:10px 0px; margin: 0px 20px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid #ccc;">
-        <div style="text-align:left; line-height:1.3; font-size:10px;">
+      <div style="width:100%; padding:10px 0px; margin: 0px 50px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid #ccc;">
+        <div style="line-height:1.3; font-size:10px;">
           Version 1.0.0 @ Target Fixings<br/>
           Helical Pile Computations
         </div>
-        <div style="text-align:right; font-size:12px;">
-          <span class="pageNumber"></span>
-        </div>
+        
+        <span class="pageNumber" style="font-size:12px;"></span>
       </div>
     `
     const headerTemplate = ` 
-      <div style="width:100%; padding: 10px 0px; margin: 0px 20px; font-size: 12px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #ccc;">
-        My Header
+      <div style="width:100%; padding: 10px 0px; margin: 0px 40px; display: flex; justify-content: space-between; align-items: center;">
+        <img src="${imageDataUri}" style="height: 50px;" />
+      
+        <img src="${imageDataUri2}" style="height: 60px;" />
       </div>
     `
 
-    const pdf = await page.pdf({
+    const pdfA = await page.pdf({
       format: 'A4',
       printBackground: true,
-      margin: {top: '20px', right: '20px', bottom: '20px', left: '20px'},
+      pageRanges: '1',
+    })
+
+    const pdfB = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      margin: {top: '120px', right: '50px', bottom: '60px', left: '50px'},
       displayHeaderFooter: true,
       headerTemplate: headerTemplate,
       footerTemplate: footerTemplate,
+      pageRanges: '2-',
     })
     
     await browser.close()
     
-    return new NextResponse(new Uint8Array(pdf), {headers: {'Content-Type': 'application/pdf'}})
+    const mergedPdf = await PDFDocument.create()
+
+    // Load the first PDF
+    const pdfDocA = await PDFDocument.load(pdfA)
+    const pagesA = await mergedPdf.copyPages(pdfDocA, pdfDocA.getPageIndices())
+    pagesA.forEach((page) => mergedPdf.addPage(page))
+
+    // Load the second PDF
+    const pdfDocB = await PDFDocument.load(pdfB)
+    const pagesB = await mergedPdf.copyPages(pdfDocB, pdfDocB.getPageIndices())
+    pagesB.forEach((page) => mergedPdf.addPage(page))
+
+    // Save the merged PDF
+    const mergedPdfBytes = await mergedPdf.save()
+
+    return new NextResponse(new Uint8Array(mergedPdfBytes), {
+    headers: {'Content-Type': 'application/pdf'}
+    })
   }
   
   catch (error) {
