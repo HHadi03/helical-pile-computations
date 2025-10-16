@@ -3,11 +3,12 @@ import { TinsertSoilSchema } from "@/schemas/soilSchemas"
 import { calculateResultsForFineSoil, calculateResultsForSoils, calculateResultsForFineSoilCPT, calculateResultsForSoilsCPT } from "@/lib/equations"
 import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
+import { capitaliseFirstLetter } from "@/lib/utils"
 
 export async function insertSoil(soil: TinsertSoilSchema, profileId: string) {
 
   if (soil.soil_name) {
-    soil = {...soil, soil_name: soil.soil_name.charAt(0).toUpperCase() + soil.soil_name.slice(1)}
+    soil = {...soil, soil_name: capitaliseFirstLetter(soil.soil_name)}
   }
   
   if (soil.test_type === "spt") {

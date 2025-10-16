@@ -171,16 +171,3 @@ input::-webkit-inner-spin-button {
 .recharts-wrapper *:focus {
   outline: none !important;
 }
-
-@media print {
-  .page-break-before {
-    page-break-before: always;
-  }
-  .page-break-after {
-    page-break-after: always;
-  }
-  .no-break-inside {
-    page-break-inside: avoid;
-    break-inside: avoid;
-  }
-}

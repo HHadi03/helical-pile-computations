@@ -3,13 +3,14 @@ import { TinsertSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
 import { calculateResultsForFineSoilNoFetch, calculateResultsForSoilsNoFetch, calculateResultsForSoilsCPTNoFetch, calculateResultsForFineSoilCPTNoFetch } from "@/lib/equations"
+import { capitaliseFirstLetter } from "@/lib/utils"
 
 type DirtyFields = Partial<Record<keyof TinsertSoilProfileSchema, boolean>>
 
 export async function updateProfile(profile: TinsertSoilProfileSchema, profileId: string, dirtyFields: DirtyFields = {}) {
   
   if (profile.profile_name && dirtyFields.profile_name) {
-    profile = {...profile, profile_name: profile.profile_name.charAt(0).toUpperCase() + profile.profile_name.slice(1)}
+    profile = {...profile, profile_name: capitaliseFirstLetter(profile.profile_name)}
   }
 
   const effectivePileLength = profile.pile_length - profile.pile_stick_out

@@ -136,7 +136,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
         const url = window.URL.createObjectURL(pdfBlob)
         const a = document.createElement('a')
         a.href = url
-        a.download = `helical-piles-computations-report.pdf`
+        a.download = `helical-pile-computations-report.pdf`
         document.body.appendChild(a)
         a.click()
         window.URL.revokeObjectURL(url)
@@ -342,7 +342,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
               name="soil_notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Additional Information <span className="font-semibold -ml-1">(optional)</span></FormLabel>
+                  <FormLabel>Description <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                   <FormControl>
                     <Textarea {...field} placeholder="Enter any additional information" className="resize-none"/>
                   </FormControl>
