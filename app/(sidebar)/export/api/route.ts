@@ -5,9 +5,9 @@ import { TexportSoilProfileSchema } from '@/schemas/soilProfileSchemas'
 import { TexportSoilSchema } from '@/schemas/soilSchemas'
 import { roundToTwoDecimals, capitaliseFirstLetter } from '@/lib/utils'
 import type { Browser } from 'puppeteer'
+import { PDFDocument } from 'pdf-lib'
 import fs from 'fs'
 import path from 'path'
-import { PDFDocument } from 'pdf-lib'
 
 async function getProfiles(profileId: string): Promise<TexportSoilProfileSchema> {
   try {
@@ -105,11 +105,11 @@ export async function POST(req: NextRequest) {
         const compression = tension + bearingCapacity
           
         if (body.applied_tension_load > (tension / body.global_safety_factor)) {
-          throw new Error("Designed tension load is greater than the designed tensile resistance.")
+          console.log("Designed tension load is greater than the designed tensile resistance.")
         }
         
         if (body.applied_compression_load > (compression / body.global_safety_factor)) {
-          throw new Error("Designed compression load is greater than the designed compressive resistance.")
+          console.log("Designed compression load is greater than the designed compressive resistance.")
         }
 
         dynamicParams = {
@@ -202,19 +202,19 @@ export async function POST(req: NextRequest) {
             const tensionOutput2 = rckTension / body.uk_safety_factor_tension_yt2
 
             if (compressionCombination1 > compressionOutput1) {
-              throw new Error("Designed compression load is greater than the designed compressive resistance.")
+              console.log("Designed compression load is greater than the designed compressive resistance.")
             }
 
             if (compressionCombination2 > compressionOutput2) {
-              throw new Error("Designed compression load is greater than the designed compressive resistance.")
+              console.log("Designed compression load is greater than the designed compressive resistance.")
             }
 
             if (tensionCombination1 > tensionOutput1) {
-              throw new Error("Designed tension load is greater than the designed tensile resistance.")
+              console.log("Designed tension load is greater than the designed tensile resistance.")
             }
 
             if (tensionCombination2 > tensionOutput2) {
-              throw new Error("Designed tension load is greater than the designed tensile resistance.")
+              console.log("Designed tension load is greater than the designed tensile resistance.")
             }
             
             dynamicParams = {
@@ -247,11 +247,11 @@ export async function POST(req: NextRequest) {
             const tensionOutput1 = rckTension / body.nl_safety_factor_tension_yt
 
             if (compressionCombination1 > compressionOutput1) {
-              throw new Error("Designed compression load is greater than the designed compressive resistance.")
+              console.log("Designed compression load is greater than the designed compressive resistance.")
             }
 
             if (tensionCombination1 > tensionOutput1) {
-              throw new Error("Designed tension load is greater than the designed tensile resistance.")
+              console.log("Designed tension load is greater than the designed tensile resistance.")
             }
 
             dynamicParams = {
@@ -278,11 +278,11 @@ export async function POST(req: NextRequest) {
             const tensionOutput1 = rckTension / body.pl_safety_factor_tension_yt
 
             if (compressionCombination1 > compressionOutput1) {
-              throw new Error("Designed compression load is greater than the designed compressive resistance.")
+              console.log("Designed compression load is greater than the designed compressive resistance.")
             }
 
             if (tensionCombination1 > tensionOutput1) {
-              throw new Error("Designed tension load is greater than the designed tensile resistance.")
+              console.log("Designed tension load is greater than the designed tensile resistance.")
             }
 
             dynamicParams = {
@@ -321,19 +321,19 @@ export async function POST(req: NextRequest) {
             const tensionOutput2 = tension / body.uk_safety_factor_tension_yt2
 
             if (compressionCombination1 > compressionOutput1) {
-              throw new Error("Designed compression load is greater than the designed compressive resistance.")
+              console.log("Designed compression load is greater than the designed compressive resistance.")
             }
 
             if (compressionCombination2 > compressionOutput2) {
-              throw new Error("Designed compression load is greater than the designed compressive resistance.")
+              console.log("Designed compression load is greater than the designed compressive resistance.")
             }
 
             if (tensionCombination1 > tensionOutput1) {
-              throw new Error("Designed tension load is greater than the designed tensile resistance.")
+              console.log("Designed tension load is greater than the designed tensile resistance.")
             }
 
             if (tensionCombination2 > tensionOutput2) {
-              throw new Error("Designed tension load is greater than the designed tensile resistance.")
+              console.log("Designed tension load is greater than the designed tensile resistance.")
             }
             
             dynamicParams = {
@@ -366,11 +366,11 @@ export async function POST(req: NextRequest) {
             const tensionOutput1 = tension / body.nl_safety_factor_tension_yt
 
             if (compressionCombination1 > compressionOutput1) {
-              throw new Error("Designed compression load is greater than the designed compressive resistance.")
+              console.log("Designed compression load is greater than the designed compressive resistance.")
             }
 
             if (tensionCombination1 > tensionOutput1) {
-              throw new Error("Designed tension load is greater than the designed tensile resistance.")
+              console.log("Designed tension load is greater than the designed tensile resistance.")
             }
 
             dynamicParams = {
@@ -397,11 +397,11 @@ export async function POST(req: NextRequest) {
             const tensionOutput1 = tension / body.pl_safety_factor_tension_yt
 
             if (compressionCombination1 > compressionOutput1) {
-              throw new Error("Designed compression load is greater than the designed compressive resistance.")
+              console.log("Designed compression load is greater than the designed compressive resistance.")
             }
 
             if (tensionCombination1 > tensionOutput1) {
-              throw new Error("Designed tension load is greater than the designed tensile resistance.")
+              console.log("Designed tension load is greater than the designed tensile resistance.")
             }
 
             dynamicParams = {
@@ -491,11 +491,11 @@ export async function POST(req: NextRequest) {
             const tensionOutput1 = rckTension / body.nl_safety_factor_tension_yt
 
             if (compressionCombination1 > compressionOutput1) {
-              throw new Error("Designed compression load is greater than the designed compressive resistance.")
+              console.log("Designed compression load is greater than the designed compressive resistance.")
             }
 
             if (tensionCombination1 > tensionOutput1) {
-              throw new Error("Designed tension load is greater than the designed tensile resistance.")
+              console.log("Designed tension load is greater than the designed tensile resistance.")
             }
 
             dynamicParams = {
@@ -522,11 +522,11 @@ export async function POST(req: NextRequest) {
             const tensionOutput1 = rckTension / body.pl_safety_factor_tension_yt
 
             if (compressionCombination1 > compressionOutput1) {
-              throw new Error("Designed compression load is greater than the designed compressive resistance.")
+              console.log("Designed compression load is greater than the designed compressive resistance.")
             }
 
             if (tensionCombination1 > tensionOutput1) {
-              throw new Error("Designed tension load is greater than the designed tensile resistance.")
+              console.log("Designed tension load is greater than the designed tensile resistance.")
             }
 
             dynamicParams = {
@@ -562,19 +562,19 @@ export async function POST(req: NextRequest) {
             const tensionOutput2 = tension / body.uk_safety_factor_tension_yt2
 
             if (compressionCombination1 > compressionOutput1) {
-              throw new Error("Designed compression load is greater than the designed compressive resistance.")
+              console.log("Designed compression load is greater than the designed compressive resistance.")
             }
 
             if (compressionCombination2 > compressionOutput2) {
-              throw new Error("Designed compression load is greater than the designed compressive resistance.")
+              console.log("Designed compression load is greater than the designed compressive resistance.")
             }
 
             if (tensionCombination1 > tensionOutput1) {
-              throw new Error("Designed tension load is greater than the designed tensile resistance.")
+              console.log("Designed tension load is greater than the designed tensile resistance.")
             }
 
             if (tensionCombination2 > tensionOutput2) {
-              throw new Error("Designed tension load is greater than the designed tensile resistance.")
+              console.log("Designed tension load is greater than the designed tensile resistance.")
             }
             
             dynamicParams = {
@@ -607,11 +607,11 @@ export async function POST(req: NextRequest) {
             const tensionOutput1 = tension / body.nl_safety_factor_tension_yt
 
             if (compressionCombination1 > compressionOutput1) {
-              throw new Error("Designed compression load is greater than the designed compressive resistance.")
+              console.log("Designed compression load is greater than the designed compressive resistance.")
             }
 
             if (tensionCombination1 > tensionOutput1) {
-              throw new Error("Designed tension load is greater than the designed tensile resistance.")
+              console.log("Designed tension load is greater than the designed tensile resistance.")
             }
 
             dynamicParams = {
@@ -638,11 +638,11 @@ export async function POST(req: NextRequest) {
             const tensionOutput1 = tension / body.pl_safety_factor_tension_yt
 
             if (compressionCombination1 > compressionOutput1) {
-              throw new Error("Designed compression load is greater than the designed compressive resistance.")
+              console.log("Designed compression load is greater than the designed compressive resistance.")
             }
 
             if (tensionCombination1 > tensionOutput1) {
-              throw new Error("Designed tension load is greater than the designed tensile resistance.")
+              console.log("Designed tension load is greater than the designed tensile resistance.")
             }
 
             dynamicParams = {
@@ -674,18 +674,16 @@ export async function POST(req: NextRequest) {
     }
 
     const baseParams = {
-      pile_diameter: body.pile_diameter, 
       job_number: capitaliseFirstLetter(body.job_number),
       pile_number: capitaliseFirstLetter(body.pile_number),
       job_location: capitaliseFirstLetter(body.job_location),
       checked_by: body.checked_by,
-
+      pile_diameter: body.pile_diameter, 
       show_description: body.show_description,
       show_spt: body.show_spt,
       show_moist: body.show_moist,
       show_sat: body.show_sat,
       show_shear_strength: body.show_shear_strength,
-
       soil_notes: body.soil_notes || "",
       design_notes: body.design_notes || "",
       pile_notes: body.pile_notes || "",
@@ -808,22 +806,17 @@ export async function POST(req: NextRequest) {
     
     const mergedPdf = await PDFDocument.create()
 
-    // Load the first PDF
     const pdfDocA = await PDFDocument.load(pdfA)
     const pagesA = await mergedPdf.copyPages(pdfDocA, pdfDocA.getPageIndices())
     pagesA.forEach((page) => mergedPdf.addPage(page))
 
-    // Load the second PDF
     const pdfDocB = await PDFDocument.load(pdfB)
     const pagesB = await mergedPdf.copyPages(pdfDocB, pdfDocB.getPageIndices())
     pagesB.forEach((page) => mergedPdf.addPage(page))
 
-    // Save the merged PDF
     const mergedPdfBytes = await mergedPdf.save()
 
-    return new NextResponse(new Uint8Array(mergedPdfBytes), {
-    headers: {'Content-Type': 'application/pdf'}
-    })
+    return new NextResponse(new Uint8Array(mergedPdfBytes), {headers: {'Content-Type': 'application/pdf'}})
   }
   
   catch (error) {

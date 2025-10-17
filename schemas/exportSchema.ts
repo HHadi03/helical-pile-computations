@@ -1,7 +1,6 @@
 import * as z from "zod"
 
 export const exportFormSchema = z.object({
-  pile_diameter: z.enum(["60", "100"], { error: "Pile Diameter is required" }),
   job_number: z.string().max(20, { error: "Job Number must be less than 20 characters" }).optional(),
   job_location: z.string().max(30, { error: "Job Location must be less than 30 characters" }).optional(),
   pile_number: z.string().max(20, { error: "Pile Number must be less than 20 characters" }).optional(),
@@ -14,7 +13,8 @@ export const exportFormSchema = z.object({
   show_sat: z.boolean(),
   show_shear_strength: z.boolean(),
   soil_notes: z.string().optional(),
-
+  pile_diameter: z.enum(["60", "100"], { error: "Pile Diameter is required" }),
+  
   design_method: z.enum(["method_bs", "method_en", "method_test"], { error: "Please select a design method" }),
   country: z.enum(["uk", "pl", "nl"]).optional(),
   applied_tension_load: z.coerce.number(),

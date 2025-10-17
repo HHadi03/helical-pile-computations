@@ -157,10 +157,10 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
         <div className="space-y-6 py-3">
           <div className="space-y-4">
             <div>
-              <h2 className="text-base font-semibold">Configure Project Information</h2>
-              <p className="text-sm text-muted-foreground mt-1">Enter project and pile details you wish to include in the report</p>
+              <h2 className="text-base font-semibold">Configure Soil Profile</h2>
+              <p className="text-sm text-muted-foreground mt-1">Select the properties you wish to include in the report</p>
             </div>
-            
+
             <FormField
               control={form.control}
               name="pile_diameter"
@@ -182,69 +182,6 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                 </FormItem>
               )}
             />
-            
-            <FormField
-              control={form.control}
-              name="pile_number"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Pile Number <span className="font-semibold -ml-1">(optional)</span></FormLabel>
-                  <FormControl>
-                    <Input placeholder="HP-003" {...field}/>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="job_location"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Job Location <span className="font-semibold -ml-1">(optional)</span></FormLabel>
-                  <FormControl>
-                    <Input placeholder="Farnborough, Hampshire" {...field}/>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="job_number"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Job Number <span className="font-semibold -ml-1">(optional)</span></FormLabel>
-                  <FormControl>
-                    <Input placeholder="Project-AX34" {...field}/>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="checked_by"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Checked By <span className="font-semibold -ml-1">(optional)</span></FormLabel>
-                  <FormControl>
-                    <Input placeholder="John Doe" {...field}/>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          
-          <div className="space-y-4">
-            <div>
-              <h2 className="text-base font-semibold">Configure Soil Profile</h2>
-              <p className="text-sm text-muted-foreground mt-1">Select the soil profile and properties you wish to include in the report</p>
-            </div>
             
             <FormField
               control={form.control}
@@ -355,7 +292,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
           <div className="space-y-4">
             <div>
               <h2 className="text-base font-semibold">Configure Design Method</h2>
-              <p className="text-sm text-muted-foreground mt-1">Define the method and parameters you wish to use for soil load testing</p>
+              <p className="text-sm text-muted-foreground mt-1">Define the method you wish to use for soil load testing</p>
             </div>
             
             <FormField
@@ -1272,6 +1209,74 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
               )}
             />
           </div>
+
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-base font-semibold">Configure Project Information</h2>
+              <p className="text-sm text-muted-foreground mt-1">Enter project and pile details you wish to include in the report</p>
+            </div>
+              
+            <FormField
+              control={form.control}
+              name="pile_number"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Pile Number</FormLabel>
+                  <FormControl>
+                    <Input placeholder="HP-003" {...field}/>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="job_location"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Job Location</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Farnborough, Hampshire" {...field}/>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="job_number"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Job Number</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Project-AX34" {...field}/>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="checked_by"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Checked By</FormLabel>
+                  <FormControl>
+                    <Input placeholder="John Doe" {...field}/>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"> Upload Document</label>
+            <Input type="file" className="cursor-pointer border"/>
+          </div>
+
+
         </div>
       
         <Button type="submit" className="w-32" disabled={isSubmitting}> {isSubmitting ? (<> <Loader2 className="mr-2 size-4 animate-spin"/>Exporting... </>) : ("Export")}</Button>

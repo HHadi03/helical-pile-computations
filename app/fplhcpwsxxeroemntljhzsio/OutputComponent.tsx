@@ -23,13 +23,6 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
   const totalCompressionLoad = dynamicParams.design_method === "method_bs" ? dynamicParams.applied_compression_load : dynamicParams.permanent_compression_load + dynamicParams.variable_compression_load
   const ExternalLoad = totalTensionLoad + totalCompressionLoad
  
-
-  const Ftra = roundToTwoDecimals(pileStructure.k2 * pileStructure.ultimate_tensile_strength_a480 * pileStructure.nominal_stress_area / (pileStructure.partial_safety_factor_2 * 1000))
-  const Fvra = roundToTwoDecimals(0.6 * pileStructure.ultimate_tensile_strength_a480 * pileStructure.nominal_stress_area / (pileStructure.partial_safety_factor_2 * 1000))
-  const Ftvra = roundToTwoDecimals(Math.PI * pileStructure.pitch_diameter * pileStructure.thread_engagement_length / 2 * 0.65 * pileStructure.ultimate_tensile_strength_lm25m / (pileStructure.partial_safety_factor_2 * 1000))
-  const Ntra = roundToTwoDecimals(Math.min(pileStructure.pile_gross_area * pileStructure.proof_strength / (pileStructure.partial_safety_factor_1 * 1000), 0.9 * 242 * pileStructure.ultimate_tensile_strength_lm25m / (pileStructure.partial_safety_factor_2 * 1000)))
-  const Nura = roundToTwoDecimals(242 * pileStructure.ultimate_tensile_strength_lm25m / (pileStructure.partial_safety_factor_2 * 1000))
-  
   const renderBSDesign = () => {
     if (dynamicParams.design_method !== 'method_bs') return null
     
@@ -42,41 +35,67 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
     const compressionPass = designedCompression >= applied_compression_load
     
     return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-2 gap-6">
-          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Tension Analysis</h3>
-            <div className="space-y-3">
-              <div className="bg-white p-4 rounded-md border border-gray-100">
-                <p className="text-sm text-gray-600 mb-2">Equation:</p>
-                <p className="font-mono text-sm break-all">
-                  {applied_tension_load} ≤ ({tension} / {global_safety_factor})
-                </p>
-                <p className="font-mono text-sm mt-2">
-                  {applied_tension_load} ≤ {roundToTwoDecimals(designedTension)}
-                </p>
+      <div className="space-y-8">
+        <div className="bg-gray-50 p-6 rounded-lg border break-inside-avoid">
+          <h3 className="text-lg font-semibold mb-2">Tension Check</h3>
+          
+          <div className="bg-white p-4 rounded-md border">
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center justify-between">
+                <p>Designed Load:</p>
+                <p className="font-mono">{applied_tension_load} kN</p>
               </div>
-              <div className={`text-center py-2 rounded-md font-medium ${tensionPass ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                {tensionPass ? 'PASS' : 'FAIL'}
+
+              <div className="flex items-center justify-between">
+                <p>Designed Resistance:</p>
+                <p className="font-mono">{roundToTwoDecimals(designedTension)} kN</p>
+              </div>
+
+              <div className="pt-2 border-t border-gray-200">
+                <img src="bs-equation.png" alt="loading equation" className="h-10 mx-auto mb-1"/>
+                <p className="font-mono text-xs text-center">{applied_tension_load} ≤ ({tension} / {global_safety_factor})</p>
+              </div>
+
+              <div className="pt-2 border-t border-gray-200 flex items-center gap-1 text-sm">
+                <p>Utilisation Rate:</p>
+                <p>{roundToOneDecimal((applied_tension_load / designedTension) * 100)}%</p>
               </div>
             </div>
-          </div>
 
-          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Compression Check</h3>
-            <div className="space-y-3">
-              <div className="bg-white p-4 rounded-md border border-gray-100">
-                <p className="text-sm text-gray-600 mb-2">Equation:</p>
-                <p className="font-mono text-sm break-all">
-                  {applied_compression_load} ≤ ({compression} / {global_safety_factor})
-                </p>
-                <p className="font-mono text-sm mt-2">
-                  {applied_compression_load} ≤ {roundToTwoDecimals(designedCompression)}
-                </p>
+            <div className={`mt-2 text-center py-2 rounded-md font-semibold ${tensionPass ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+              {tensionPass ? 'PASS' : 'FAIL'}
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gray-50 p-6 rounded-lg border break-inside-avoid">
+          <h3 className="text-lg font-semibold mb-2">Compression Check</h3>
+          
+          <div className="bg-white p-4 rounded-md border">
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center justify-between">
+                <p>Designed Load:</p>
+                <p className="font-mono">{applied_compression_load} kN</p>
               </div>
-              <div className={`text-center py-2 rounded-md font-medium ${compressionPass ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                {compressionPass ? 'PASS' : 'FAIL'}
+
+              <div className="flex items-center justify-between">
+                <p>Designed Resistance:</p>
+                <p className="font-mono">{roundToTwoDecimals(designedCompression)} kN</p>
               </div>
+
+              <div className="pt-2 border-t border-gray-200">
+                <img src="bs-equation.png" alt="loading equation" className="h-10 mx-auto mb-1"/>
+                <p className="font-mono text-xs text-center">{applied_compression_load} ≤ ({compression} / {global_safety_factor})</p>
+              </div>
+
+              <div className="pt-2 border-t border-gray-200 flex items-center gap-1 text-sm mb-2">
+                <p>Utilisation Rate:</p>
+                <p>{roundToOneDecimal((applied_compression_load / designedCompression) * 100)}%</p>
+              </div>
+            </div>
+
+            <div className={`mt-2 text-center py-2 rounded-md font-semibold ${compressionPass ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+              {compressionPass ? 'PASS' : 'FAIL'}
             </div>
           </div>
         </div>
@@ -110,128 +129,137 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
       const tensionPass2 = designedTension2 >= tensionCombination2
       return (
         <div className="space-y-8">
-          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 break-inside-avoid">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Compression Check</h3>
+          <div className="bg-gray-50 p-6 rounded-lg border break-inside-avoid">
+            <h3 className="text-lg font-semibold mb-2">Tension Check</h3>
             <div className="grid grid-cols-2 gap-6">
               
-              <div className="p-4 bg-white rounded-md border border-gray-100">
-                <h4 className="font-semibold text-gray-800 mb-3">Combination 1</h4>
-                <div className="space-y-2">
-                  <div className="bg-gray-50 p-3 rounded-md space-y-2">
-                    <div className="flex items-center gap-2">
-                      <p className="text-xs text-gray-600">Designed Load:</p>
-                      <p className="font-mono text-sm">{roundToTwoDecimals(compressionCombination1)} kN</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-xs text-gray-600">Designed Resistance:</p>
-                      <p className="font-mono text-sm">{roundToTwoDecimals(designedCompression1)} kN</p>
-                    </div>
-                    <div className="pt-2 border-t border-gray-200">
-                      <p className="text-xs text-gray-600 text-center">Equation:</p>
-                      <img src="equation-image.png" alt="loading equation" className="h-10 mx-auto mb-1"/>
-                      <p className="font-mono text-xs break-all text-center">{`(${dynamicParams.uk_safety_factor_compression_yg1} × ${permanent_compression_load}) + (${dynamicParams.uk_safety_factor_compression_yq1} × ${variable_compression_load}) ≤ (${compression} / ${dynamicParams.uk_safety_factor_compression_yt1})`}</p>
-                    </div>
-                    <div className="pt-2 border-t border-gray-200 flex items-center gap-2">
-                      <p className="text-xs text-gray-600">Utilisation Rate:</p>
-                      <p className="font-mono text-sm">{roundToTwoDecimals((compressionCombination1 / designedCompression1) * 100)}%</p>
-                    </div>
+              {/* Combination 1 */}
+              <div className="bg-white p-4 rounded-md border flex flex-col shadow-lg">
+                <h4 className="mb-2 font-semibold">Combination 1</h4>
+                
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center justify-between">
+                    <p>Designed Load:</p>
+                    <p className="font-mono">{roundToTwoDecimals(tensionCombination1)} kN</p>
                   </div>
-                  <div className={`text-center py-2 rounded-md ${ compressionPass1 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                    {compressionPass1 ? 'PASS' : 'FAIL'}
+                  
+                  <div className="flex items-center justify-between">
+                    <p>Designed Resistance:</p>
+                    <p className="font-mono">{roundToTwoDecimals(designedTension1)} kN</p>
                   </div>
+
+                  <div className="pt-2 border-t border-gray-200">
+                    <img src="equation-image.png" alt="loading equation" className="h-10 mx-auto mb-1"/>
+                    <p className="font-mono text-xs text-center">{`(${dynamicParams.uk_safety_factor_tension_yg1} × ${permanent_tension_load}) + (${dynamicParams.uk_safety_factor_tension_yq1} × ${variable_tension_load}) ≤ (${tension} / ${dynamicParams.uk_safety_factor_tension_yt1})`}</p>
+                  </div>
+
+                  <div className="pt-2 border-t border-gray-200 flex items-center gap-1 text-sm mb-2">
+                    <p>Utilisation Rate:</p>
+                    <p>{roundToOneDecimal((tensionCombination1 / designedTension1) * 100)}%</p>
+                  </div>
+                </div>
+
+                <div className={`mt-auto text-center py-2 rounded-md font-semibold ${tensionPass1 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                  {tensionPass1 ? 'PASS' : 'FAIL'}
                 </div>
               </div>
 
               {/* Combination 2 */}
-              <div className="p-4 bg-white rounded-md border border-gray-100">
-                <h4 className="font-semibold text-gray-800 mb-3">Combination 2</h4>
-                <div className="space-y-2">
-                  <div className="bg-gray-50 p-3 rounded-md space-y-2">
-                    <div className="flex items-center gap-2">
-                      <p className="text-xs text-gray-600">Designed Load:</p>
-                      <p className="font-mono text-sm">{roundToTwoDecimals(compressionCombination2)} kN</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-xs text-gray-600">Designed Resistance:</p>
-                      <p className="font-mono text-sm">{roundToTwoDecimals(designedCompression2)} kN</p>
-                    </div>
-                    <div className="pt-2 border-t border-gray-200">
-                      <p className="text-xs text-gray-600 text-center">Equation:</p>
-                      <img src="equation-image.png" alt="loading equation" className="h-10 mx-auto mb-1"/>
-                      <p className="font-mono text-xs break-all text-center">{`(${dynamicParams.uk_safety_factor_compression_yg2} × ${permanent_compression_load}) + (${dynamicParams.uk_safety_factor_compression_yq2} × ${variable_compression_load}) ≤ (${compression} / ${dynamicParams.uk_safety_factor_compression_yt2})`}</p>
-                    </div>
-                    <div className="pt-2 border-t border-gray-200 flex items-center gap-2">
-                      <p className="text-xs text-gray-600">Utilisation Rate:</p>
-                      <p className="font-mono text-sm">{roundToTwoDecimals((compressionCombination2 / designedCompression2) * 100)}%</p>
-                    </div>
+              <div className="bg-white p-4 rounded-md border flex flex-col shadow-lg">
+                <h4 className="mb-2 font-semibold">Combination 2</h4>
+                
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center justify-between">
+                    <p>Designed Load:</p>
+                    <p className="font-mono">{roundToTwoDecimals(tensionCombination2)} kN</p>
                   </div>
-                  <div className={`text-center py-2 rounded-md ${ compressionPass2 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                    {compressionPass2 ? 'PASS' : 'FAIL'}
+                  
+                  <div className="flex items-center justify-between">
+                    <p>Designed Resistance:</p>
+                    <p className="font-mono">{roundToTwoDecimals(designedTension2)} kN</p>
                   </div>
+
+                  <div className="pt-2 border-t border-gray-200">
+                    <img src="equation-image.png" alt="loading equation" className="h-10 mx-auto mb-1"/>
+                    <p className="font-mono text-xs text-center">{`(${dynamicParams.uk_safety_factor_tension_yg2} × ${permanent_tension_load}) + (${dynamicParams.uk_safety_factor_tension_yq2} × ${variable_tension_load}) ≤ (${tension} / ${dynamicParams.uk_safety_factor_tension_yt2})`}</p>
+                  </div>
+
+                  <div className="pt-2 border-t border-gray-200 flex items-center gap-1 text-sm mb-2">
+                    <p>Utilisation Rate:</p>
+                    <p>{roundToOneDecimal((tensionCombination2 / designedTension2) * 100)}%</p>
+                  </div>
+                </div>
+
+                <div className={`mt-auto text-center py-2 rounded-md font-semibold ${tensionPass2 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                  {tensionPass2 ? 'PASS' : 'FAIL'}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Tension Check */}
-          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 break-inside-avoid">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Tension Check</h3>
+          <div className="bg-gray-50 p-6 rounded-lg border break-inside-avoid">
+            <h3 className="text-lg font-semibold mb-2">Compression Check</h3>
             <div className="grid grid-cols-2 gap-6">
+              
               {/* Combination 1 */}
-              <div className="p-4 bg-white rounded-md border border-gray-100">
-                <h4 className="font-semibold text-gray-800 mb-3">Combination 1</h4>
-                <div className="space-y-2">
-                  <div className="bg-gray-50 p-3 rounded-md space-y-2">
-                    <div className="flex items-center gap-2">
-                      <p className="text-xs text-gray-600">Designed Load:</p>
-                      <p className="font-mono text-sm">{roundToTwoDecimals(tensionCombination1)} kN</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-xs text-gray-600">Designed Resistance:</p>
-                      <p className="font-mono text-sm">{roundToTwoDecimals(designedTension1)} kN</p>
-                    </div>
-                    <div className="pt-2 border-t border-gray-200">
-                      <p className="text-xs text-gray-600 text-center">Equation:</p>
-                      <img src="equation-image.png" alt="loading equation" className="h-10 mx-auto mb-1"/>
-                      <p className="font-mono text-xs break-all text-center">{`(${dynamicParams.uk_safety_factor_tension_yg1} × ${permanent_tension_load}) + (${dynamicParams.uk_safety_factor_tension_yq1} × ${variable_tension_load}) ≤ (${tension} / ${dynamicParams.uk_safety_factor_tension_yt1})`}</p>
-                    </div>
-                    <div className="pt-2 border-t border-gray-200 flex items-center gap-2">
-                      <p className="text-xs text-gray-600">Utilisation Rate:</p>
-                      <p className="font-mono text-sm">{roundToTwoDecimals((tensionCombination1 / designedTension1) * 100)}%</p>
-                    </div>
+              <div className="bg-white p-4 rounded-md border flex flex-col shadow-lg">
+                <h4 className="mb-2 font-semibold">Combination 1</h4>
+                
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center justify-between">
+                    <p>Designed Load:</p>
+                    <p className="font-mono">{roundToTwoDecimals(compressionCombination1)} kN</p>
                   </div>
-                  <div className={`text-center py-2 rounded-md ${ tensionPass1 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                    {tensionPass1 ? 'PASS' : 'FAIL'}
+                  
+                  <div className="flex items-center justify-between">
+                    <p>Designed Resistance:</p>
+                    <p className="font-mono">{roundToTwoDecimals(designedCompression1)} kN</p>
                   </div>
+
+                  <div className="pt-2 border-t border-gray-200">
+                    <img src="equation-image.png" alt="loading equation" className="h-10 mx-auto mb-1"/>
+                    <p className="font-mono text-xs text-center">{`(${dynamicParams.uk_safety_factor_compression_yg1} × ${permanent_compression_load}) + (${dynamicParams.uk_safety_factor_compression_yq1} × ${variable_compression_load}) ≤ (${compression} / ${dynamicParams.uk_safety_factor_compression_yt1})`}</p>
+                  </div>
+
+                  <div className="pt-2 border-t border-gray-200 flex items-center gap-1 text-sm mb-2">
+                    <p>Utilisation Rate:</p>
+                    <p>{roundToOneDecimal((compressionCombination1 / designedCompression1) * 100)}%</p>
+                  </div>
+                </div>
+
+                <div className={`mt-auto text-center py-2 rounded-md font-semibold ${compressionPass1 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                  {compressionPass1 ? 'PASS' : 'FAIL'}
                 </div>
               </div>
 
               {/* Combination 2 */}
-              <div className="p-4 bg-white rounded-md border border-gray-100">
-                <h4 className="font-semibold text-gray-800 mb-3">Combination 2</h4>
-                <div className="space-y-2">
-                  <div className="bg-gray-50 p-3 rounded-md space-y-2">
-                    <div className="flex items-center gap-2">
-                      <p className="text-xs text-gray-600">Designed Load:</p>
-                      <p className="font-mono text-sm">{roundToTwoDecimals(tensionCombination2)} kN</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-xs text-gray-600">Designed Resistance:</p>
-                      <p className="font-mono text-sm">{roundToTwoDecimals(designedTension2)} kN</p>
-                    </div>
-                    <div className="pt-2 border-t border-gray-200">
-                      <p className="text-xs text-gray-600 text-center">Equation:</p>
-                      <img src="equation-image.png" alt="loading equation" className="h-10 mx-auto mb-1"/>
-                      <p className="font-mono text-xs break-all text-center">{`(${dynamicParams.uk_safety_factor_tension_yg2} × ${permanent_tension_load}) + (${dynamicParams.uk_safety_factor_tension_yq2} × ${variable_tension_load}) ≤ (${tension} / ${dynamicParams.uk_safety_factor_tension_yt2})`}</p>
-                    </div>
-                    <div className="pt-2 border-t border-gray-200 flex items-center gap-2">
-                      <p className="text-xs text-gray-600">Utilisation Rate:</p>
-                      <p className="font-mono text-sm">{roundToTwoDecimals((tensionCombination2 / designedTension2) * 100)}%</p>
-                    </div>
+              <div className="bg-white p-4 rounded-md border flex flex-col shadow-lg">
+                <h4 className="mb-2 font-semibold">Combination 2</h4>
+                
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center justify-between">
+                    <p>Designed Load:</p>
+                    <p className="font-mono">{roundToTwoDecimals(compressionCombination2)} kN</p>
                   </div>
-                  <div className={`text-center py-2 rounded-md ${ tensionPass2 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                    {tensionPass2 ? 'PASS' : 'FAIL'}
+                  
+                  <div className="flex items-center justify-between">
+                    <p>Designed Resistance:</p>
+                    <p className="font-mono">{roundToTwoDecimals(designedCompression2)} kN</p>
                   </div>
+
+                  <div className="pt-2 border-t border-gray-200">
+                    <img src="equation-image.png" alt="loading equation" className="h-10 mx-auto mb-1"/>
+                    <p className="font-mono text-xs text-center">{`(${dynamicParams.uk_safety_factor_compression_yg2} × ${permanent_compression_load}) + (${dynamicParams.uk_safety_factor_compression_yq2} × ${variable_compression_load}) ≤ (${compression} / ${dynamicParams.uk_safety_factor_compression_yt2})`}</p>
+                  </div>
+
+                  <div className="pt-2 border-t border-gray-200 flex items-center gap-1 text-sm mb-2">
+                    <p>Utilisation Rate:</p>
+                    <p>{roundToOneDecimal((compressionCombination2 / designedCompression2) * 100)}%</p>
+                  </div>
+                </div>
+
+                <div className={`mt-auto text-center py-2 rounded-md font-semibold ${compressionPass2 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                  {compressionPass2 ? 'PASS' : 'FAIL'}
                 </div>
               </div>
             </div>
@@ -240,202 +268,383 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
       )
     }
 
-    return null
+    else if (dynamicParams.country === 'nl') {
+      const tensionCombination = (dynamicParams.nl_safety_factor_tension_yg * dynamicParams.permanent_tension_load) + (dynamicParams.nl_safety_factor_tension_yq * dynamicParams.variable_tension_load)
+      const designedTension = tension / dynamicParams.nl_safety_factor_tension_yt
+      const tensionPass = designedTension >= tensionCombination
+
+      const compressionCombination = (dynamicParams.nl_safety_factor_compression_yg * dynamicParams.permanent_compression_load) + (dynamicParams.nl_safety_factor_compression_yq * dynamicParams.variable_compression_load)
+      const designedCompression = compression / dynamicParams.nl_safety_factor_compression_yt
+      const compressionPass = designedCompression >= compressionCombination
+
+      return (
+        <div className="space-y-8">
+          <div className="bg-gray-50 p-6 rounded-lg border break-inside-avoid">
+            <h3 className="text-lg font-semibold mb-2">Tension Check</h3>
+            
+            <div className="bg-white p-4 rounded-md border shadow-lg">
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <p>Designed Load:</p>
+                  <p className="font-mono">{roundToTwoDecimals(tensionCombination)} kN</p>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <p>Designed Resistance:</p>
+                  <p className="font-mono">{roundToTwoDecimals(designedTension)} kN</p>
+                </div>
+
+                <div className="pt-2 border-t border-gray-200">
+                  <img src="equation-image.png" alt="loading equation" className="h-10 mx-auto mb-1"/>
+                  <p className="font-mono text-xs text-center">{`(${dynamicParams.nl_safety_factor_tension_yg} × ${permanent_tension_load}) + (${dynamicParams.nl_safety_factor_tension_yq} × ${variable_tension_load}) ≤ (${tension} / ${dynamicParams.nl_safety_factor_tension_yt})`}</p>
+                </div>
+
+                <div className="pt-2 border-t border-gray-200 flex items-center gap-1 text-sm">
+                  <p>Utilisation Rate:</p>
+                  <p>{roundToOneDecimal((tensionCombination / designedTension) * 100)}%</p>
+                </div>
+              </div>
+
+              <div className={`mt-2 text-center py-2 rounded-md font-semibold ${tensionPass ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                {tensionPass ? 'PASS' : 'FAIL'}
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 p-6 rounded-lg border break-inside-avoid">
+            <h3 className="text-lg font-semibold mb-2">Compression Check</h3>
+            
+            <div className="bg-white p-4 rounded-md border shadow-lg">
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <p>Designed Load:</p>
+                  <p className="font-mono">{roundToTwoDecimals(compressionCombination)} kN</p>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <p>Designed Resistance:</p>
+                  <p className="font-mono">{roundToTwoDecimals(designedCompression)} kN</p>
+                </div>
+
+                <div className="pt-2 border-t border-gray-200">
+                  <img src="equation-image.png" alt="loading equation" className="h-10 mx-auto mb-1"/>
+                  <p className="font-mono text-xs text-center">{`(${dynamicParams.nl_safety_factor_compression_yg} × ${permanent_compression_load}) + (${dynamicParams.nl_safety_factor_compression_yq} × ${variable_compression_load}) ≤ (${compression} / ${dynamicParams.nl_safety_factor_compression_yt})`}</p>
+                </div>
+
+                <div className="pt-2 border-t border-gray-200 flex items-center gap-1 text-sm mb-2">
+                  <p>Utilisation Rate:</p>
+                  <p>{roundToOneDecimal((compressionCombination / designedCompression) * 100)}%</p>
+                </div>
+              </div>
+
+              <div className={`mt-2 text-center py-2 rounded-md font-semibold ${compressionPass ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                {compressionPass ? 'PASS' : 'FAIL'}
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    else {
+      const tensionCombination = (dynamicParams.pl_safety_factor_tension_yg * dynamicParams.permanent_tension_load) + (dynamicParams.pl_safety_factor_tension_yq * dynamicParams.variable_tension_load)
+      const designedTension = tension / dynamicParams.pl_safety_factor_tension_yt
+      const tensionPass = designedTension >= tensionCombination
+
+      const compressionCombination = (dynamicParams.pl_safety_factor_compression_yg * dynamicParams.permanent_compression_load) + (dynamicParams.pl_safety_factor_compression_yq * dynamicParams.variable_compression_load)
+      const designedCompression = compression / dynamicParams.pl_safety_factor_compression_yt
+      const compressionPass = designedCompression >= compressionCombination
+      return (
+        <div className="space-y-8">
+          <div className="bg-gray-50 p-6 rounded-lg border break-inside-avoid">
+            <h3 className="text-lg font-semibold mb-2">Tension Check</h3>
+
+            <div className="bg-white p-4 rounded-md border shadow-lg">
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <p>Designed Load:</p>
+                  <p className="font-mono">{roundToTwoDecimals(tensionCombination)} kN</p>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <p>Designed Resistance:</p>
+                  <p className="font-mono">{roundToTwoDecimals(designedTension)} kN</p>
+                </div>
+
+                <div className="pt-2 border-t border-gray-200">
+                  <img src="equation-image.png" alt="loading equation" className="h-10 mx-auto mb-1"/>
+                  <p className="font-mono text-xs text-center">{`(${dynamicParams.pl_safety_factor_tension_yg} × ${permanent_tension_load}) + (${dynamicParams.pl_safety_factor_tension_yq} × ${variable_tension_load}) ≤ (${tension} / ${dynamicParams.pl_safety_factor_tension_yt})`}</p>
+                </div>
+
+                <div className="pt-2 border-t border-gray-200 flex items-center gap-1 text-sm">
+                  <p>Utilisation Rate:</p>
+                  <p>{roundToOneDecimal((tensionCombination / designedTension) * 100)}%</p>
+                </div>
+              </div>
+
+              <div className={`mt-2 text-center py-2 rounded-md font-semibold ${tensionPass ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                {tensionPass ? 'PASS' : 'FAIL'}
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 p-6 rounded-lg border break-inside-avoid">
+            <h3 className="text-lg font-semibold mb-2">Compression Check</h3>
+
+            <div className="bg-white p-4 rounded-md border shadow-lg">
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <p>Designed Load:</p>
+                  <p className="font-mono">{roundToTwoDecimals(compressionCombination)} kN</p>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <p>Designed Resistance:</p>
+                  <p className="font-mono">{roundToTwoDecimals(designedCompression)} kN</p>
+                </div>
+
+                <div className="pt-2 border-t border-gray-200">
+                  <img src="equation-image.png" alt="loading equation" className="h-10 mx-auto mb-1"/>
+                  <p className="font-mono text-xs text-center">{`(${dynamicParams.pl_safety_factor_compression_yg} × ${permanent_compression_load}) + (${dynamicParams.pl_safety_factor_compression_yq} × ${variable_compression_load}) ≤ (${compression} / ${dynamicParams.pl_safety_factor_compression_yt})`}</p>
+                </div>
+
+                <div className="pt-2 border-t border-gray-200 flex items-center gap-1 text-sm mb-2">
+                  <p>Utilisation Rate:</p>
+                  <p>{roundToOneDecimal((compressionCombination / designedCompression) * 100)}%</p>
+                </div>
+              </div>
+
+              <div className={`mt-2 text-center py-2 rounded-md font-semibold ${compressionPass ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                {compressionPass ? 'PASS' : 'FAIL'}
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    }
   }
 
-
   const renderPileStructuralCheck = () => {
+    const horizontalLoad = roundToTwoDecimals(pileStructure.horizontal_load * pileStructure.horizontal_load_safety_factor)
+
+    const Ftra = roundToTwoDecimals(pileStructure.k2 * pileStructure.ultimate_tensile_strength_a480 * pileStructure.nominal_stress_area / (pileStructure.partial_safety_factor_2 * 1000))
+    
+    const Fvra = roundToTwoDecimals(0.6 * pileStructure.ultimate_tensile_strength_a480 * pileStructure.nominal_stress_area / (pileStructure.partial_safety_factor_2 * 1000))
+
+    const designedShearAndTension = roundToTwoDecimals((horizontalLoad / Fvra) + (totalTensionLoad / (1.4 * Ftra)))
+
+    const Ftvra = roundToTwoDecimals(Math.PI * pileStructure.pitch_diameter * pileStructure.thread_engagement_length / 2 * 0.65 * pileStructure.ultimate_tensile_strength_lm25m / (pileStructure.partial_safety_factor_2 * 1000))
+    
+    const ntraCalc1 = roundToTwoDecimals(pileStructure.pile_gross_area * pileStructure.proof_strength / (pileStructure.partial_safety_factor_1 * 1000))
+    const ntraCalc2 = roundToTwoDecimals(0.9 * 242 * pileStructure.ultimate_tensile_strength_lm25m / (pileStructure.partial_safety_factor_2 * 1000))
+    const Ntra = Math.min(ntraCalc1, ntraCalc2)
+    const isCalc1Selected = ntraCalc1 <= ntraCalc2
+    
+    const Nura = roundToTwoDecimals(242 * pileStructure.ultimate_tensile_strength_lm25m / (pileStructure.partial_safety_factor_2 * 1000))
     return (
       <div className="space-y-8">
-        <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 break-inside-avoid">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Resistance at joints (Eurocode 3)</h3>
-          
-          {/* First two checks in grid-cols-2 */}
-          <div className="grid grid-cols-2 gap-6 mb-6">
-            {/* Check 1: M20 A4-80 bolt tension resistance */}
-            <div className="p-4 bg-white rounded-md border border-gray-100">
-              <h4 className="font-semibold text-gray-800 mb-3">M20 A4-80 bolt tension resistance</h4>
-              <div className="space-y-2">
-                <div className="bg-gray-50 p-3 rounded-md space-y-2">
-                  <div className="flex items-center gap-2">
-                    <p className="text-xs text-gray-600">Designed Effect of Actions:</p>
-                    <p className="font-mono text-sm">{roundToTwoDecimals(totalTensionLoad)} kN</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <p className="text-xs text-gray-600">Designed Structural Resistance:</p>
-                    <p className="font-mono text-sm">{Ftra} kN</p>
-                  </div>
-                  <div className="pt-2 border-t border-gray-200">
-                    <p className="text-xs text-gray-600 text-center">Equation:</p>
-                    <p className="font-mono text-sm break-all text-center">
-                      F<sub>t,Ed</sub> ≤ F<sub>t,Rd</sub>
-                    </p>
-                    <p className="font-mono text-xs break-all text-center mt-1">
-                      {`${roundToTwoDecimals(totalTensionLoad)} ≤ (${pileStructure.k2} × ${pileStructure.ultimate_tensile_strength_a480} × ${pileStructure.nominal_stress_area} / ${pileStructure.partial_safety_factor_2})`}
-                    </p>
-                  </div>
-                  <div className="pt-2 border-t border-gray-200 flex items-center gap-2">
-                    <p className="text-xs text-gray-600">Utilisation Rate:</p>
-                    <p className="font-mono text-sm">{roundToTwoDecimals((totalTensionLoad / Ftra) * 100)}%</p>
-                  </div>
-                </div>
-                <div className={`text-center py-2 rounded-md ${totalTensionLoad <= Ftra ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                  {totalTensionLoad <= Ftra ? 'PASS' : 'FAIL'}
-                </div>
-              </div>
-            </div>
-
-            {/* Check 2 - Add your second check here with same structure */}
-            <div className="p-4 bg-white rounded-md border border-gray-100">
-              <h4 className="font-semibold text-gray-800 mb-3">Shear resistance per bolt</h4>
-              <div className="space-y-2">
-                <div className="bg-gray-50 p-3 rounded-md space-y-2">
-                  <div className="flex items-center gap-2">
-                    <p className="text-xs text-gray-600">Designed Effect of Actions:</p>
-                    <p className="font-mono text-sm">{roundToTwoDecimals(pileStructure.horizontal_load * pileStructure.horizontal_load_safety_factor)} kN</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <p className="text-xs text-gray-600">Designed Structural Resistance:</p>
-                    <p className="font-mono text-sm">{Fvra} kN</p>
-                  </div>
-                  <div className="pt-2 border-t border-gray-200">
-                    <p className="text-xs text-gray-600 text-center">Equation:</p>
-                    <p className="font-mono text-sm break-all text-center">
-                      (F<sub>v,Ed</sub> × γ) ≤ F<sub>v,Rd</sub>
-                    </p>
-                    <p className="font-mono text-xs break-all text-center mt-1">
-                      {`(${pileStructure.horizontal_load} × ${pileStructure.horizontal_load_safety_factor}) ≤ (0.6 × ${pileStructure.ultimate_tensile_strength_a480} × ${pileStructure.nominal_stress_area} / ${pileStructure.partial_safety_factor_2})`}
-                    </p>
-                  </div>
-                  <div className="pt-2 border-t border-gray-200 flex items-center gap-2">
-                    <p className="text-xs text-gray-600">Utilisation Rate:</p>
-                    <p className="font-mono text-sm">{roundToTwoDecimals(((pileStructure.horizontal_load * pileStructure.horizontal_load_safety_factor) / Fvra) * 100)}%</p>
-                  </div>
-                </div>
-                <div className={`text-center py-2 rounded-md ${(pileStructure.horizontal_load * pileStructure.horizontal_load_safety_factor) <= Fvra ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                  {(pileStructure.horizontal_load * pileStructure.horizontal_load_safety_factor) <= Fvra ? 'PASS' : 'FAIL'}
-                </div>
-              </div>
-            </div>
-          </div>
-
+        <div className="bg-gray-50 p-6 rounded-lg border break-inside-avoid">
+          <h3 className="text-lg font-semibold mb-2">Resistance at joints (Eurocode 3)</h3>
           <div className="grid grid-cols-2 gap-6">
-            <div className="p-4 bg-white rounded-md border border-gray-100">
-              <h4 className="font-semibold text-gray-800 mb-3">Combined Shear and Tension</h4>
-              {/* Same structure as Check 1 */}
+            
+            {/* Check 1: M20 A4-80 bolt tension resistance */}
+            <div className="bg-white p-4 rounded-md border flex flex-col shadow-lg">
+              <h4 className="font-semibold mb-2">M20 A4-80 bolt tension resistance</h4>
+              
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <p>Designed Load:</p>
+                  <p className="font-mono">{roundToTwoDecimals(totalTensionLoad)} kN</p>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <p>Designed Resistance:</p>
+                  <p className="font-mono">{Ftra} kN</p>
+                </div>
+
+                <div className="pt-2 border-t border-gray-200">
+                  <p className="font-mono text-sm text-center mb-1">F<sub>t,Ed</sub> ≤ F<sub>t,Rd</sub></p>
+                  <p className="font-mono text-xs text-center">{`${roundToTwoDecimals(totalTensionLoad)} ≤ (${pileStructure.k2} × ${pileStructure.ultimate_tensile_strength_a480} × ${pileStructure.nominal_stress_area} / ${pileStructure.partial_safety_factor_2})`}</p>
+                </div>
+
+                <div className="pt-2 border-t border-gray-200 flex items-center gap-1 text-sm mb-2">
+                  <p>Utilisation Rate:</p>
+                  <p className="font-mono">{roundToOneDecimal((totalTensionLoad / Ftra) * 100)}%</p>
+                </div>
+              </div>
+
+              <div className={`mt-auto text-center py-2 rounded-md font-semibold ${totalTensionLoad <= Ftra ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                {totalTensionLoad <= Ftra ? 'PASS' : 'FAIL'}
+              </div>  
+            </div>
+
+            {/* Shear resistance per bolt */}
+            <div className="bg-white p-4 rounded-md border flex flex-col shadow-lg">
+              <h4 className="font-semibold mb-2">Shear resistance per bolt</h4>
+              
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <p>Designed Load:</p>
+                  <p className="font-mono">{horizontalLoad} kN</p>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <p>Designed Resistance:</p>
+                  <p className="font-mono">{Fvra} kN</p>
+                </div>
+
+                <div className="pt-2 border-t border-gray-200">
+                  <p className="font-mono text-sm text-center mb-1">F<sub>v,Ed</sub>γ ≤ F<sub>v,Rd</sub></p>
+                  <p className="font-mono text-xs text-center">{`(${pileStructure.horizontal_load} × ${pileStructure.horizontal_load_safety_factor}) ≤ (0.6 × ${pileStructure.ultimate_tensile_strength_a480} × ${pileStructure.nominal_stress_area} / ${pileStructure.partial_safety_factor_2})`}</p>
+                </div>
+
+                <div className="pt-2 border-t border-gray-200 flex items-center gap-1 text-sm mb-2">
+                  <p>Utilisation Rate:</p>
+                  <p className="font-mono">{roundToOneDecimal((horizontalLoad / Fvra) * 100)}%</p>
+                </div>
+              </div>
+
+              <div className={`mt-auto text-center py-2 rounded-md font-semibold ${horizontalLoad < Fvra ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                {horizontalLoad <= Fvra ? 'PASS' : 'FAIL'}
+              </div>
+            </div>
+          </div>
+
+          {/* Combined Shear and Tension */}
+          <div className="bg-white p-4 rounded-md border mt-6 shadow-lg">
+            <h4 className="font-semibold mb-2">Combined Shear and Tension</h4>
+            
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center justify-between">
+                <p>Designed Load:</p>
+                <p className="font-mono">N/A</p>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <p>Designed Resistance:</p>
+                <p className="font-mono">{designedShearAndTension}</p>
+              </div>
+
+              <div className="pt-2 border-t border-gray-200">
+                <p className="font-mono text-sm text-center mb-1">(F<sub>v,Ed</sub>γ / F<sub>v,Rd</sub>) + (F<sub>t,Ed</sub> / 1.4F<sub>t,Rd</sub>)</p>
+                <p className="font-mono text-xs text-center">{`((${pileStructure.horizontal_load} × ${pileStructure.horizontal_load_safety_factor}) / ${Fvra}) + (${roundToTwoDecimals(totalTensionLoad)} / (1.4 × ${Ftra}))`}</p>
+              </div>
+
+              <div className="pt-2 border-t border-gray-200 flex items-center gap-1 text-sm mb-2">
+                <p>Utilisation Rate:</p>
+                <p className="font-mono">{roundToOneDecimal((designedShearAndTension / 1.0) * 100)}%</p>
+              </div>
+            </div>
+
+            <div className={`mt-auto text-center py-2 rounded-md font-semibold ${designedShearAndTension < 1.0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+              {designedShearAndTension < 1.0 ? 'PASS' : 'FAIL'}
             </div>
           </div>
         </div>
 
-        <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 break-inside-avoid">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Inner thread failure inside Heli Pile</h3>
+        <div className="bg-gray-50 p-6 rounded-lg border break-inside-avoid">
+          <h3 className="text-lg font-semibold mb-2">Inner thread failure inside Heli Pile</h3>
           
-          <div className="">
-            <div className="p-4 bg-white rounded-md border border-gray-100">
-              <h4 className="font-semibold text-gray-800 mb-3">Resistance of the inner thread</h4>
-              <div className="space-y-2">
-                <div className="bg-gray-50 p-3 rounded-md space-y-2">
-                  <div className="flex items-center gap-2">
-                    <p className="text-xs text-gray-600">Designed Effect of Actions:</p>
-                    <p className="font-mono text-sm">{roundToTwoDecimals(totalTensionLoad)} kN</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <p className="text-xs text-gray-600">Designed Structural Resistance:</p>
-                    <p className="font-mono text-sm">{Ftvra} kN</p>
-                  </div>
-                  <div className="pt-2 border-t border-gray-200">
-                    <p className="text-xs text-gray-600 text-center">Equation:</p>
-                    <p className="font-mono text-sm break-all text-center">
-                      F<sub>v,Ed</sub> ≤ F<sub>tv,Rd</sub>
-                    </p>
-                    <p className="font-mono text-xs break-all text-center mt-1">
-                      {`${roundToTwoDecimals(totalTensionLoad)} ≤ (π × ${pileStructure.pitch_diameter} × ${pileStructure.thread_engagement_length} / 2 × 0.65 × ${pileStructure.ultimate_tensile_strength_lm25m} / ${pileStructure.partial_safety_factor_2})`}
-                    </p>
-                  </div>
-                  <div className="pt-2 border-t border-gray-200 flex items-center gap-2">
-                    <p className="text-xs text-gray-600">Utilisation Rate:</p>
-                    <p className="font-mono text-sm">{roundToTwoDecimals((totalTensionLoad / Ftvra) * 100)}%</p>
-                  </div>
+          <div className="bg-white p-4 rounded-md border shadow-lg">
+            <h4 className="font-semibold text-gray-800 mb-3">Resistance of the inner thread</h4>
+            
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center justify-between">
+                <p>Designed Load:</p>
+                <p className="font-mono">{roundToTwoDecimals(totalTensionLoad)} kN</p>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <p>Designed Resistance:</p>
+                <p className="font-mono">{Ftvra} kN</p>
+              </div>
+
+              <div className="pt-2 border-t border-gray-200">
+                <p className="font-mono text-sm text-center mb-1">F<sub>tv,Ed</sub> ≤ F<sub>tv,Rd</sub></p>
+                <p className="font-mono text-xs text-center">
+                  {`${roundToTwoDecimals(totalTensionLoad)} ≤ (π × ${pileStructure.pitch_diameter} × ${pileStructure.thread_engagement_length} / 2) × (0.65 × ${pileStructure.ultimate_tensile_strength_lm25m} / ${pileStructure.partial_safety_factor_2})`}
+                </p>
+              </div>
+
+              <div className="pt-2 border-t border-gray-200 flex items-center gap-1 text-sm mb-2">
+                <p>Utilisation Rate:</p>
+                <p className="font-mono">{roundToOneDecimal((totalTensionLoad / Ftvra) * 100)}%</p>
+              </div>
+            </div>
+
+            <div className={`text-center py-2 rounded-md font-semibold ${totalTensionLoad <= Ftvra ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+              {totalTensionLoad <= Ftvra ? 'PASS' : 'FAIL'}
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gray-50 p-6 rounded-lg border break-inside-avoid">
+          <h3 className="text-lg font-semibold mb-2">Resistance along the pile (Eurocode 9)</h3>
+          <div className="grid grid-cols-2 gap-6">
+            
+            {/* Tensile resistance of the pile */}
+            <div className="bg-white p-4 rounded-md border flex flex-col shadow-lg">
+              <h4 className="font-semibold mb-2">Tensile resistance of the pile</h4>
+              
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <p>Designed Load:</p>
+                  <p className="font-mono">{roundToTwoDecimals(totalTensionLoad)} kN</p>
                 </div>
-                <div className={`text-center py-2 rounded-md ${totalTensionLoad <= Ftvra ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                  {totalTensionLoad <= Ftvra ? 'PASS' : 'FAIL'}
+
+                <div className="flex items-center justify-between">
+                  <p>Designed Resistance:</p>
+                  <p className="font-mono">{Ntra} kN</p>
                 </div>
+
+                <div className="pt-2 border-t border-gray-200">
+                  <p className="font-mono text-sm text-center mb-1">N<sub>t,Ed</sub> ≤ N<sub>t,Rd</sub></p>
+                  <p className="font-mono text-xs text-center">{`${roundToTwoDecimals(totalTensionLoad)} ≤ ${isCalc1Selected ? `(${pileStructure.pile_gross_area} × ${pileStructure.proof_strength} / ${pileStructure.partial_safety_factor_1})` : `(0.9 × 242 × ${pileStructure.ultimate_tensile_strength_lm25m} / ${pileStructure.partial_safety_factor_2})`}`}</p>
+                </div>
+
+                <div className="pt-2 border-t border-gray-200 flex items-center gap-1 text-sm mb-2">
+                  <p>Utilisation Rate:</p>
+                  <p className="font-mono">{roundToOneDecimal((totalTensionLoad / Ntra) * 100)}%</p>
+                </div>
+              </div>
+
+              <div className={`mt-auto text-center py-2 rounded-md font-semibold ${totalTensionLoad <= Ntra ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                {totalTensionLoad <= Ntra ? 'PASS' : 'FAIL'}
+              </div>
+            </div>
+
+            {/* Compressive resistance of the pile */}
+            <div className="bg-white p-4 rounded-md border flex flex-col shadow-lg">
+              <h4 className="font-semibold mb-2">Compressive resistance of the pile</h4>
+              
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <p>Designed Load:</p>
+                  <p className="font-mono">{roundToTwoDecimals(totalCompressionLoad)} kN</p>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <p>Designed Resistance:</p>
+                  <p className="font-mono">{Nura} kN</p>
+                </div>
+
+                <div className="pt-2 border-t border-gray-200">
+                  <p className="font-mono text-sm text-center mb-1">N<sub>c,Ed</sub> ≤ N<sub>c,Rd</sub></p>
+                  <p className="font-mono text-xs text-center">{`${roundToTwoDecimals(totalCompressionLoad)} ≤ (242 × ${pileStructure.ultimate_tensile_strength_lm25m} / ${pileStructure.partial_safety_factor_2})`}</p>
+                </div>
+
+                <div className="pt-2 border-t border-gray-200 flex items-center gap-1 text-sm mb-2">
+                  <p>Utilisation Rate:</p>
+                  <p className="font-mono">{roundToOneDecimal((totalCompressionLoad / Nura) * 100)}%</p>
+                </div>
+              </div>
+
+              <div className={`mt-auto text-center py-2 rounded-md font-semibold ${totalCompressionLoad <= Nura ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                {totalCompressionLoad <= Nura ? 'PASS' : 'FAIL'}
               </div>
             </div>
           </div>
         </div>
-
-        <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 break-inside-avoid">
-  <h3 className="text-lg font-semibold text-gray-900 mb-4">Resistance along the pile (Eurocode 9)</h3>
-  
-  <div className="grid grid-cols-2 gap-6">
-    {/* Tensile resistance of the pile */}
-    <div className="p-4 bg-white rounded-md border border-gray-100">
-      <h4 className="font-semibold text-gray-800 mb-3">Tensile resistance of the pile</h4>
-      <div className="space-y-2">
-        <div className="bg-gray-50 p-3 rounded-md space-y-2">
-          <div className="flex items-center gap-2">
-            <p className="text-xs text-gray-600">Designed Effect of Actions:</p>
-            <p className="font-mono text-sm">{roundToTwoDecimals(totalTensionLoad)} kN</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <p className="text-xs text-gray-600">Designed Structural Resistance:</p>
-            <p className="font-mono text-sm">{Ntra} kN</p>
-          </div>
-          <div className="pt-2 border-t border-gray-200">
-            <p className="text-xs text-gray-600 text-center">Equation:</p>
-            <p className="font-mono text-sm break-all text-center">
-              N<sub>t,Ed</sub> ≤ N<sub>t,Rd</sub>
-            </p>
-            <p className="font-mono text-xs break-all text-center mt-1">
-              {`${roundToTwoDecimals(totalTensionLoad)} ≤ ${Ntra}`}
-            </p>
-          </div>
-          <div className="pt-2 border-t border-gray-200 flex items-center gap-2">
-            <p className="text-xs text-gray-600">Utilisation Rate:</p>
-            <p className="font-mono text-sm">{roundToTwoDecimals((totalTensionLoad / Ntra) * 100)}%</p>
-          </div>
-        </div>
-        <div className={`text-center py-2 rounded-md ${totalTensionLoad <= Ntra ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-          {totalTensionLoad <= Ntra ? 'PASS' : 'FAIL'}
-        </div>
-      </div>
-    </div>
-
-    {/* Compressive resistance of the pile */}
-    <div className="p-4 bg-white rounded-md border border-gray-100">
-      <h4 className="font-semibold text-gray-800 mb-3">Compressive resistance of the pile</h4>
-      <div className="space-y-2">
-        <div className="bg-gray-50 p-3 rounded-md space-y-2">
-          <div className="flex items-center gap-2">
-            <p className="text-xs text-gray-600">Designed Effect of Actions:</p>
-            <p className="font-mono text-sm">{roundToTwoDecimals(totalCompressionLoad)} kN</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <p className="text-xs text-gray-600">Designed Structural Resistance:</p>
-            <p className="font-mono text-sm">{Nura} kN</p>
-          </div>
-          <div className="pt-2 border-t border-gray-200">
-            <p className="text-xs text-gray-600 text-center">Equation:</p>
-            <p className="font-mono text-sm break-all text-center">
-              N<sub>c,Ed</sub> ≤ N<sub>c,Rd</sub>
-            </p>
-            <p className="font-mono text-xs break-all text-center mt-1">
-              {`${roundToTwoDecimals(totalCompressionLoad)} ≤ (242 × ${pileStructure.ultimate_tensile_strength_lm25m} / ${pileStructure.partial_safety_factor_2})`}
-            </p>
-          </div>
-          <div className="pt-2 border-t border-gray-200 flex items-center gap-2">
-            <p className="text-xs text-gray-600">Utilisation Rate:</p>
-            <p className="font-mono text-sm">{roundToTwoDecimals((totalCompressionLoad / Nura) * 100)}%</p>
-          </div>
-        </div>
-        <div className={`text-center py-2 rounded-md ${totalCompressionLoad <= Nura ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-          {totalCompressionLoad <= Nura ? 'PASS' : 'FAIL'}
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
       </div>
     )
   }
@@ -444,7 +653,7 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
     <>
       {/* --- PAGE 1: Title Page --- */}
       <div className="h-screen relative">
-        <div className="absolute top-5 left-20">
+        <div className="flex justify-center mr-5 mt-7">
           <img src="/logo.png" alt="Helical Pile Logo" className="h-15"/>
         </div>
 
@@ -660,6 +869,12 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
                 <MoveUp key={`right-${i}`} className="size-6"/>
               ))}
             </div>
+
+            <div className="absolute z-20 flex flex-row gap-4 left-[275px]" style={{top: `${pileHeight}px`, width: '60px'}}>
+              {Array.from({ length: Math.ceil(60 / 40) }).map((_, i) => (
+                <MoveUp key={`bottom-${i}`} className="size-6"/>
+              ))}
+            </div>
           </div> 
 
           <OutputSoilGraph soilsData={soilsData} effectivePileLength={profileData.effective_pile_length} pileDiameter={baseParams.pile_diameter} />
@@ -688,17 +903,12 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
             <li><span className="font-semibold">Design Method:</span> Design by testing</li>
           ) : null}
 
-          {dynamicParams.design_method !== "method_bs" && (
-            <li><span className="font-semibold">Design Approach:
-            </span> {dynamicParams.country === "uk" ? "United Kingdom" : dynamicParams.country === "pl" ? "Poland" : dynamicParams.country === "nl" ? "Netherlands" : "—"}</li>
-          )}
-          
           {baseParams.design_notes && (
             <li><span className="font-semibold">Notes:</span> {baseParams.design_notes}</li>
           )}
         </ul>
 
-        <div className={`scale-85 origin-top ${profileData.profile_name || baseParams.pile_number || baseParams.design_notes || dynamicParams.design_method ? 'mt-6' : 'mt-2'}`}>
+        <div className="scale-85 origin-top ${profileData.profile_name mt-6">
           {dynamicParams.design_method === "method_bs" ? renderBSDesign() : renderENOrTestDesign()}
         </div>
       </div>
@@ -727,7 +937,7 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
       </div>
 
       <div className="break-before-page">
-        <div className="text-2xl font-semibold tracking-tight">Appendix</div>
+        <div className="text-2xl font-semibold tracking-tight">Appendix I</div>
       </div>
     </>
   )
