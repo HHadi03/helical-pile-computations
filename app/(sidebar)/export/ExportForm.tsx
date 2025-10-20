@@ -14,6 +14,7 @@ import { NumberInput, SafetyNumberInput } from "@/components/NumberInput"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Fragment, useEffect } from "react"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileSchema[] }) {
   const router = useRouter()
@@ -163,28 +164,6 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
 
             <FormField
               control={form.control}
-              name="pile_diameter"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel htmlFor="pile_diameter">Pile Diameter <span className="font-semibold -ml-1">(mm)</span></FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value} name={field.name}>
-                    <FormControl>
-                      <SelectTrigger className="w-full" id="pile_diameter">
-                        <SelectValue placeholder="Select pile diameter"/>
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="60">60 mm</SelectItem>
-                      <SelectItem value="100">100 mm</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage/>
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
               name="soil_profile_id"
               render={({ field }) => (
                 <FormItem>
@@ -200,6 +179,34 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                     </SelectContent>
                   </Select>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <p className="text-sm leading-none mb-1.5 ml-1"> Pile Diameter <span className="font-semibold">(mm)</span></p>
+            <FormField
+              control={form.control}
+              name="pile_diameter"
+              render={({ field }) => (
+                <FormItem className="border border-input rounded-sm p-2">
+                  <FormControl>
+                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} name={field.name} className="flex flex-col space-x-4 sm:flex-row pt-1 px-2">
+                      <FormItem className="flex items-center space-x-2">
+                        <FormControl>
+                          <RadioGroupItem value="60" id="pile_diameter_60" />
+                        </FormControl>
+                        <FormLabel htmlFor="pile_diameter_60">60 mm</FormLabel>
+                      </FormItem>
+
+                      <FormItem className="flex items-center space-x-2">
+                        <FormControl>
+                          <RadioGroupItem value="100" id="pile_diameter_100" />
+                        </FormControl>
+                        <FormLabel htmlFor="pile_diameter_100">100 mm</FormLabel>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage className="mt-2" />
                 </FormItem>
               )}
             />
@@ -1275,8 +1282,6 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
             <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"> Upload Document</label>
             <Input type="file" className="cursor-pointer border"/>
           </div>
-
-
         </div>
       
         <Button type="submit" className="w-32" disabled={isSubmitting}> {isSubmitting ? (<> <Loader2 className="mr-2 size-4 animate-spin"/>Exporting... </>) : ("Export")}</Button>

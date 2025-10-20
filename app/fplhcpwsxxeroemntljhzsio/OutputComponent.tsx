@@ -17,12 +17,23 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
   let effectivePileLength = profileData.effective_pile_length
   if (effectivePileLength > lastLayer.end_depth) {effectivePileLength = lastLayer.end_depth}
   
-  let pileHeight = 0
-
   const totalTensionLoad = dynamicParams.design_method === "method_bs" ? dynamicParams.applied_tension_load : dynamicParams.permanent_tension_load + dynamicParams.variable_tension_load
   const totalCompressionLoad = dynamicParams.design_method === "method_bs" ? dynamicParams.applied_compression_load : dynamicParams.permanent_compression_load + dynamicParams.variable_compression_load
   const ExternalLoad = totalTensionLoad + totalCompressionLoad
- 
+  
+  let pileHeight = 0
+  const calculateRowHeight = () => {
+    let height = 40
+    
+    if (baseParams.show_description) height += 25.5
+    if (baseParams.show_spt) height += 25.5
+    if (baseParams.show_moist) height += 25.5
+    if (baseParams.show_sat) height += 25.5
+    if (baseParams.show_shear_strength) height += 25.5
+    
+    return Math.max(60, height)
+  }
+
   const renderBSDesign = () => {
     if (dynamicParams.design_method !== 'method_bs') return null
     
@@ -709,7 +720,7 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
           )}
         </ul>
 
-        <div className={`scale-85 origin-top ${profileData.profile_name || baseParams.pile_number || baseParams.soil_notes ? 'mt-6' : 'mt-2'}`}>
+        <div className={` origin-top ${profileData.profile_name || baseParams.pile_number || baseParams.soil_notes ? 'mt-6' : 'mt-2'}`}>
           <div className="p-2 bg-sky-50 dark:bg-sky-900/50 border"> 
             <div className="text-sm justify-between flex">
               <p><span className="font-semibold">Pile Diameter:</span> {baseParams.pile_diameter} mm</p>
@@ -723,17 +734,18 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
               const isDark = getLuminance(soil.colour) < 0.5
               const textColor = isDark ? "text-white" : "text-black"
 
+              const rowHeight = calculateRowHeight()
               if (soil.id === lastLayer.id) {
                 if (lastLayer.end_depth <= profileData.effective_pile_length) {
-                  pileHeight = (index + 1) * 161
+                  pileHeight = (index + 1) * rowHeight
                 } else {
                   const portionOfLayer = (profileData.effective_pile_length - soil.start_depth) / (soil.end_depth - soil.start_depth)
-                  pileHeight = (index * 161) + (portionOfLayer * 161)
+                  pileHeight = (index * rowHeight) + (portionOfLayer * rowHeight)
                 }
               }
 
               return (
-                <div key={soil.id} className={`h-[161px] break-inside-avoid relative p-2 grid grid-cols-[190px_50px_1fr] whitespace-nowrap ${isDefaultColour && index < soilsData.length - 1 ? 'after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-[oklch(0.87_0.01_258)] dark:after:bg-[oklch(1_0_0_/_25%)]' : ''}`} style={{ backgroundColor: isDefaultColour ? "" : soil.colour}}>
+                <div key={soil.id} className={`min-h-[${rowHeight}] break-inside-avoid relative p-2 grid grid-cols-[190px_50px_1fr] whitespace-nowrap ${isDefaultColour && index < soilsData.length - 1 ? 'after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-[oklch(0.87_0.01_258)] dark:after:bg-[oklch(1_0_0_/_25%)]' : ''}`} style={{ backgroundColor: isDefaultColour ? "" : soil.colour}}>
 
                   <div className={`mt-auto text-xs ${isDefaultColour ? 'text-foreground' : textColor}`}><span className="font-semibold">Depth:</span> {soil.start_depth} – {soil.end_depth} m</div>
                   
@@ -741,18 +753,18 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
                     
                   <div className={`space-y-2 text-sm leading-tight @container ${isDefaultColour ? 'text-foreground' : textColor}`}>
                     <p className="font-semibold uppercase">{soil.soil_name || soil.soil}</p>
-                    <p className="overflow-hidden whitespace-nowrap">Description: {soil.description || "N/A"}</p>
-                    <p>SPT N-Value: {soil.test_type === "spt" ? soil.n_value : '—'}</p>
-                    <p>Moist Weight: {soil.y_moist} kN/m³</p>
-                    <p>Saturated Weight: {soil.y_sat} kN/m³</p>
-                    <p>{soil.soil_type === 'fine' ? 'Undrained Shear Strength:' : 'Shear Strength:'} {soil.soil_type === 'fine' ? soil.su : soil.t} kPa</p>
+                    {baseParams.show_description && <p className="overflow-hidden whitespace-nowrap">Description: {soil.description || "N/A"}</p>}
+                    {baseParams.show_spt && <p>SPT N-Value: {soil.test_type === "spt" ? soil.n_value : '—'}</p>}
+                    {baseParams.show_moist && <p>Moist Weight: {soil.y_moist} kN/m³</p>}
+                    {baseParams.show_sat && <p>Saturated Weight: {soil.y_sat} kN/m³</p>}
+                    {baseParams.show_shear_strength && <p>{soil.soil_type === 'fine' ? 'Undrained Shear Strength:' : 'Shear Strength:'} {soil.soil_type === 'fine' ? soil.su : soil.t} kPa</p>}
                   </div>
 
                   <div className={`absolute right-2 top-2 text-xs px-2 py-0.5 rounded-sm border font-semibold ${isDefaultColour ? 'border-foreground' : isDark ? 'border-white text-white' : 'border-black text-black'}`}>Layer  {index + 1}</div>
 
                   {soil.start_depth < profileData.water_depth && profileData.water_depth <= soil.end_depth && (
                     <div className={`absolute left-0 right-0 z-10 border-b-2 border-dashed ${isDefaultColour ? 'border-blue-400 dark:border-blue-800' :  isDark ? 'border-blue-400' : 'border-blue-800'}`} style={{ top: `${Math.max(15, Math.min(100, ((profileData.water_depth - soil.start_depth) / (soil.end_depth - soil.start_depth)) * 100))}%`}}>
-                      <div className={`absolute bottom-0.5 left-2 flex flex-row text-xs gap-2 ${isDefaultColour ? 'text-foreground' : textColor}`}>
+                      <div className={`absolute bottom-0.5 right-2 flex flex-row text-xs gap-2 ${isDefaultColour ? 'text-foreground' : textColor}`}>
                         <Triangle className={`text-muted-foreground rotate-180 size-4 ${isDefaultColour ? 'fill-blue-400 dark:fill-blue-800' : isDark ? 'fill-blue-400' : 'fill-blue-800'}`}/><span className="-ml-1 -mr-1">Water Table:</span>{profileData.water_depth} m
                       </div>
                     </div>
@@ -867,12 +879,6 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
             <div className={`absolute z-20 flex flex-col gap-4 top-0 left-[335px] transform -translate-x-1/2`} style={{height: `${pileHeight}px`}}>
               {Array.from({ length: Math.ceil(pileHeight / 40) }).map((_, i) => (
                 <MoveUp key={`right-${i}`} className="size-6"/>
-              ))}
-            </div>
-
-            <div className="absolute z-20 flex flex-row gap-4 left-[275px]" style={{top: `${pileHeight}px`, width: '60px'}}>
-              {Array.from({ length: Math.ceil(60 / 40) }).map((_, i) => (
-                <MoveUp key={`bottom-${i}`} className="size-6"/>
               ))}
             </div>
           </div> 
