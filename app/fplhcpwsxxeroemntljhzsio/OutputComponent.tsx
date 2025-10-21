@@ -6,8 +6,10 @@ import { getLuminance, roundToOneDecimal, roundToTwoDecimals } from "@/lib/utils
 import { Triangle, MoveUp } from "lucide-react"
 import { OutputSoilGraph } from "./OutputSoilGraph"
 import { Arimo } from "next/font/google"
+import { Space_Mono } from "next/font/google"
 
 const arimo = Arimo({subsets: ["latin"], weight: ['400', '700']})
+const spaceMono = Space_Mono({subsets: ["latin"], weight: ['400', '700'], variable: '--font-space-mono'})
 
 export function OutputComponent({ baseParams, dynamicParams, soilsData, profileData, pileStructure }: { baseParams: BaseParamsType, dynamicParams: DynamicParamsType, pileStructure: PileStructureType, soilsData: TexportSoilSchema[], profileData: TexportSoilProfileSchema }) {
   
@@ -664,7 +666,7 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
   }
 
   return (
-    <div className={`${arimo.className}`}>
+    <div className={`${arimo.className} ${spaceMono.variable} `}>
       {/* --- PAGE 1: Title Page --- */}
       <div className="flex flex-col justify-between h-screen">
         <div className="flex justify-center mr-5 mt-7">
