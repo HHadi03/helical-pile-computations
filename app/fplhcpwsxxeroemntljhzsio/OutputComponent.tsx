@@ -5,6 +5,9 @@ import { TexportSoilSchema } from "@/schemas/soilSchemas"
 import { getLuminance, roundToOneDecimal, roundToTwoDecimals } from "@/lib/utils"
 import { Triangle, MoveUp } from "lucide-react"
 import { OutputSoilGraph } from "./OutputSoilGraph"
+import { Arimo } from "next/font/google"
+
+const arimo = Arimo({subsets: ["latin"], weight: ['400', '700']})
 
 export function OutputComponent({ baseParams, dynamicParams, soilsData, profileData, pileStructure }: { baseParams: BaseParamsType, dynamicParams: DynamicParamsType, pileStructure: PileStructureType, soilsData: TexportSoilSchema[], profileData: TexportSoilProfileSchema }) {
   
@@ -506,7 +509,7 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
 
                 <div className="pt-2 border-t border-gray-200">
                   <p className="font-mono text-sm text-center mb-1">F<sub>v,Ed</sub>γ ≤ F<sub>v,Rd</sub></p>
-                  <p className="font-mono text-xs text-center">{`(${pileStructure.horizontal_load} × ${pileStructure.horizontal_load_safety_factor}) ≤ (0.6 × ${pileStructure.ultimate_tensile_strength_a480} × ${pileStructure.nominal_stress_area} / ${pileStructure.partial_safety_factor_2})`}</p>
+                  <p className="font-mono text-xs text-center">{`${pileStructure.horizontal_load} × ${pileStructure.horizontal_load_safety_factor} ≤ (0.6 × ${pileStructure.ultimate_tensile_strength_a480} × ${pileStructure.nominal_stress_area} / ${pileStructure.partial_safety_factor_2})`}</p>
                 </div>
 
                 <div className="pt-2 border-t border-gray-200 flex items-center gap-1 text-sm mb-2">
@@ -537,8 +540,8 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
               </div>
 
               <div className="pt-2 border-t border-gray-200">
-                <p className="font-mono text-sm text-center mb-1">(F<sub>v,Ed</sub>γ / F<sub>v,Rd</sub>) + (F<sub>t,Ed</sub> / 1.4F<sub>t,Rd</sub>)</p>
-                <p className="font-mono text-xs text-center">{`((${pileStructure.horizontal_load} × ${pileStructure.horizontal_load_safety_factor}) / ${Fvra}) + (${roundToTwoDecimals(totalTensionLoad)} / (1.4 × ${Ftra}))`}</p>
+                <p className="font-mono text-sm text-center mb-1">F<sub>v,Ed</sub>γ / F<sub>v,Rd</sub> + F<sub>t,Ed</sub> / 1.4F<sub>t,Rd</sub></p>
+                <p className="font-mono text-xs text-center">{`(${pileStructure.horizontal_load} × ${pileStructure.horizontal_load_safety_factor} / ${Fvra}) + (${roundToTwoDecimals(totalTensionLoad)} / 1.4 × ${Ftra})`}</p>
               </div>
 
               <div className="pt-2 border-t border-gray-200 flex items-center gap-1 text-sm mb-2">
@@ -661,20 +664,27 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
   }
 
   return (
-    <>
+    <div className={`${arimo.className}`}>
       {/* --- PAGE 1: Title Page --- */}
-      <div className="h-screen relative">
+      <div className="flex flex-col justify-between h-screen">
         <div className="flex justify-center mr-5 mt-7">
           <img src="/logo.png" alt="Helical Pile Logo" className="h-15"/>
         </div>
 
-        <div className="flex flex-col justify-center items-center text-center h-full pb-15">
+        <div className="flex flex-col justify-center items-center text-center">
           <h1 className="text-4xl font-semibold tracking-tight">Helical Pile Computations</h1>
           <h2 className="text-2xl mt-3">Design Report</h2>
         </div>
 
-        <div className="absolute bottom-30 right-20">
+        <div className="flex justify-end mr-20 mb-30">
           <div className="grid grid-cols-[auto_1fr] gap-x-4 text-left text-sm">
+            {baseParams.pile_number && (
+              <>
+                <p className="font-semibold">Pile Number:</p>
+                <p>{baseParams.pile_number}</p>
+              </>
+            )}
+            
             {baseParams.job_number && (
               <>
                 <p className="font-semibold">Job Number:</p>
@@ -704,15 +714,11 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
 
       {/* --- PAGE 2: Soil Profile Configuration --- */}
       <div>
-        <h2 className={`text-2xl font-semibold tracking-tight ${profileData.profile_name || baseParams.pile_number || baseParams.soil_notes ? '' : 'ml-13'}`}>Soil Profile Configuration</h2>
+        <h2 className={`text-2xl font-semibold tracking-tight ${profileData.profile_name || baseParams.soil_notes ? '' : 'ml-13'}`}>Soil Profile Configuration</h2>
         
         <ul className="text-sm space-y-1 mt-2 list-disc list-inside">
           {profileData.profile_name && (
             <li><span className="font-semibold">Soil Profile:</span> {profileData.profile_name}</li>
-          )}
-
-          {baseParams.pile_number && (
-            <li><span className="font-semibold">Pile Number:</span> {baseParams.pile_number}</li>
           )}
 
           {baseParams.soil_notes && (
@@ -720,7 +726,7 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
           )}
         </ul>
 
-        <div className={` origin-top ${profileData.profile_name || baseParams.pile_number || baseParams.soil_notes ? 'mt-6' : 'mt-2'}`}>
+        <div className={`scale-85 origin-top ${profileData.profile_name || baseParams.soil_notes ? 'mt-6' : 'mt-2'}`}>
           <div className="p-2 bg-sky-50 dark:bg-sky-900/50 border"> 
             <div className="text-sm justify-between flex">
               <p><span className="font-semibold">Pile Diameter:</span> {baseParams.pile_diameter} mm</p>
@@ -735,6 +741,7 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
               const textColor = isDark ? "text-white" : "text-black"
 
               const rowHeight = calculateRowHeight()
+              
               if (soil.id === lastLayer.id) {
                 if (lastLayer.end_depth <= profileData.effective_pile_length) {
                   pileHeight = (index + 1) * rowHeight
@@ -745,7 +752,7 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
               }
 
               return (
-                <div key={soil.id} className={`min-h-[${rowHeight}] break-inside-avoid relative p-2 grid grid-cols-[190px_50px_1fr] whitespace-nowrap ${isDefaultColour && index < soilsData.length - 1 ? 'after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-[oklch(0.87_0.01_258)] dark:after:bg-[oklch(1_0_0_/_25%)]' : ''}`} style={{ backgroundColor: isDefaultColour ? "" : soil.colour}}>
+                <div key={soil.id} className={` break-inside-avoid relative p-2 grid grid-cols-[190px_50px_1fr] whitespace-nowrap ${isDefaultColour && index < soilsData.length - 1 ? 'after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-[oklch(0.87_0.01_258)] dark:after:bg-[oklch(1_0_0_/_25%)]' : ''}`} style={{ backgroundColor: isDefaultColour ? "" : soil.colour, minHeight: `${rowHeight}px`}}>
 
                   <div className={`mt-auto text-xs ${isDefaultColour ? 'text-foreground' : textColor}`}><span className="font-semibold">Depth:</span> {soil.start_depth} – {soil.end_depth} m</div>
                   
@@ -763,8 +770,8 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
                   <div className={`absolute right-2 top-2 text-xs px-2 py-0.5 rounded-sm border font-semibold ${isDefaultColour ? 'border-foreground' : isDark ? 'border-white text-white' : 'border-black text-black'}`}>Layer  {index + 1}</div>
 
                   {soil.start_depth < profileData.water_depth && profileData.water_depth <= soil.end_depth && (
-                    <div className={`absolute left-0 right-0 z-10 border-b-2 border-dashed ${isDefaultColour ? 'border-blue-400 dark:border-blue-800' :  isDark ? 'border-blue-400' : 'border-blue-800'}`} style={{ top: `${Math.max(15, Math.min(100, ((profileData.water_depth - soil.start_depth) / (soil.end_depth - soil.start_depth)) * 100))}%`}}>
-                      <div className={`absolute bottom-0.5 right-2 flex flex-row text-xs gap-2 ${isDefaultColour ? 'text-foreground' : textColor}`}>
+                    <div className={`absolute left-0 right-0 z-10 border-b-2 border-dashed ${isDefaultColour ? 'border-blue-400 dark:border-blue-800' :  isDark ? 'border-blue-400' : 'border-blue-800'}`} style={{ top: `${Math.max(33, Math.min(100, ((profileData.water_depth - soil.start_depth) / (soil.end_depth - soil.start_depth)) * 100))}%`}}>
+                      <div className={`absolute bottom-0.5 left-2 flex flex-row text-xs gap-2 ${isDefaultColour ? 'text-foreground' : textColor}`}>
                         <Triangle className={`text-muted-foreground rotate-180 size-4 ${isDefaultColour ? 'fill-blue-400 dark:fill-blue-800' : isDark ? 'fill-blue-400' : 'fill-blue-800'}`}/><span className="-ml-1 -mr-1">Water Table:</span>{profileData.water_depth} m
                       </div>
                     </div>
@@ -780,15 +787,11 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
 
       {/* --- PAGE 3: Pile Capacities --- */}
       <div className="break-before-page">
-        <h2 className={`text-2xl font-semibold tracking-tight ${profileData.profile_name || baseParams.pile_number || baseParams.soil_notes ? '' : 'ml-13'}`}>Helical Pile Capacity</h2>
+        <h2 className={`text-2xl font-semibold tracking-tight ${profileData.profile_name || baseParams.soil_notes ? '' : 'ml-13'}`}>Helical Pile Capacity</h2>
         
         <ul className="text-sm space-y-1 mt-2 list-disc list-inside">
           {profileData.profile_name && (
             <li><span className="font-semibold">Soil Profile:</span> {profileData.profile_name}</li>
-          )}
-
-          {baseParams.pile_number && (
-            <li><span className="font-semibold">Pile Number:</span> {baseParams.pile_number}</li>
           )}
 
           {baseParams.soil_notes && (
@@ -796,7 +799,7 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
           )}
         </ul>
 
-        <div className={`scale-85 origin-top ${profileData.profile_name || baseParams.pile_number || baseParams.soil_notes ? 'mt-6' : 'mt-2'}`}>
+        <div className={`scale-85 origin-top ${profileData.profile_name || baseParams.soil_notes ? 'mt-6' : 'mt-2'}`}>
           <div className="p-2 bg-sky-50 dark:bg-sky-900/50 border-t border-x relative"> 
             <div className="flex justify-between">
               
@@ -844,9 +847,9 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
                   <div className={`flex flex-col space-y-2 text-sm leading-snug ${isDefaultColour ? 'text-foreground' : textColor}`}>
                     {!isLayerBeyondPile && (
                       <>
-                        <p><span className="italic"> q<sub>s,{index + 1}</sub> = </span> {soil.soil_type === 'fine' ? soil.su : soil.t} kPa</p>
-                        {soil.id === lastLayer.id && (<p><span className="italic"> q<sub>b,{rbIndex + 1}</sub> = </span> {soil.qult} kPa</p>)}
-                        <div className="mt-auto text-xs"><span className="italic">h<sub>{index + 1}</sub> = </span> {soilHeight} m</div>
+                        <p>q<sub>s,{index + 1}</sub> =  <span className="font-mono">{soil.soil_type === 'fine' ? soil.su : soil.t} kPa</span></p>
+                        {soil.id === lastLayer.id && (<p>q<sub>b,{rbIndex + 1}</sub> = <span className="font-mono">{soil.qult} kPa</span></p>)}
+                        <div className="mt-auto">h<sub>{index + 1}</sub> = <span className="font-mono">{soilHeight} m</span></div>
                       </>
                     )}
                   </div>
@@ -857,8 +860,8 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
                     <p className="font-semibold uppercase">{soil.soil_name || soil.soil}</p>
                     {!isLayerBeyondPile && (
                       <>
-                        <p><span className="italic">R<sub>s,{index + 1}</sub> = </span> <span className="italic">q<sub>s,{index + 1}</sub> ⋅ h<sub>{index + 1}</sub>  ⋅ πD = </span> {baseParams.pile_diameter === "60" ? soil.shaft_capacity60 : soil.shaft_capacity100} kN</p>
-                        {soil.id === lastLayer.id && (<p><span className="italic">R<sub>b,{rbIndex + 1}</sub> = </span> <span className="italic">q<sub>b,{rbIndex + 1}</sub> ⋅ A<sub>base</sub> = </span> {baseParams.pile_diameter === "60" ? soil.bearing_capacity60 : soil.bearing_capacity100} kN</p>)}
+                        <p>R<sub>s,{index + 1}</sub> = q<sub>s,{index + 1}</sub> ⋅ h<sub>{index + 1}</sub>  ⋅ πD = <span className="font-mono">{baseParams.pile_diameter === "60" ? soil.shaft_capacity60 : soil.shaft_capacity100} kN</span></p>
+                        {soil.id === lastLayer.id && (<p>R<sub>b,{rbIndex + 1}</sub> = q<sub>b,{rbIndex + 1}</sub> ⋅ A<sub>base</sub> = <span className="font-mono">{baseParams.pile_diameter === "60" ? soil.bearing_capacity60 : soil.bearing_capacity100} kN</span></p>)}
                       </>
                     )}
                   </div>
@@ -869,7 +872,34 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
             })}
 
             <div className={`absolute z-20 top-[-25px] left-[305px] transform -translate-x-1/2 ${baseParams.pile_diameter === "60" ? 'w-[30px] bg-size-[30px] bg-[url(/60mm-pile.png)]' : 'w-[40px] bg-size-[40px] bg-[url(/100mm-pile.png)]'}`} style={{height: `${pileHeight + 25}px`}}/>
-
+            
+            <div className="absolute z-20 bottom-0 left-[275px] w-[60px] h-[40px]" style={{ top: `${pileHeight}px` }}>
+              <svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+                {/* Base line */}
+                <line x1="0" y1="70" x2="100" y2="70" stroke="black" strokeWidth="3"/>
+                
+                {/* Arrow 1 */}
+                <line x1="0" y1="70" x2="0" y2="20" stroke="black" strokeWidth="4"/>
+                <polygon points="0,15 -7,28 7,28" fill="black"/>
+                
+                {/* Arrow 2 */}
+                <line x1="25" y1="70" x2="25" y2="20" stroke="black" strokeWidth="4"/>
+                <polygon points="25,15 18,28 32,28" fill="black"/>
+                
+                {/* Arrow 3 */}
+                <line x1="50" y1="70" x2="50" y2="20" stroke="black" strokeWidth="4"/>
+                <polygon points="50,15 43,28 57,28" fill="black"/>
+                
+                {/* Arrow 4 */}
+                <line x1="75" y1="70" x2="75" y2="20" stroke="black" strokeWidth="4"/>
+                <polygon points="75,15 68,28 82,28" fill="black"/>
+                
+                {/* Arrow 5 */}
+                <line x1="100" y1="70" x2="100" y2="20" stroke="black" strokeWidth="4"/>
+                <polygon points="100,15 93,28 107,28" fill="black"/>
+              </svg>
+            </div>
+            
             <div className="absolute z-20 flex flex-col gap-4 top-0 left-[275px] transform -translate-x-1/2" style={{height: `${pileHeight}px`}}>
               {Array.from({ length: Math.ceil(pileHeight / 40) }).map((_, i) => (
                 <MoveUp key={`left-${i}`} className="size-6"/>
@@ -885,7 +915,6 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
 
           <OutputSoilGraph soilsData={soilsData} effectivePileLength={profileData.effective_pile_length} pileDiameter={baseParams.pile_diameter} />
         </div>
-        
       </div>
       
       {/* PAGE 4: Ultimate Limit State GEO */}
@@ -895,10 +924,6 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
         <ul className="text-sm space-y-1 mt-2 list-disc list-inside">
           {profileData.profile_name && (
             <li><span className="font-semibold">Soil Profile:</span> {profileData.profile_name}</li>
-          )}
-
-          {baseParams.pile_number && (
-            <li><span className="font-semibold">Pile Number:</span> {baseParams.pile_number}</li>
           )}
 
           {dynamicParams.design_method === "method_bs" ? (
@@ -921,15 +946,11 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
 
       {/* PAGE 5: Ultimate Limit State STR */}
       <div className="break-before-page">
-        <h2 className={`text-2xl font-semibold tracking-tight ${profileData.profile_name || baseParams.pile_number || baseParams.pile_notes ? '' : 'ml-13'}`}>Ultimate Limit State (STR)</h2>
+        <h2 className={`text-2xl font-semibold tracking-tight ${profileData.profile_name || baseParams.pile_notes ? '' : 'ml-13'}`}>Ultimate Limit State (STR)</h2>
         
         <ul className="text-sm space-y-1 mt-2 list-disc list-inside">
           {profileData.profile_name && (
             <li><span className="font-semibold">Soil Profile:</span> {profileData.profile_name}</li>
-          )}
-
-          {baseParams.pile_number && (
-            <li><span className="font-semibold">Pile Number:</span> {baseParams.pile_number}</li>
           )}
 
           {baseParams.pile_notes && (
@@ -937,7 +958,7 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
           )}
         </ul>
 
-        <div className={`scale-85 origin-top ${profileData.profile_name || baseParams.pile_number || baseParams.pile_notes ? 'mt-6' : 'mt-2'}`}>
+        <div className={`scale-85 origin-top ${profileData.profile_name || baseParams.pile_notes ? 'mt-6' : 'mt-2'}`}>
           {renderPileStructuralCheck()}
         </div>
       </div>
@@ -945,7 +966,7 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
       <div className="break-before-page">
         <div className="text-2xl font-semibold tracking-tight">Appendix I</div>
       </div>
-    </>
+    </div>
   )
   
 }

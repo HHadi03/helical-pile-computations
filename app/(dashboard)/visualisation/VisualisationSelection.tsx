@@ -18,6 +18,10 @@ export function VisualisationSelection({ profilesData, initialDialogOpen }: { pr
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   
+  const handleRouterBack = () => {
+    router.push('/overview')
+  }
+
   const handleCheckboxToggle = (key: string, checked: boolean) => {
     setSelections(prev => {
       const newSet = new Set(prev)
@@ -107,7 +111,7 @@ export function VisualisationSelection({ profilesData, initialDialogOpen }: { pr
         </div>
         
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={router.back} disabled={isLoading}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel onClick={handleRouterBack} disabled={isLoading}>Cancel</AlertDialogCancel>
           <Button disabled={selections.size === 0 || isLoading} onClick={() => handleConfigureChart(selections)} className="sm:w-32">
             {isLoading ? <><Loader2 className="animate-spin size-4"/>Configuring...</> : "Configure Chart"}
           </Button>

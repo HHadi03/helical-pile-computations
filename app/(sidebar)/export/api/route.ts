@@ -801,7 +801,7 @@ export async function POST(req: NextRequest) {
       footerTemplate: footerTemplate,
       pageRanges: '2-',
     })
-    
+
     await browser.close()
     
     const mergedPdf = await PDFDocument.create()
