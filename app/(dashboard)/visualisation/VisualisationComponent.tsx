@@ -354,84 +354,82 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
     <>
       <div className="flex flex-col md:flex-row max-w-5xl mx-auto gap-5">
         <div className="flex-auto h-110 sm:h-140 border-2 p-5" id="VisualisationGraph">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartDisplayData} layout="vertical" margin={{ top: 5, right: 20, left: -5, bottom: 15 }}>
-              
-              <CartesianGrid 
-                strokeDasharray="3 3"
-                stroke={resolvedTheme === 'dark' ? "oklch(0.707 0.022 261.325)" : "oklch(0.551 0.027 264.364)"}
-                strokeOpacity={0.5}
-              />
-              
-              <Legend 
-                verticalAlign="top"
-                align="left"
-                layout="horizontal"
-                wrapperStyle={{ fontSize: '0.875rem', paddingBottom: '10px', marginLeft: "55px" , paddingRight:"15px" }}
-              />
+          <LineChart data={chartDisplayData} layout="vertical" responsive width="100%" height="100%" margin={{ top: 5, right: 20, left: -5, bottom: 15 }}>
+            
+            <CartesianGrid 
+              strokeDasharray="3 3"
+              stroke={resolvedTheme === 'dark' ? "oklch(0.707 0.022 261.325)" : "oklch(0.551 0.027 264.364)"}
+              strokeOpacity={0.5}
+            />
+            
+            <Legend 
+              verticalAlign="top"
+              align="left"
+              layout="horizontal"
+              wrapperStyle={{ fontSize: '0.875rem', paddingBottom: '10px', marginLeft: "55px" , paddingRight:"15px" }}
+            />
 
-              <YAxis
-                dataKey="end_depth" 
-                domain={['dataMin', 'dataMax']}
-                type="number"
-                label={{ fill: resolvedTheme === 'dark' ? "oklch(0.985 0.002 247.839)" : "oklch(0.13 0.028 261.692)", value: 'Pile Depth (m)', angle: -91, position: 'insideLeft', offset: 15, fontSize: '0.875rem' }}
-                tick={{ fontSize: '0.875rem', fill: resolvedTheme === 'dark' ? "oklch(0.707 0.022 261.325)" : "oklch(0.551 0.027 264.364)" }}
-                axisLine={{ stroke: resolvedTheme === 'dark' ? "oklch(0.92 0.00 49)" : "oklch(0.56 0.00 0)", strokeWidth: 2, strokeOpacity: 0.8}}
-                tickLine={{ stroke: resolvedTheme === 'dark' ? "oklch(0.707 0.022 261.325)" : "oklch(0.551 0.027 264.364)", strokeWidth: 0.5}}
-              />
+            <YAxis
+              dataKey="end_depth" 
+              domain={['dataMin', 'dataMax']}
+              type="number"
+              label={{ fill: resolvedTheme === 'dark' ? "oklch(0.985 0.002 247.839)" : "oklch(0.13 0.028 261.692)", value: 'Pile Depth (m)', angle: -91, position: 'insideLeft', offset: 15, fontSize: '0.875rem' }}
+              tick={{ fontSize: '0.875rem', fill: resolvedTheme === 'dark' ? "oklch(0.707 0.022 261.325)" : "oklch(0.551 0.027 264.364)" }}
+              axisLine={{ stroke: resolvedTheme === 'dark' ? "oklch(0.92 0.00 49)" : "oklch(0.56 0.00 0)", strokeWidth: 2, strokeOpacity: 0.8}}
+              tickLine={{ stroke: resolvedTheme === 'dark' ? "oklch(0.707 0.022 261.325)" : "oklch(0.551 0.027 264.364)", strokeWidth: 0.5}}
+            />
 
-              <XAxis
-                type="number"
-                domain={['dataMin', 'dataMax']}
-                label={{ fill: resolvedTheme === 'dark' ? "oklch(0.985 0.002 247.839)" : "oklch(0.13 0.028 261.692)", value: 'Pile Capacity (kN)', position: 'insideBottom', offset: -10, fontSize: '0.875rem' }}
-                tick={{ fontSize: '0.875rem', fill: resolvedTheme === 'dark' ? "oklch(0.707 0.022 261.325)" : "oklch(0.551 0.027 264.364)" }}
-                axisLine={{ stroke: resolvedTheme === 'dark' ? "oklch(0.92 0.00 49)" : "oklch(0.56 0.00 0)", strokeWidth: 2, strokeOpacity: 0.8}}
-                tickLine={{ stroke: resolvedTheme === 'dark' ? "oklch(0.707 0.022 261.325)" : "oklch(0.551 0.027 264.364)", strokeWidth: 0.5}}
+            <XAxis
+              type="number"
+              domain={['dataMin', 'dataMax']}
+              label={{ fill: resolvedTheme === 'dark' ? "oklch(0.985 0.002 247.839)" : "oklch(0.13 0.028 261.692)", value: 'Pile Capacity (kN)', position: 'insideBottom', offset: -10, fontSize: '0.875rem' }}
+              tick={{ fontSize: '0.875rem', fill: resolvedTheme === 'dark' ? "oklch(0.707 0.022 261.325)" : "oklch(0.551 0.027 264.364)" }}
+              axisLine={{ stroke: resolvedTheme === 'dark' ? "oklch(0.92 0.00 49)" : "oklch(0.56 0.00 0)", strokeWidth: 2, strokeOpacity: 0.8}}
+              tickLine={{ stroke: resolvedTheme === 'dark' ? "oklch(0.707 0.022 261.325)" : "oklch(0.551 0.027 264.364)", strokeWidth: 0.5}}
+            />
+            
+            {transformedChartData.map((item) => (
+              <Line 
+                key={item.selection.id}
+                type={"linear"}
+                dataKey={item.selection.id}
+                stroke={item.selection.colour}
+                strokeWidth={item.selection.stroke_width}
+                animationDuration={1200}
+                name={item.selection.selection_name}
+                activeDot={{ r: 4 }}
+                dot={false}
               />
-              
-              {transformedChartData.map((item) => (
-                <Line 
-                  key={item.selection.id}
-                  type={"linear"}
-                  dataKey={item.selection.id}
-                  stroke={item.selection.colour}
-                  strokeWidth={item.selection.stroke_width}
-                  animationDuration={1200}
-                  name={item.selection.selection_name}
-                  activeDot={{ r: 4 }}
-                  dot={false}
-                />
-              ))}
+            ))}
 
-              <RechartsTooltip
-                cursor={{ stroke: "oklch(0.55 0.04 257)", strokeWidth: 1 }}
-                content={({ active, payload }) => {
-                  if (!active || !payload?.length) return null
-                  const { end_depth } = payload[0].payload
-                  return (
-                    <div className="bg-secondary text-primary p-3 rounded border border-foreground/30 text-sm">
-                      {payload.map((entry, idx) => (
-                        <div key={idx} style={{ color: entry.color }}>
-                          Pile Capacity: {entry.value.toFixed(2)} kN
-                        </div>
-                      ))}
-                      <div className="mt-1 pt-1 border-t">
-                        Pile Depth: {end_depth} m
+            <RechartsTooltip
+              cursor={{ stroke: "oklch(0.55 0.04 257)", strokeWidth: 1 }}
+              content={({ active, payload }) => {
+                if (!active || !payload?.length) return null
+                const { end_depth } = payload[0].payload
+                return (
+                  <div className="bg-secondary text-primary p-3 rounded border border-foreground/30 text-sm">
+                    {payload.map((entry, idx) => (
+                      <div key={idx} style={{ color: entry.color }}>
+                        Pile Capacity: {entry.value.toFixed(2)} kN
                       </div>
+                    ))}
+                    <div className="mt-1 pt-1 border-t">
+                      Pile Depth: {end_depth} m
                     </div>
-                  )
-                }}
-              />
+                  </div>
+                )
+              }}
+            />
 
-              {chartDisplayData.length === 0 && (
-                <text x="50%" y="50%" textAnchor="middle" fill={resolvedTheme === 'dark' ? "oklch(0.985 0.002 247.839)" : "oklch(0.13 0.028 261.692)"} className="text-xs sm:text-sm">
-                  {windowWidth >= 490 ? <tspan x="50%" dy="0">No soil layers detected</tspan> : <tspan x="60%" dy="1.2em">No soil layers detected.</tspan>}
-                  {windowWidth >= 490 && <tspan x="50%" dy="1.2em">Add soil layers in configuration to begin analysis.</tspan>}
-                </text>
-              )}
-              
-            </LineChart>
-          </ResponsiveContainer>
+            {chartDisplayData.length === 0 && (
+              <text x="50%" y="50%" textAnchor="middle" fill={resolvedTheme === 'dark' ? "oklch(0.985 0.002 247.839)" : "oklch(0.13 0.028 261.692)"} className="text-xs sm:text-sm">
+                {windowWidth >= 490 ? <tspan x="50%" dy="0">No soil layers detected</tspan> : <tspan x="60%" dy="1.2em">No soil layers detected.</tspan>}
+                {windowWidth >= 490 && <tspan x="50%" dy="1.2em">Add soil layers in configuration to begin analysis.</tspan>}
+              </text>
+            )}
+            
+          </LineChart>
         </div>
       
         <div className="shrink-0 border p-2 rounded-xl h-fit w-fit flex space-x-2 mx-auto md:mx-0 md:space-y-2 md:flex-col md:space-x-0">

@@ -349,7 +349,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                               <Button variant="link" className="hidden sm:block text-blue-500 text-xs absolute -top-0.5 -right-2">I dont have SPT N-Value</Button>
                             </PopoverTrigger>
                             <PopoverContent align="end" side="top" sideOffset={-2} className="w-xl md:w-2xl dark:bg-black rounded-none p-1">
-                              <Image src={resolvedTheme === "dark" ? darkSPTImage : lightSPTImage} placeholder="blur" alt="SPT N-Value Guide Picture"/>
+                              <Image src={resolvedTheme === "dark" ? darkSPTImage : lightSPTImage} alt="SPT N-Value Guide Picture" placeholder="blur"/>
                             </PopoverContent>
                           </Popover>
                         <FormControl>
