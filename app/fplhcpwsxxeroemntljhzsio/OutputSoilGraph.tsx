@@ -1,4 +1,4 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend, Tooltip } from "recharts"
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, Tooltip } from "recharts"
 import { roundToTwoDecimals } from "@/lib/utils"
 import { TexportSoilSchema } from "@/schemas/soilSchemas"
 
@@ -123,7 +123,7 @@ export function OutputSoilGraph ({ soilsData, effectivePileLength, pileDiameter 
           activeDot={{ r: 6 }}
           dot={false} 
         />
-        
+
       </LineChart>
     </div>
 	)

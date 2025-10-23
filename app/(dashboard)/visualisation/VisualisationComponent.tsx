@@ -3,7 +3,7 @@ import { TconfigSoilProfileSchema, TvisualisationSoilProfileSchema } from "@/sch
 import { TvisualisationSoilSchema } from "@/schemas/soilSchemas"
 import { useState, useEffect } from "react" 
 import { createClient } from "@/utils/supabase/client"
-import { LineChart, Tooltip as RechartsTooltip, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend } from "recharts"
+import { LineChart, Tooltip as RechartsTooltip, Line, XAxis, YAxis, CartesianGrid, Legend } from "recharts"
 import { useTheme } from "next-themes"
 import { Toggle } from "@/components/ui/toggle"
 import { MoveUp, Download, RotateCcw, SquarePen, Loader2 } from "lucide-react"
