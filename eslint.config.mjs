@@ -14,11 +14,6 @@ const eslintConfig = [
     ignores: ["node_modules/**", ".next/**", "out/**", "build/**", "next-env.d.ts"]
   },
   ...compat.extends("next/core-web-vitals", "next/typescript"),
-  {
-    rules: {
-      "@next/next/no-img-element": "off",
-    }
-  }
 ];
 
 export default eslintConfig;

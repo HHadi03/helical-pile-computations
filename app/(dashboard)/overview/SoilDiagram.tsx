@@ -92,7 +92,10 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
           )
         })}
 
-        <div className={`absolute z-20 top-[-25px] left-[220px] transform -translate-x-1/2 ${pileDiameter === "60" ? 'w-[30px] bg-size-[30px] bg-[url(/60mm-pile.png)]' : 'w-[40px] bg-size-[40px] bg-[url(/100mm-pile.png)]'}`} style={{height: `${pileHeight + 25}px`}}/>
+        <div 
+        className={`absolute z-20 top-[-25px] left-[220px] transform -translate-x-1/2 ${pileDiameter === "60" ? 'w-[30px] bg-size-[30px] bg-[url(/60mm-pile.png)]' : 'w-[40px] bg-size-[40px] bg-[url(/100mm-pile.png)]'}`} style={{height: `${pileHeight + 25}px`}}
+        
+        />
       </div> 
     </div>
   )

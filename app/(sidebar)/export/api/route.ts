@@ -7,7 +7,6 @@ import { roundToTwoDecimals, capitaliseFirstLetter } from '@/lib/utils'
 import type { Browser } from 'puppeteer'
 import { PDFDocument } from 'pdf-lib'
 import fs from 'fs'
-import path from 'path'
 
 async function getProfiles(profileId: string): Promise<TexportSoilProfileSchema> {
   try {
@@ -724,8 +723,16 @@ export async function POST(req: NextRequest) {
       throw new Error("Failed to export data, please try again later.")
     }
     
-    let browser: Browser | undefined | null
+    const cookie = req.cookies.get('sb-kiasruegemqnakhmbels-auth-token')?.value
 
+    const imageBase64 = fs.readFileSync('public/logo.png', 'base64')
+    const imageDataUri = `data:image/png;base64,${imageBase64}`
+
+    const imageBase64_2 = fs.readFileSync('public/logo-2.jpg', 'base64')
+    const imageDataUri2 = `data:image/jpeg;base64,${imageBase64_2}`
+
+    let browser: Browser | undefined | null
+                                         
     const viewPort = {width: 1280, height: 1080, deviceScaleFactor: 1}
 
     if (process.env.NODE_ENV === "production") {
@@ -745,7 +752,6 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    const cookie = req.cookies.get('sb-kiasruegemqnakhmbels-auth-token')?.value
     await browser.setCookie({
       name: 'sb-kiasruegemqnakhmbels-auth-token',
       value: cookie ?? '',
@@ -758,16 +764,7 @@ export async function POST(req: NextRequest) {
     await page.goto(`${process.env.NODE_ENV === 'production'  ? "https://helical-pile-computations.vercel.app" : 'http://localhost:3000'}/fplhcpwsxxeroemntljhzsio`, { 
       waitUntil: 'networkidle2',
     })
-    
-    const imagePath = path.join(process.cwd(), 'public', 'logo.png');
-    const imageBase64 = fs.readFileSync(imagePath, 'base64');
-    const imageDataUri = `data:image/png;base64,${imageBase64}`;
-
-    const imagePath2 = path.join(process.cwd(), 'public', 'logo-2.jpg');
-    const imageBase64_2 = fs.readFileSync(imagePath2, 'base64');
-    const imageDataUri2 = `data:image/jpeg;base64,${imageBase64_2}`;
-
-
+  
     const footerTemplate = `
       <div style="width:100%; padding:10px 0px; margin: 0px 50px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid #ccc;">
         <div style="line-height:1.3; font-size:10px;">
