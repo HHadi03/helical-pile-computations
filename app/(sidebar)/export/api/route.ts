@@ -769,7 +769,7 @@ export async function POST(req: NextRequest) {
       const puppeteer = await import ("puppeteer-core")
       browser = await puppeteer.launch({
         args: chromium.args,
-        executablePath: await chromium.executablePath("https://github.com/Sparticuz/chromium/blob/master/bin/x64/chromium.br"),
+        executablePath: await chromium.executablePath("https://github.com/Sparticuz/chromium/releases/download/v110.0.1/chromium-v110.0.1-pack.tar"),
         defaultViewport: viewPort
       })
     }
