@@ -990,7 +990,7 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
               className="w-full rounded-lg shadow"
             />
           ) : (
-            <p className="text-gray-500 italic">No image uploaded</p>
+           null
           )}
         </div>
       </div>
