@@ -20,7 +20,8 @@ export function OverviewComponent({ soilsData, profilesData }: { soilsData: Tove
   const [current, setCurrent] = useState(0)
   const [count, setCount] = useState(0)
   const [windowWidth, setWindowWidth] = useState(0)
-
+  
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!api) {
       return

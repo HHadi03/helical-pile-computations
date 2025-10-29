@@ -11,7 +11,7 @@ export default async function ExportOutputPage() {
 
   const { data: exportData, error: exportError } = await supabase
   .from("exports")
-  .select("profile_data, soils_data, dynamic_params, base_params, pile_structure")
+  .select("profile_data, soils_data, dynamic_params, base_params, pile_structure, image_url")
   .single()
 
   if (exportError || !exportData) {
@@ -25,6 +25,7 @@ export default async function ExportOutputPage() {
       dynamicParams={exportData.dynamic_params} 
       baseParams={exportData.base_params} 
       pileStructure={exportData.pile_structure} 
+      imageUrl={exportData.image_url}
     />
   )
 }

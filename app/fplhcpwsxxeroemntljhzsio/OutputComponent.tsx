@@ -11,7 +11,7 @@ import { Space_Mono } from "next/font/google"
 const arimo = Arimo({subsets: ["latin"], weight: ['400', '700']})
 const spaceMono = Space_Mono({subsets: ["latin"], weight: ['400', '700'], variable: '--font-space-mono'})
 
-export function OutputComponent({ baseParams, dynamicParams, soilsData, profileData, pileStructure }: { baseParams: BaseParamsType, dynamicParams: DynamicParamsType, pileStructure: PileStructureType, soilsData: TexportSoilSchema[], profileData: TexportSoilProfileSchema }) {
+export function OutputComponent({ baseParams, dynamicParams, soilsData, profileData, pileStructure, imageUrl }: { baseParams: BaseParamsType, dynamicParams: DynamicParamsType, pileStructure: PileStructureType, soilsData: TexportSoilSchema[], profileData: TexportSoilProfileSchema, imageUrl: string | null }) {
   
   const ultimatePulloutCapacity = baseParams.pile_diameter === "60" ? soilsData.reduce((sum, soil) => sum + soil.shaft_capacity60, 0) : soilsData.reduce((sum, soil) => sum + soil.shaft_capacity100, 0)
   const lastLayer = soilsData.find(soil => soil.start_depth <= profileData.effective_pile_length && profileData.effective_pile_length <= soil.end_depth) || soilsData[soilsData.length - 1]
@@ -26,7 +26,6 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
   const totalCompressionLoad = dynamicParams.design_method === "method_bs" ? dynamicParams.applied_compression_load : dynamicParams.permanent_compression_load + dynamicParams.variable_compression_load
   const ExternalLoad = totalTensionLoad + totalCompressionLoad
   
-  let pileHeight = 0
   const calculateRowHeight = () => {
     let height = 40
     
@@ -38,6 +37,38 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
     
     return Math.max(60, height)
   }
+
+  const pileHeight = (() => {
+    let height = 0
+
+    soilsData.forEach((soil, index) => {
+      const rowHeight = calculateRowHeight()
+      if (soil.id === lastLayer.id) {
+        if (lastLayer.end_depth <= profileData.effective_pile_length) {
+          height = (index + 1) * rowHeight
+        } else {
+          const portionOfLayer =
+            (profileData.effective_pile_length - soil.start_depth) /
+            (soil.end_depth - soil.start_depth)
+          height = (index * rowHeight) + (portionOfLayer * rowHeight)
+        }
+      }
+    })
+
+    return height
+  })()
+
+  const secondPileHeight = soilsData.reduce((height, soil, index) => {
+    if (soil.id === lastLayer.id) {
+      if (lastLayer.end_depth <= profileData.effective_pile_length) {
+        return (index + 1) * 89.75
+      } else {
+        const portionOfLayer = (profileData.effective_pile_length - soil.start_depth) / (soil.end_depth - soil.start_depth)
+        return (index * 89.75) + (portionOfLayer * 89.75)
+      }
+    }
+    return height
+  }, 0)
 
   const renderBSDesign = () => {
     if (dynamicParams.design_method !== 'method_bs') return null
@@ -741,20 +772,10 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
               const isDefaultColour = soil.colour === "#000000"
               const isDark = getLuminance(soil.colour) < 0.5
               const textColor = isDark ? "text-white" : "text-black"
-
-              const rowHeight = calculateRowHeight()
               
-              if (soil.id === lastLayer.id) {
-                if (lastLayer.end_depth <= profileData.effective_pile_length) {
-                  pileHeight = (index + 1) * rowHeight
-                } else {
-                  const portionOfLayer = (profileData.effective_pile_length - soil.start_depth) / (soil.end_depth - soil.start_depth)
-                  pileHeight = (index * rowHeight) + (portionOfLayer * rowHeight)
-                }
-              }
-
+              const rowHeight = calculateRowHeight()
               return (
-                <div key={soil.id} className={` break-inside-avoid relative p-2 grid grid-cols-[190px_50px_1fr] whitespace-nowrap ${isDefaultColour && index < soilsData.length - 1 ? 'after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-[oklch(0.87_0.01_258)] dark:after:bg-[oklch(1_0_0_/_25%)]' : ''}`} style={{ backgroundColor: isDefaultColour ? "" : soil.colour, minHeight: `${rowHeight}px`}}>
+                <div key={soil.id} className={` break-inside-avoid relative p-2 grid grid-cols-[190px_50px_1fr] whitespace-nowrap ${isDefaultColour && index < soilsData.length - 1 ? 'after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-[oklch(0.87_0.01_258)] dark:after:bg-[oklch(1_0_0/25%)]' : ''}`} style={{ backgroundColor: isDefaultColour ? "" : soil.colour, minHeight: `${rowHeight}px`}}>
 
                   <div className={`mt-auto text-xs ${isDefaultColour ? 'text-foreground' : textColor}`}><span className="font-semibold">Depth:</span> {soil.start_depth} – {soil.end_depth} m</div>
                   
@@ -782,7 +803,7 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
               )
             })}
 
-            <div className={`absolute z-20 top-[-25px] left-[220px] transform -translate-x-1/2 ${baseParams.pile_diameter === "60" ? 'w-[30px] bg-size-[30px] bg-[url(/60mm-pile.png)]' : 'w-[40px] bg-size-[40px] bg-[url(/100mm-pile.png)]'}`} style={{height: `${pileHeight + 25}px`}}/>
+            <div className={`absolute z-20 top-[-25px] left-[220px] transform -translate-x-1/2 ${baseParams.pile_diameter === "60" ? 'w-[30px] bg-size-[30px] bg-[url(/60mm-pile.png)]' : 'w-10 bg-size-[40px] bg-[url(/100mm-pile.png)]'}`} style={{height: `${pileHeight + 25}px`}}/>
           </div>
         </div>
       </div>
@@ -818,7 +839,7 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
               </div>
 
               <div className="size-[45px] bg-[url('/up-down-arrow.png')] bg-contain bg-center bg-no-repeat absolute top-1 transform -translate-x-1/2 left-[305px]"/>
-              <div className="absolute top-4 left-[320px] text-sm font-semibold"> {ExternalLoad.toFixed(2)} kN </div>
+              <div className="absolute top-4 left-80 text-sm font-semibold"> {ExternalLoad.toFixed(2)} kN </div>
 
             </div>
           </div>
@@ -834,17 +855,8 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
             
               const isLayerBeyondPile = soil.start_depth >= profileData.effective_pile_length
 
-              if (soil.id === lastLayer.id) {
-                if (lastLayer.end_depth <= profileData.effective_pile_length) {
-                  pileHeight = (index + 1) * 89.75
-                } else {
-                  const portionOfLayer = (profileData.effective_pile_length - soil.start_depth) / (soil.end_depth - soil.start_depth)
-                  pileHeight = (index * 89.75) + (portionOfLayer * 89.75)
-                }
-              }
-
               return (
-                <div key={soil.id} className={`h-[89.75px] break-inside-avoid relative p-2 grid grid-cols-[275_50px_1fr] whitespace-nowrap ${isDefaultColour && index < soilsData.length - 1 ? 'after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-[oklch(0.87_0.01_258)] dark:after:bg-[oklch(1_0_0_/_25%)]' : ''}`} style={{ backgroundColor: isDefaultColour ? "" : soil.colour}}>
+                <div key={soil.id} className={`h-[89.75px] break-inside-avoid relative p-2 grid grid-cols-[275_50px_1fr] whitespace-nowrap ${isDefaultColour && index < soilsData.length - 1 ? 'after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-[oklch(0.87_0.01_258)] dark:after:bg-[oklch(1_0_0/25%)]' : ''}`} style={{ backgroundColor: isDefaultColour ? "" : soil.colour}}>
 
                   <div className={`flex flex-col space-y-2 text-sm leading-snug ${isDefaultColour ? 'text-foreground' : textColor}`}>
                     {!isLayerBeyondPile && (
@@ -873,9 +885,9 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
               )
             })}
 
-            <div className={`absolute z-20 top-[-25px] left-[305px] transform -translate-x-1/2 ${baseParams.pile_diameter === "60" ? 'w-[30px] bg-size-[30px] bg-[url(/60mm-pile.png)]' : 'w-[40px] bg-size-[40px] bg-[url(/100mm-pile.png)]'}`} style={{height: `${pileHeight + 25}px`}}/>
+            <div className={`absolute z-20 top-[-25px] left-[305px] transform -translate-x-1/2 ${baseParams.pile_diameter === "60" ? 'w-[30px] bg-size-[30px] bg-[url(/60mm-pile.png)]' : 'w-10 bg-size-[40px] bg-[url(/100mm-pile.png)]'}`} style={{height: `${secondPileHeight + 25}px`}}/>
             
-            <div className="absolute z-20 bottom-0 left-[275px] w-[60px] h-[40px]" style={{ top: `${pileHeight}px` }}>
+            <div className="absolute z-20 bottom-0 left-[275px] w-[60px] h-10" style={{ top: `${secondPileHeight}px` }}>
               <svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
                 {/* Base line */}
                 <line x1="0" y1="70" x2="100" y2="70" stroke="black" strokeWidth="3"/>
@@ -902,14 +914,14 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
               </svg>
             </div>
             
-            <div className="absolute z-20 flex flex-col gap-4 top-0 left-[275px] transform -translate-x-1/2" style={{height: `${pileHeight}px`}}>
-              {Array.from({ length: Math.ceil(pileHeight / 40) }).map((_, i) => (
+            <div className="absolute z-20 flex flex-col gap-4 top-0 left-[275px] transform -translate-x-1/2" style={{height: `${secondPileHeight}px`}}>
+              {Array.from({ length: Math.ceil(secondPileHeight / 40) }).map((_, i) => (
                 <MoveUp key={`left-${i}`} className="size-6"/>
               ))}
             </div>
 
-            <div className={`absolute z-20 flex flex-col gap-4 top-0 left-[335px] transform -translate-x-1/2`} style={{height: `${pileHeight}px`}}>
-              {Array.from({ length: Math.ceil(pileHeight / 40) }).map((_, i) => (
+            <div className={`absolute z-20 flex flex-col gap-4 top-0 left-[335px] transform -translate-x-1/2`} style={{height: `${secondPileHeight}px`}}>
+              {Array.from({ length: Math.ceil(secondPileHeight / 40) }).map((_, i) => (
                 <MoveUp key={`right-${i}`} className="size-6"/>
               ))}
             </div>
@@ -966,7 +978,21 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
       </div>
 
       <div className="break-before-page">
-        <div className="text-2xl font-semibold tracking-tight">Appendix I</div>
+        <div className="text-2xl font-semibold tracking-tight">
+          Appendix I
+        </div>
+
+        <div className="scale-85 origin-top mt-6">
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt="Uploaded appendix image"
+              className="w-full rounded-lg shadow"
+            />
+          ) : (
+            <p className="text-gray-500 italic">No image uploaded</p>
+          )}
+        </div>
       </div>
     </div>
   )

@@ -84,8 +84,14 @@ const nObjectMethodTest: { [key: number]: { s1: number; s2: number } } = {
 
 export async function POST(req: NextRequest) {
   try {
-    const json = await req.json()
-    const body: TexportFormSchema = exportFormSchema.parse(json)
+    const formData = await req.formData()
+
+    const dataString = formData.get('data') as string
+    const temp = JSON.parse(dataString)
+    const body: TexportFormSchema = exportFormSchema.parse(temp)
+    const file = formData.get('file') as File | null
+
+    let imageUrl: string | null = null
 
     let soilsData: TexportSoilSchema[]
     let profileData: TexportSoilProfileSchema 
@@ -706,13 +712,36 @@ export async function POST(req: NextRequest) {
     const supabase = await createClient()
     const { data } = await supabase.auth.getClaims()
 
-    const finalObject = { 
+    if (file) {
+      const fileExt = file.name.split(".").pop()
+      const fileName = `${crypto.randomUUID()}.${fileExt}`
+      const filePath = `exports/${data?.claims.sub}/${fileName}`
+
+      const { error: uploadError } = await supabase.storage
+        .from("exports") // 👈 your storage bucket name
+        .upload(filePath, file, { upsert: true })
+
+      if (uploadError) {
+        console.error("Upload error:", uploadError)
+        return new Response("Failed to upload file", { status: 500 })
+      }
+
+      // --- Step 2: Get the public URL ---
+      const { data: publicUrlData } = supabase.storage
+        .from("exports")
+        .getPublicUrl(filePath)
+
+      imageUrl = publicUrlData.publicUrl
+    }
+
+     const finalObject = { 
       profile_data: profileData,
       soils_data: soilsData,
       dynamic_params: fullDynamicParams,
       base_params: baseParams,
       pile_structure: pileStructure,
-      user_id: data?.claims.sub
+      user_id: data?.claims.sub,
+      image_url: imageUrl
     }
 
     const { error } = await supabase

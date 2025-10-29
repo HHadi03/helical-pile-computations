@@ -13,7 +13,18 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
 
   const ultimateBearingCapacity = ultimatePulloutCapacity + bearingCapacity
 
-  let pileHeight = 0
+  const pileHeight = profileSoils.reduce((height, soil, index) => {
+    if (soil.id === lastLayer.id) {
+      if (lastLayer.end_depth <= profile.effective_pile_length) {
+        return (index + 1) * 161
+      } else {
+        const portionOfLayer = (profile.effective_pile_length - soil.start_depth) / (soil.end_depth - soil.start_depth)
+        return (index * 161) + (portionOfLayer * 161)
+      }
+    }
+    return height
+  }, 0)
+
   return (
     <div>
       <div className="p-2 bg-sky-50 dark:bg-sky-900/50 relative border-2"> 
@@ -45,18 +56,9 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
           const isDark = getLuminance(soil.colour) < 0.5
 
           const textColor = isDark ? "text-white" : "text-black"
-              
-          if (soil.id === lastLayer.id) {
-            if (lastLayer.end_depth <= profile.effective_pile_length) {
-              pileHeight = (index + 1) * 161
-            } else {
-              const portionOfLayer = (profile.effective_pile_length - soil.start_depth) / (soil.end_depth - soil.start_depth)
-              pileHeight = (index * 161) + (portionOfLayer * 161)
-            }
-          }
 
           return (
-            <div key={soil.id} className={`relative p-2 flex flex-col sm:grid sm:grid-cols-[190px_50px_1fr] whitespace-nowrap ${isDefaultColour && index < profileSoils.length - 1 ? 'after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-[oklch(0.87_0.01_258)] dark:after:bg-[oklch(1_0_0_/_25%)]' : ''}`} style={{ backgroundColor: isDefaultColour ? "" : soil.colour}}>
+            <div key={soil.id} className={`relative p-2 flex flex-col sm:grid sm:grid-cols-[190px_50px_1fr] whitespace-nowrap ${isDefaultColour && index < profileSoils.length - 1 ? 'after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-[oklch(0.87_0.01_258)] dark:after:bg-[oklch(1_0_0/25%)]' : ''}`} style={{ backgroundColor: isDefaultColour ? "" : soil.colour}}>
 
               <div className={`flex flex-col space-y-2 text-sm leading-snug ${isDefaultColour ? 'text-foreground' : textColor}`}>
                 {profile.effective_pile_length > soil.start_depth && (
@@ -92,10 +94,7 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
           )
         })}
 
-        <div 
-        className={`absolute z-20 top-[-25px] left-[220px] transform -translate-x-1/2 ${pileDiameter === "60" ? 'w-[30px] bg-size-[30px] bg-[url(/60mm-pile.png)]' : 'w-[40px] bg-size-[40px] bg-[url(/100mm-pile.png)]'}`} style={{height: `${pileHeight + 25}px`}}
-        
-        />
+        <div className={`absolute z-20 top-[-25px] left-[220px] transform -translate-x-1/2 ${pileDiameter === "60" ? 'w-[30px] bg-size-[30px] bg-[url(/60mm-pile.png)]' : 'w-10 bg-size-[40px] bg-[url(/100mm-pile.png)]'}`} style={{height: `${pileHeight + 25}px`}}/>
       </div> 
     </div>
   )

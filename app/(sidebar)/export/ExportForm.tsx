@@ -15,9 +15,12 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Fragment, useEffect } from "react"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { useState } from "react"
 
 export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileSchema[] }) {
   const router = useRouter()
+   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
+
 
   const form = useForm({
     resolver: zodResolver(exportFormSchema),
@@ -119,12 +122,29 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
     }
   }
 
+   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setUploadedFile(file)
+    }
+  }
+
+
   async function onSubmit(values: TexportFormSchema) {
     try {
+      const formData = new FormData()
+      
+      // Append all form values as JSON string
+      formData.append('data', JSON.stringify(values))
+      
+      // Append file if one was selected
+      if (uploadedFile) {
+        formData.append('file', uploadedFile)
+      }
+
       const response = await fetch('/export/api', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(values),
+        body: formData, // Send FormData instead of JSON
       })
  
       if (!response.ok) {
@@ -1279,8 +1299,17 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
               )}
             />
 
-            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"> Upload Document</label>
-            <Input type="file" className="cursor-pointer border"/>
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Upload Document {uploadedFile && <span className="text-muted-foreground">({uploadedFile.name})</span>}
+              </label>
+              <Input 
+                type="file" 
+                className="cursor-pointer border"
+                onChange={handleFileChange}
+                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+              />
+            </div>
           </div>
         </div>
       

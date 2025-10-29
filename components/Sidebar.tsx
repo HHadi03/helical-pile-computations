@@ -7,6 +7,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from './ui/button'
 import type { Route } from 'next'
+import logo from '@/public/logo.png'
 
 export const Sidebar = () => {
   const [expanded, setExpanded] = useState(false)
@@ -64,7 +65,7 @@ export const Sidebar = () => {
     <aside className={`bg-sidebar flex flex-col shrink-0 border-r border-sidebar-border p-2 shadow-inner overflow-y-auto overflow-x-clip scrollbar-thin scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-500 ${expanded ? 'w-[260px] animate-in ease-in-out duration-500' : 'w-[70px] animate-out ease-out duration-500'}`}>
       {expanded ? (
         <div className="flex flex-row items-center justify-between mt-2">
-          <Image src='/logo.png' alt='Company Logo' width={624} height={128} className='w-[195px]'/>
+          <Image src={logo} alt='Company Logo' className='w-[195px]'/>
           <Button title='Collapse Sidebar' variant="ghost" size="icon" onClick={() => setExpanded(false)} aria-label="Collapse Sidebar" aria-expanded={expanded} className='hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7'><ArrowLeftToLine className="size-6 text-muted-foreground"/></Button>
         </div>
       ) : (
