@@ -15,8 +15,8 @@ export default async function LoadPage() {
   }
 
   return (
-    <div>
-      Load Page
-    </div>
+    <section className='p-5 rounded-lg border max-w-lg mx-auto'>
+      
+    </section>
   )
 }

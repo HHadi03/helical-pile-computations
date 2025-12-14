@@ -15,8 +15,8 @@ export default async function FeedbackPage() {
   }
 
   return (
-    <div>
-      Feedback Page
-    </div>
+    <section className='p-5 rounded-lg border max-w-lg mx-auto'>
+      
+    </section>
   )
 }

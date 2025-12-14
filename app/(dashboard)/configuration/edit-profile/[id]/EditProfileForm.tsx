@@ -32,7 +32,6 @@ export function EditProfileForm({ profile, profileId }: { profile: TinsertSoilPr
     }
   }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const errorFields = Object.keys(form.formState.errors)
 

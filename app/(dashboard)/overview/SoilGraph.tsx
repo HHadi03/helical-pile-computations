@@ -76,16 +76,34 @@ export function SoilGraph ({ profileSoils, profile, profileIndex, pileDiameter, 
         <div className="flex flex-col space-y-3 sm:flex-row sm:justify-between sm:space-y-0">
 
           <div className="flex flex-col">
-            <h2 className="font-semibold line-clamp-1" title={profile.profile_name || `Soil Profile ${profileIndex + 1}`}>{profile.profile_name || `Soil Profile ${profileIndex + 1}`}</h2>
+            <h2 className="font-semibold sm:line-clamp-1" title={profile.profile_name || `Soil Profile ${profileIndex + 1}`}>{profile.profile_name || `Soil Profile ${profileIndex + 1}`}</h2>
             <p className="text-sm mt-auto text-muted-foreground">Pile Diameter: {pileDiameter} mm</p>
           </div>
 
-          <div className="sm:text-right text-sm sm:whitespace-nowrap">
-            <p><span className="font-semibold">Maximum Depth:</span> {lastBaseChartEntry.end_depth} m</p>
-            <p><span className="font-semibold">Maximum Total Capacity:</span> {lastBaseChartEntry[shaftCapacityKey].toFixed(2)} kN</p>
-            {!hideBearingCapacity && (<p><span className="font-semibold">Bearing Capacity Contribution:</span> {bearingCapacity.toFixed(2)} kN</p>)}
-          </div>
+          <div className="sm:text-right text-sm space-y-1 sm:whitespace-nowrap sm:space-y-0">
+            <p>
+              <span className="font-semibold">Maximum Depth:</span> {lastBaseChartEntry.end_depth} m
+            </p>
 
+            <p>
+              <span className="font-semibold">
+                <span className="hidden sm:inline">Maximum Total Capacity: </span>
+                <span className="sm:hidden">Maximum Capacity: </span>
+              </span>
+              {lastBaseChartEntry[shaftCapacityKey].toFixed(2)} kN
+            </p>
+
+            {!hideBearingCapacity && (
+              <p>
+                <span className="font-semibold">
+                  <span className="hidden sm:inline">Bearing Capacity Contribution: </span>
+                  <span className="sm:hidden">Bearing Contribution: </span>
+                </span>
+                {bearingCapacity.toFixed(2)} kN
+              </p>
+            )}
+          </div>
+          
         </div>
       </div>
 

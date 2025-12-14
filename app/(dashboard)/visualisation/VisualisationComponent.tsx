@@ -332,7 +332,7 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
   if (isFetchingData) {
     return (
       <div className="flex flex-col md:flex-row max-w-5xl mx-auto gap-5">
-        <div className="flex-auto h-140 border-2 p-5 relative">
+        <div className="flex-auto h-[70dvh] border-2 p-5 relative">
           <Skeleton className="h-4 w-auto mx-10"/>
           <Skeleton className="absolute inset-15"/>
           <Skeleton className="h-4 w-18 absolute left-2 top-1/2 -translate-y-1/2 -rotate-90"/>
@@ -353,7 +353,7 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
   return (
     <>
       <div className="flex flex-col md:flex-row max-w-5xl mx-auto gap-5">
-        <div className="flex-auto h-110 sm:h-140 border-2 p-5" id="VisualisationGraph">
+        <div className="flex-auto h-[70dvh] border-2 p-5" id="VisualisationGraph">
           <LineChart data={chartDisplayData} layout="vertical" responsive width="100%" height="100%" margin={{ top: 5, right: 20, left: -5, bottom: 15 }}>
             
             <CartesianGrid 

@@ -15,8 +15,8 @@ export default async function HelpPage() {
   }
 
   return (
-    <div>
-      Help Page
-    </div>
+    <section className='p-5 rounded-lg border max-w-lg mx-auto'>
+      
+    </section>
   )
 }

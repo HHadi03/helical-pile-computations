@@ -85,7 +85,6 @@ const nObjectMethodTest: { [key: number]: { s1: number; s2: number } } = {
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData()
-
     const dataString = formData.get('data') as string
     const temp = JSON.parse(dataString)
     const body: TexportFormSchema = exportFormSchema.parse(temp)
@@ -797,7 +796,7 @@ export async function POST(req: NextRequest) {
     const footerTemplate = `
       <div style="width:100%; padding:10px 0px; margin: 0px 50px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid #ccc;">
         <div style="line-height:1.3; font-size:10px;">
-          Version 1.0.0 @ Target Fixings<br/>
+          Version 1.0 @ Target Fixings<br/>
           Helical Pile Computations
         </div>
         
