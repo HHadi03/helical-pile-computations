@@ -56,25 +56,6 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
   const testType = form.watch("test_type")
 
   useEffect(() => {
-    const errorFields = Object.keys(form.formState.errors)
-
-    if (errorFields.length === 0) return
-    
-    const soilTabFields = ["soil_type", "soil", "density", "soil_name", "description", "colour"]
-    const parametersTabFields = ["start_depth", "end_depth", "y_moist", "y_sat", "n_value"]
-
-    const hasSoilErrors = errorFields.some(field => soilTabFields.includes(field))
-    const hasParameterErrors = errorFields.some(field => parametersTabFields.includes(field))
-
-    if (hasSoilErrors) {
-      setActiveTab("soil")
-    }
-    else if (hasParameterErrors) {
-      setActiveTab("parameters")
-    }
-  }, [form.formState.errors])
-
-  useEffect(() => {
     if (soil && density && soilProperties[soil]) {
       const values = soilProperties[soil][density]
       form.setValue("y_moist", values.yMoist)
@@ -87,6 +68,16 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
       router.back()
     } else {
       router.replace('/configuration') 
+    }
+  }
+
+  const onError = (errors: typeof form.formState.errors) => {
+    if (errors.soil_type || errors.soil || errors.density || errors.soil_name || errors.description || errors.colour) {
+      setActiveTab("soil")
+    }
+
+    else if (errors.start_depth || errors.end_depth || errors.y_moist || errors.y_sat || errors.n_value) {
+      setActiveTab("parameters")
     }
   }
 
@@ -111,7 +102,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+      <form onSubmit={form.handleSubmit(onSubmit, onError)} noValidate>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="soil">Information</TabsTrigger>

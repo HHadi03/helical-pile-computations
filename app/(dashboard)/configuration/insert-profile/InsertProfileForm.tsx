@@ -10,7 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useRouter } from "next/navigation"
 import { NumberInput } from "@/components/NumberInput"
 import { toast } from "sonner"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export function InsertProfileForm() {
@@ -39,24 +39,15 @@ export function InsertProfileForm() {
     }
   }
 
-  useEffect(() => {
-    const errorFields = Object.keys(form.formState.errors)
-
-    if (errorFields.length === 0) return
-    
-    const profileTabFields = ["profile_name", "water_depth"]
-    const pileTabFields = ["pile_length", "pile_stick_out"]
-
-    const hasProfileErrors = errorFields.some(field => profileTabFields.includes(field))
-    const hasPileErrors = errorFields.some(field => pileTabFields.includes(field))
-
-    if (hasProfileErrors) {
+  const onError = (errors: typeof form.formState.errors) => {
+    if (errors.profile_name || errors.water_depth) {
       setActiveTab("profile")
-    } 
-    else if (hasPileErrors) {
+    }
+
+    else if (errors.pile_length || errors.pile_stick_out) {
       setActiveTab("pile")
     }
-  }, [form.formState.errors])
+  }
 
   async function onSubmit(values: TinsertSoilProfileSchema) {
     try {
@@ -78,7 +69,7 @@ export function InsertProfileForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+      <form onSubmit={form.handleSubmit(onSubmit, onError)} noValidate>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="profile">Profile</TabsTrigger>

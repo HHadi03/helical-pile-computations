@@ -18,20 +18,23 @@ export function OverviewComponent({ soilsData, profilesData }: { soilsData: Tove
   const [pileDiameter, setPileDiameter] = useState("100")
   const [api, setApi] = useState<CarouselApi>()
   const [current, setCurrent] = useState(0)
-  const [count, setCount] = useState(0)
   const [windowWidth, setWindowWidth] = useState(0)
   
+  const count = api?.scrollSnapList().length ?? 0
   useEffect(() => {
-    if (!api) {
-      return
-    }
- 
-    setCount(api.scrollSnapList().length)
-    setCurrent(api.selectedScrollSnap() + 1)
- 
-    api.on("select", () => {
+    if (!api) return
+
+    const onSelect = () => {
       setCurrent(api.selectedScrollSnap() + 1)
-    })
+    }
+
+    onSelect()
+
+    api.on("select", onSelect)
+
+    return () => {
+      api.off("select", onSelect)
+    }
   }, [api])
 
   useEffect(() => {

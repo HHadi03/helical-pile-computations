@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 
 export function EditProfileForm({ profile, profileId }: { profile: TinsertSoilProfileSchema, profileId: string }) {
   const router = useRouter()
@@ -32,24 +32,15 @@ export function EditProfileForm({ profile, profileId }: { profile: TinsertSoilPr
     }
   }
 
-  useEffect(() => {
-    const errorFields = Object.keys(form.formState.errors)
-
-    if (errorFields.length === 0) return
-    
-    const profileTabFields = ["profile_name", "water_depth"]
-    const pileTabFields = ["pile_length", "pile_stick_out"]
-
-    const hasProfileErrors = errorFields.some(field => profileTabFields.includes(field))
-    const hasPileErrors = errorFields.some(field => pileTabFields.includes(field))
-
-    if (hasProfileErrors) {
+  const onError = (errors: typeof form.formState.errors) => {
+    if (errors.profile_name || errors.water_depth) {
       setActiveTab("profile")
-    } 
-    else if (hasPileErrors) {
+    }
+
+    else if (errors.pile_length || errors.pile_stick_out) {
       setActiveTab("pile")
     }
-  }, [form.formState.errors])
+  }
 
   async function onSubmit(values: TinsertSoilProfileSchema) {
     try {
@@ -71,7 +62,7 @@ export function EditProfileForm({ profile, profileId }: { profile: TinsertSoilPr
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+      <form onSubmit={form.handleSubmit(onSubmit, onError)} noValidate>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="profile">Profile</TabsTrigger>

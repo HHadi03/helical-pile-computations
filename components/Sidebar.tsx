@@ -11,7 +11,6 @@ import logo from '@/public/logo.png'
 
 export const Sidebar = () => {
   const [expanded, setExpanded] = useState(false)
-  
   const [isLoggingOut, setIsLoggingOut] = useState(false)
    
   useEffect(() => {
