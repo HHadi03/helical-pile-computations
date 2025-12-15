@@ -31,7 +31,7 @@ export default async function ExportModal() {
   }
 
   return (
-    <Modal title='Export - FORM INCOMPLETE'>
+    <Modal title='Generate Report'>
       <ExportForm soilProfiles={soilProfiles}/>
     </Modal>
   )

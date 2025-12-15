@@ -5,6 +5,15 @@ import { getLuminance } from "@/lib/utils"
 
 export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter, hideBearingCapacity, showMobileLayout}: { profileSoils: ToverviewSoilSchema[], profile: ToverviewSoilProfileSchema, profileIndex: number, pileDiameter: string, hideBearingCapacity: boolean, showMobileLayout?: boolean }) {
   
+  const BASE_HEIGHT = 161 // Base height in pixels
+  const SCALE_FACTOR = 50 // Additional pixels per meter of depth
+  
+  // Calculate height for each layer based on its thickness
+  const getLayerHeight = (soil: ToverviewSoilSchema) => {
+    const thickness = soil.end_depth - soil.start_depth
+    return Math.max(BASE_HEIGHT, BASE_HEIGHT + (thickness * SCALE_FACTOR))
+  }
+  
   const ultimatePulloutCapacity = pileDiameter === "60" ? profileSoils.reduce((sum, soil) => sum + soil.shaft_capacity60, 0) : profileSoils.reduce((sum, soil) => sum + soil.shaft_capacity100, 0)
   
   const lastLayer = profileSoils.find(soil => soil.start_depth <= profile.effective_pile_length && profile.effective_pile_length <= soil.end_depth) || profileSoils[profileSoils.length - 1]
@@ -13,14 +22,22 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
 
   const ultimateBearingCapacity = ultimatePulloutCapacity + bearingCapacity
 
-  const pileHeight = profileSoils.reduce((height, soil, index) => {
+  // Calculate pile height with scaled layers
+  const pileHeight = profileSoils.reduce((height, soil) => {
+    const layerHeight = getLayerHeight(soil)
+    
     if (soil.id === lastLayer.id) {
       if (lastLayer.end_depth <= profile.effective_pile_length) {
-        return (index + 1) * 161
+        // Full layers up to and including the last layer
+        return height + layerHeight
       } else {
+        // Partial last layer
         const portionOfLayer = (profile.effective_pile_length - soil.start_depth) / (soil.end_depth - soil.start_depth)
-        return (index * 161) + (portionOfLayer * 161)
+        return height + (portionOfLayer * layerHeight)
       }
+    } else if (soil.start_depth < profile.effective_pile_length) {
+      // Full layer before the last layer
+      return height + layerHeight
     }
     return height
   }, 0)
@@ -41,7 +58,7 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
             {!hideBearingCapacity && (<p><span className="font-semibold">Ultimate Bearing Capacity:</span> {ultimateBearingCapacity.toFixed(2)} kN</p>)}
           </div>
 
-          <div className="sm:absolute sm:bottom-3 sm:left-[247px]">
+          <div className="sm:absolute sm:bottom-3 sm:left-61.75">
             <div className="flex flex-row text-xs gap-1 -ml-1">
               {showMobileLayout ? <>Stickout: {profile.pile_stick_out} m <MoveRight className="size-4"/></> : <><MoveLeft className="size-4 rotate-180 sm:rotate-0"/>Stickout: {profile.pile_stick_out} m</>}
             </div>
@@ -54,11 +71,11 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
         {profileSoils.map((soil, index) => {
           const isDefaultColour = soil.colour === "#000000"
           const isDark = getLuminance(soil.colour) < 0.5
-
           const textColor = isDark ? "text-white" : "text-black"
+          const layerHeight = getLayerHeight(soil)
 
           return (
-            <div key={soil.id} className={`relative p-2 flex flex-col sm:grid sm:grid-cols-[190px_50px_1fr] whitespace-nowrap ${isDefaultColour && index < profileSoils.length - 1 ? 'after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-[oklch(0.87_0.01_258)] dark:after:bg-[oklch(1_0_0/25%)]' : ''}`} style={{ backgroundColor: isDefaultColour ? "" : soil.colour}}>
+            <div key={soil.id} className={`relative p-2 flex flex-col sm:grid sm:grid-cols-[190px_50px_1fr] whitespace-nowrap ${isDefaultColour && index < profileSoils.length - 1 ? 'after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-[oklch(0.87_0.01_258)] dark:after:bg-[oklch(1_0_0/25%)]' : ''}`} style={{ backgroundColor: isDefaultColour ? "" : soil.colour, minHeight: `${layerHeight}px` }}>
 
               <div className={`flex flex-col space-y-2 text-sm leading-snug ${isDefaultColour ? 'text-foreground' : textColor}`}>
                 {profile.effective_pile_length > soil.start_depth && (
@@ -94,7 +111,7 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
           )
         })}
 
-        <div className={`absolute z-20 top-[-25px] left-[220px] transform -translate-x-1/2 ${pileDiameter === "60" ? 'w-[30px] bg-size-[30px] bg-[url(/60mm-pile.png)]' : 'w-10 bg-size-[40px] bg-[url(/100mm-pile.png)]'}`} style={{height: `${pileHeight + 25}px`}}/>
+        <div className={`absolute z-20 -top-6.25 left-55 transform -translate-x-1/2 ${pileDiameter === "60" ? 'w-7.5 bg-size-[30px] bg-[url(/60mm-pile.png)]' : 'w-10 bg-size-[40px] bg-[url(/100mm-pile.png)]'}`} style={{height: `${pileHeight + 25}px`}}/>
       </div> 
     </div>
   )

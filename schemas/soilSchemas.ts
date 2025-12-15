@@ -331,3 +331,45 @@ export const fineSoilCalculationsCPTSchema = z.object({
   a: z.number(),
 })
 export type TfineSoilCalculationsCPTSchema = z.infer<typeof fineSoilCalculationsCPTSchema>
+
+export const fullSoilSchema = z.object({
+  idx: z.number(),
+  id: z.string().uuid(),
+  soil_profile_id: z.string().uuid(),
+  user_id: z.string().uuid(),
+
+  soil_type: z.enum(["coarse", "fine", "manmade"]),
+  density: z.enum(["loose", "dense"]),
+
+  soil: z.string(),
+  soil_name: z.string().optional(),
+  description: z.string().optional(),
+  colour: z.string(),
+
+  start_depth: z.coerce.number(),
+  end_depth: z.coerce.number(),
+  n_value: z.coerce.number(),
+
+  po: z.coerce.number().optional().nullable(),
+  angle: z.coerce.number().optional().nullable(),
+  t: z.coerce.number().optional().nullable(),
+  su: z.coerce.number().optional().nullable(),
+
+  shaft_capacity60: z.coerce.number(),
+  shaft_capacity100: z.coerce.number(),
+  bearing_capacity60: z.coerce.number(),
+  bearing_capacity100: z.coerce.number(),
+  qult: z.coerce.number(),
+
+  ks: z.coerce.number(),
+  kc: z.coerce.number(),
+  qc: z.coerce.number(),
+  qs: z.coerce.number(),
+  a: z.coerce.number(),
+  nk: z.coerce.number(),
+  nc: z.coerce.number(),
+
+  test_type: z.enum(["spt", "cpt"]),
+})
+
+export type TfullSoilSchema = z.infer<typeof fullSoilSchema>

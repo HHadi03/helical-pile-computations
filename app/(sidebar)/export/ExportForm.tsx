@@ -178,9 +178,9 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
          <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="soil">Step 1</TabsTrigger>
-            <TabsTrigger value="pile">Step 2</TabsTrigger>
-            <TabsTrigger value="project">Step 3</TabsTrigger>
-            <TabsTrigger value="design">Step 4</TabsTrigger>
+            <TabsTrigger value="design">Step 2</TabsTrigger>
+            <TabsTrigger value="pile">Step 3</TabsTrigger>
+            <TabsTrigger value="project">Step 4</TabsTrigger>
           </TabsList>
       
           <TabsContent value="soil" className="focus-visible:ring-transparent">
@@ -206,6 +206,29 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                       </SelectContent>
                     </Select>
                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="design_method"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="design_method">Design Method</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value} name={field.name}>
+                      <FormControl>
+                        <SelectTrigger className="w-full" id="design_method">
+                          <SelectValue placeholder="Select design method"/>
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="method_bs">Design by calculation (BS 8004)</SelectItem>
+                        <SelectItem value="method_en">Design by calculation (EN 1997-1)</SelectItem>
+                        <SelectItem value="method_test">Design by testing</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage/>
                   </FormItem>
                 )}
               />
@@ -325,36 +348,13 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
 
             <div className="pt-2 flex justify-end gap-2">
               <Button type="button" className="w-18" variant="outline" onClick={handleClose}>Close</Button>
-              <Button type="button" className="w-32" onClick={() => setActiveTab("pile")}>Next</Button>
+              <Button type="button" className="w-32" onClick={() => setActiveTab("design")}>Next</Button>
             </div>
           </TabsContent>
           
-          <TabsContent value="design">
+          <TabsContent value="design" className="focus-visible:ring-transparent">
             <div className="space-y-4 border-y-2 py-3">
               
-              <FormField
-                control={form.control}
-                name="design_method"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor="design_method">Design Method</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value} name={field.name}>
-                      <FormControl>
-                        <SelectTrigger className="w-full" id="design_method">
-                          <SelectValue placeholder="Select design method"/>
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="method_bs">Design by calculation (BS 8004)</SelectItem>
-                        <SelectItem value="method_en">Design by calculation (EN 1997-1)</SelectItem>
-                        <SelectItem value="method_test">Design by testing</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage/>
-                  </FormItem>
-                )}
-              />
-
               {selectedMethod === "method_bs" && (
                 <>
                   <FormField
@@ -1081,7 +1081,13 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                 )}
               />
             </div>
+
+             <div className="pt-2 flex justify-end gap-2">
+              <Button type="button" className="w-18" variant="outline" onClick={() => setActiveTab("soil")}>Back</Button>
+              <Button type="button" className="w-32" onClick={() => setActiveTab("pile")}>Next</Button>
+            </div>
           </TabsContent>
+
           <TabsContent value="pile" className="focus-visible:ring-transparent">
             <div className="space-y-4 border-y-2 py-3">
               <FormField
@@ -1242,7 +1248,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
             </div>
 
             <div className="pt-2 flex justify-end gap-2">
-              <Button type="button" className="w-18" variant="outline" disabled={isSubmitting} onClick={() => setActiveTab("soil")}>Back</Button>
+              <Button type="button" className="w-18" variant="outline" disabled={isSubmitting} onClick={() => setActiveTab("design")}>Back</Button>
               <Button type="button" className="w-32" onClick={() => setActiveTab("project")}>Next</Button>
             </div>
           </TabsContent>
