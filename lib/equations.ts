@@ -1,4 +1,4 @@
-import { TsoilCalculationsSchema, TfineSoilCalculationsSchema, TsoilCalculationsCPTSchema, TfineSoilCalculationsCPTSchema } from '@/schemas/soilSchemas'
+import { TsoilCalculationsSchema, TfineSoilCalculationsSchema, TsoilCalculationsCPTSchema } from '@/schemas/soilSchemas'
 import { createClient } from '@/utils/supabase/server'
 import { roundToTwoDecimals, calculateSoilHeight, roundToOneDecimal } from './utils'
 
@@ -206,42 +206,45 @@ export async function calculateResultsForFineSoilNoFetch (soil: TfineSoilCalcula
   }
 }
 
-//Coarse OR Manmade Soil Algorithm CPT
-export async function calculateResultsForSoilsCPT (soil: TsoilCalculationsCPTSchema, profileId: string) {
-
-  let shaft_capacity60: number
-  let shaft_capacity100: number
-  let bearing_capacity60: number
-  let bearing_capacity100: number
+// Coarse OR Manmade Soil Algorithm CPT
+export async function calculateResultsForSoilsCPT(
+  soil: TsoilCalculationsCPTSchema,
+  profileId: string
+) {
+  let shaft_capacity60 = 0
+  let shaft_capacity100 = 0
+  let bearing_capacity60 = 0
+  let bearing_capacity100 = 0
 
   const supabase = await createClient()
   const { data, error } = await supabase
-  .from('soil_profiles')
-  .select("effective_pile_length")
-  .eq('id', profileId)
-  .single()
+    .from('soil_profiles')
+    .select("effective_pile_length")
+    .eq('id', profileId)
+    .single()
 
-  if (error) {
+  if (error || !data) {
     throw new Error("Unable to fetch pile data")
   }
 
   const h = roundToOneDecimal(soil.end_depth - soil.start_depth)
-  const t = roundToTwoDecimals(soil.ks * soil.qs)
-  const qult = roundToTwoDecimals(soil.kc * soil.qc)
-  
-  const soilHeight = calculateSoilHeight(soil.start_depth, soil.end_depth, h, data.effective_pile_length)
+
+  // NEW equations
+  const t = roundToTwoDecimals(soil.qc * soil.a)
+  const qult = roundToTwoDecimals(soil.qca * soil.kc)
+
+  const soilHeight = calculateSoilHeight(
+    soil.start_depth,
+    soil.end_depth,
+    h,
+    data.effective_pile_length
+  )
+
   if (soilHeight > 0) {
     shaft_capacity60 = roundToTwoDecimals(t * soilHeight * pileDiameter60)
     shaft_capacity100 = roundToTwoDecimals(t * soilHeight * pileDiameter100)
     bearing_capacity60 = roundToTwoDecimals(qult * pileAreaDiameter60)
     bearing_capacity100 = roundToTwoDecimals(qult * pileAreaDiameter100)
-  }
-
-  else {
-    shaft_capacity60 = 0
-    shaft_capacity100 = 0
-    bearing_capacity60 = 0
-    bearing_capacity100 = 0 
   }
 
   return {
@@ -254,34 +257,41 @@ export async function calculateResultsForSoilsCPT (soil: TsoilCalculationsCPTSch
   }
 }
 
-//Fine Soil Algorithm CPT
-export async function calculateResultsForFineSoilCPT (soil: TfineSoilCalculationsCPTSchema, profileId: string) {
 
-  let shaft_capacity60: number
-  let shaft_capacity100: number
-  let bearing_capacity60: number
-  let bearing_capacity100: number
+// Fine Soil Algorithm CPT
+export async function calculateResultsForFineSoilCPT(
+  soil: TsoilCalculationsCPTSchema,
+  profileId: string
+) {
+  let shaft_capacity60 = 0
+  let shaft_capacity100 = 0
+  let bearing_capacity60 = 0
+  let bearing_capacity100 = 0
 
   const supabase = await createClient()
   const { data, error } = await supabase
-  .from('soil_profiles')
-  .select("effective_pile_length, water_depth")
-  .eq('id', profileId)
-  .single()
+    .from('soil_profiles')
+    .select("effective_pile_length")
+    .eq('id', profileId)
+    .single()
 
   if (error || !data) {
-    throw new Error("Unable to fetch Pile Data")
+    throw new Error("Unable to fetch pile data")
   }
-  
+
   const h = roundToOneDecimal(soil.end_depth - soil.start_depth)
-  const hMoist = Math.max(0, Math.min(data.water_depth, soil.end_depth) - soil.start_depth)
-  const hSat = Math.max(0, soil.end_depth - Math.max(data.water_depth, soil.start_depth))
-  const po = roundToTwoDecimals((soil.y_moist * hMoist) + (soil.y_sat * hSat))
 
-  const su = roundToTwoDecimals(((soil.qc - po) / soil.nk) * soil.a)
-  const qult = roundToTwoDecimals(soil.nc * su)
+  // NEW equations
+  const su = roundToTwoDecimals(soil.qc * soil.a)
+  const qult = roundToTwoDecimals(soil.qca * soil.kc)
 
-  const soilHeight = calculateSoilHeight(soil.start_depth, soil.end_depth, h, data.effective_pile_length)
+  const soilHeight = calculateSoilHeight(
+    soil.start_depth,
+    soil.end_depth,
+    h,
+    data.effective_pile_length
+  )
+
   if (soilHeight > 0) {
     shaft_capacity60 = roundToTwoDecimals(su * soilHeight * pileDiameter60)
     shaft_capacity100 = roundToTwoDecimals(su * soilHeight * pileDiameter100)
@@ -289,13 +299,6 @@ export async function calculateResultsForFineSoilCPT (soil: TfineSoilCalculation
     bearing_capacity100 = roundToTwoDecimals(qult * pileAreaDiameter100)
   }
 
-  else {
-    shaft_capacity60 = 0
-    shaft_capacity100 = 0
-    bearing_capacity60 = 0
-    bearing_capacity100 = 0 
-  }
-  
   return {
     su,
     qult,
@@ -306,6 +309,7 @@ export async function calculateResultsForFineSoilCPT (soil: TfineSoilCalculation
   }
 }
 
+
 //Coarse OR Manmade Soil Algorithm CPT - NO FETCH
 export async function calculateResultsForSoilsCPTNoFetch (soil: TsoilCalculationsCPTSchema, pileLength: number) {
  
@@ -315,8 +319,8 @@ export async function calculateResultsForSoilsCPTNoFetch (soil: TsoilCalculation
   let bearing_capacity100: number
 
   const h = roundToOneDecimal(soil.end_depth - soil.start_depth)
-  const t = roundToTwoDecimals(soil.ks * soil.qs)
-  const qult = roundToTwoDecimals(soil.kc * soil.qc)
+  const t = roundToTwoDecimals(soil.qc * soil.a)
+  const qult = roundToTwoDecimals(soil.qca * soil.kc)
 
   const soilHeight = calculateSoilHeight(soil.start_depth, soil.end_depth, h, pileLength)
   if (soilHeight > 0) {
@@ -344,7 +348,7 @@ export async function calculateResultsForSoilsCPTNoFetch (soil: TsoilCalculation
 }
 
 //Fine Soil Algorithm CPT - NO FETCH
-export async function calculateResultsForFineSoilCPTNoFetch (soil: TfineSoilCalculationsCPTSchema, pileLength: number, waterDepth: number) {
+export async function calculateResultsForFineSoilCPTNoFetch (soil: TsoilCalculationsCPTSchema, pileLength: number) {
   
   let shaft_capacity60: number
   let shaft_capacity100: number
@@ -352,12 +356,9 @@ export async function calculateResultsForFineSoilCPTNoFetch (soil: TfineSoilCalc
   let bearing_capacity100: number
 
   const h = roundToOneDecimal(soil.end_depth - soil.start_depth)
-  const hMoist = Math.max(0, Math.min(waterDepth, soil.end_depth) - soil.start_depth)
-  const hSat = Math.max(0, soil.end_depth - Math.max(waterDepth, soil.start_depth))
-  const po = roundToTwoDecimals((soil.y_moist * hMoist) + (soil.y_sat * hSat))
-
-  const su = roundToTwoDecimals(((soil.qc - po) / soil.nk) * soil.a)
-  const qult = roundToTwoDecimals(soil.nc * su)
+   // NEW equations
+  const su = roundToTwoDecimals(soil.qc * soil.a)
+  const qult = roundToTwoDecimals(soil.qca * soil.kc)
 
   const soilHeight = calculateSoilHeight(soil.start_depth, soil.end_depth, h, pileLength)
   if (soilHeight > 0) {

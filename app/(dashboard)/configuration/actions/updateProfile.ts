@@ -20,7 +20,7 @@ export async function updateProfile(profile: TinsertSoilProfileSchema, profileId
     const supabase = await createClient()
     const { data, error } = await supabase
     .from("soils")
-    .select("id, start_depth, end_depth, y_moist, y_sat, n_value, soil_type, test_type, qs, qc, kc, ks, nk, nc, a")
+    .select("id, start_depth, end_depth, y_moist, y_sat, n_value, soil_type, test_type, qca, qc, kc, a")
     .eq("soil_profile_id", profileId)
       
     if (error) {
@@ -48,7 +48,7 @@ export async function updateProfile(profile: TinsertSoilProfileSchema, profileId
         
         else {
           if (soil.soil_type === "fine") {
-            result = await calculateResultsForFineSoilCPTNoFetch(soil, roundedEffectivePileLength, profile.water_depth)
+            result = await calculateResultsForFineSoilCPTNoFetch(soil, roundedEffectivePileLength)
           } 
           
           else {

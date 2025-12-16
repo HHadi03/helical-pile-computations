@@ -96,12 +96,10 @@ export const insertSoilSchema = z.object({
   test_type: z.enum(["spt", "cpt"], { error: "Please select a test method" }),
   n_value: z.coerce.number(),
   qc: z.coerce.number(),
-  qs: z.coerce.number(),
-  ks: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().positive({ error: "Required" }).default(1)),
-  kc: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().positive({ error: "Required" }).default(0.45)),
-  a: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().positive({ error: "Required" }).default(1)),
-  nk: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().positive({ error: "Required" }).default(15)),
-  nc: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().positive({ error: "Required" }).default(7)),
+  qca: z.coerce.number(),
+  kc:z.coerce.number(),
+  a: z.coerce.number(),
+  
 })
 
 .refine(
@@ -143,15 +141,6 @@ export const insertSoilSchema = z.object({
     error: "Cone Tip Resistance is required",
   }
 )
-
-.refine(
-  (data) => data.test_type !== "cpt" || data.soil_type === "fine" || data.qs > 0,
-  {
-    path: ['qs'],
-    error: "Cone Sleeve Resistance is required",
-  }
-)
-
 export type TinsertSoilSchema = z.infer<typeof insertSoilSchema>
 
 
@@ -194,12 +183,9 @@ export const editSoilParametersSchema = z.object({
   test_type: z.enum(["spt", "cpt"], { error: "Please select a test method" }),
   n_value: z.coerce.number(),
   qc: z.coerce.number(),
-  qs: z.coerce.number(),
-  ks: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().positive({ error: "Required" }).default(1)),
-  kc: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().positive({ error: "Required" }).default(0.45)),
-  a: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().positive({ error: "Required" }).default(1)),
-  nk: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().positive({ error: "Required" }).default(15)),
-  nc: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().positive({ error: "Required" }).default(7)),
+  qca: z.coerce.number(),
+  kc: z.coerce.number(),
+  a: z.coerce.number(),
   soil_profile_id: z.uuid(),
   soil_type: z.string(),
   soil: z.string(),
@@ -229,15 +215,6 @@ export const editSoilParametersSchema = z.object({
     error: "Cone Tip Resistance is required",
   }
 )
-
-.refine(
-  (data) => data.test_type !== "cpt" || data.soil_type === "fine" || data.qs > 0,
-  {
-    path: ['qs'],
-    error: "Cone Sleeve Resistance is required",
-  }
-)
-
 export type TeditSoilParametersSchema = z.infer<typeof editSoilParametersSchema>
 
 
@@ -311,8 +288,8 @@ export const soilCalculationsCPTSchema = z.object({
   start_depth: z.number(),
   end_depth: z.number(),
   qc: z.number(),
-  qs: z.number(),
-  ks: z.number(),
+  qca: z.number(),
+  a: z.number(),
   kc: z.number()
 })
 export type TsoilCalculationsCPTSchema = z.infer<typeof soilCalculationsCPTSchema>

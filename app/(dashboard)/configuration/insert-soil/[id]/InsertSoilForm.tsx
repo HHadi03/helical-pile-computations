@@ -39,12 +39,9 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
       description: "",
       colour: "#000000",
       qc: "",
-      qs: "",
-      ks: 1,
-      kc: 0.45,
-      a: 1,
-      nk: 15,
-      nc: 7,
+      qca: "",
+      kc: "",
+      a: "",
     }
   })
   
@@ -353,129 +350,80 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                 )}
 
                 {testType === "cpt" && (
-                  <>  
-                    {soilType === "fine" ? (
-                      <>
-                        <FormField
-                          control={form.control}
-                          name="qc"
-                          render={({ field }) => (
-                            <FormItem className="pt-2">
-                              <FormLabel>Cone Tip Resistance<span className="font-semibold -ml-1">(kPa)</span></FormLabel>
-                              <FormControl>
-                                <NumberInput field={field} placeholder="0"/>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                 <>
+                  {/* Shaft capacity */}
+                  <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
+                    <FormField
+                      control={form.control}
+                      name="qc"
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormLabel>
+                            Cone Tip Resistance
+                            <span className="font-semibold -ml-1">(kPa)</span>
+                          </FormLabel>
+                          <FormControl>
+                            <NumberInput field={field} placeholder="0" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                        <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
-                          <FormField
-                            control={form.control}
-                            name="nk"
-                            render={({ field }) => (
-                              <FormItem className="flex-1">
-                                <FormLabel>Cone Factor</FormLabel>
-                                <FormControl>
-                                  <NumberInput field={field} placeholder="15"/>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                    <FormField
+                      control={form.control}
+                      name="a"
+                      render={({ field }) => (
+                        <FormItem className="w-40">
+                          <FormLabel>
+                            Alpha Factor
+                          </FormLabel>
+                          <FormControl>
+                            <NumberInput field={field} placeholder="0" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
-                          <FormField
-                            control={form.control}
-                            name="nc"
-                            render={({ field }) => (
-                              <FormItem className="flex-1">
-                                <FormLabel >Capacity Factor</FormLabel>
-                                <FormControl>
-                                  <NumberInput field={field} placeholder="7"/>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                  {/* Bearing capacity */}
+                  <div className="flex flex-col sm:flex-row gap-4 sm:items-start pt-4">
+                    <FormField
+                      control={form.control}
+                      name="qca"
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormLabel>
+                            Cone Tip Resistance
+                            <span className="font-semibold -ml-1">(kPa)</span>
+                          </FormLabel>
+                          <FormControl>
+                            <NumberInput field={field} placeholder="0" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                          <FormField
-                            control={form.control}
-                            name="a"
-                            render={({ field }) => (
-                              <FormItem className="flex-1">
-                                <FormLabel >Pore Factor</FormLabel>
-                                <FormControl>
-                                  <NumberInput field={field} placeholder="1"/>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <FormField
-                          control={form.control}
-                          name="qs"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Cone Sleeve Resistance<span className="font-semibold -ml-1">(kPa)</span></FormLabel>
-                              <FormControl>
-                                <NumberInput field={field} placeholder="0"/>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                    <FormField
+                      control={form.control}
+                      name="kc"
+                      render={({ field }) => (
+                        <FormItem className="w-40">
+                          <FormLabel>
+                            Bearing Factor
+                          </FormLabel>
+                          <FormControl>
+                            <NumberInput field={field} placeholder="0" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </>
 
-                        <FormField
-                          control={form.control}
-                          name="qc"
-                          render={({ field }) => (
-                            <FormItem className="pt-2">
-                              <FormLabel>Cone Tip Resistance<span className="font-semibold -ml-1">(kPa)</span></FormLabel>
-                              <FormControl>
-                                <NumberInput field={field} placeholder="0"/>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
-                          <FormField
-                            control={form.control}
-                            name="ks"
-                            render={({ field }) => (
-                              <FormItem className="flex-1">
-                                <FormLabel>Cone Factor</FormLabel>
-                                <FormControl>
-                                  <NumberInput field={field} placeholder="1"/>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          
-                          <FormField
-                            control={form.control}
-                            name="kc"
-                            render={({ field }) => (
-                              <FormItem className="flex-1">
-                                <FormLabel>Capacity Factor</FormLabel>
-                                <FormControl>
-                                  <NumberInput field={field} placeholder="0.45"/>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                      </>
-                    )}
-                  </>
                 )}
               </div>
             </div>

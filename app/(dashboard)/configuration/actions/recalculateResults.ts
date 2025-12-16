@@ -51,7 +51,7 @@ export async function recalculateResults(soilId: string, testType: string, soilT
     
     const { data, error } = await supabase
     .from('soils')
-    .select("start_depth, end_depth, y_moist, y_sat, n_value, qs, qc, kc, ks, nk, nc, a, soil_profile_id")
+    .select("start_depth, end_depth, y_moist, y_sat, n_value, qca, qc, kc, a, soil_profile_id")
     .eq('id', soilId)
     .single()
     

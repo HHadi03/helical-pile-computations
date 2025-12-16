@@ -37,7 +37,7 @@ export async function updateSoilParameters(soil: TeditSoilParametersSchema, soil
 
       const {data: proceedingSoilData, error: proceedingSoilError} = await supabase
       .from("soils")
-      .select("y_moist, y_sat, n_value, soil_type, test_type, qs, qc, kc, ks, nk, nc, a")
+      .select("y_moist, y_sat, n_value, soil_type, test_type, qca, qc, kc, a")
       .eq("id", proceedingSoil.id)
       .single()
       

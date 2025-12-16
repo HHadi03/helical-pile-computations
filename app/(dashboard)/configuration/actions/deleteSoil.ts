@@ -27,7 +27,7 @@ export async function deleteSoil(id: string, name: string, profileId: string) {
 
     const {data: proceedingSoilData, error: proceedingSoilError} = await supabase
     .from("soils")
-    .select("end_depth, y_moist, y_sat, n_value, soil_type, test_type, qs, qc, kc, ks, nk, nc, a")
+    .select("end_depth, y_moist, y_sat, n_value, soil_type, test_type, qca, qc, kc, a")
     .eq("id", proceedingSoil.id)
     .single()
     

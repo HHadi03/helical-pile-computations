@@ -17,7 +17,7 @@ export async function updateSoilInformation(soil: TeditSoilInformationSchema, so
     const supabase = await createClient()
     const { data, error } = await supabase
     .from('soils')
-    .select("start_depth, end_depth, y_moist, y_sat, n_value, test_type, qs, qc, kc, ks, nk, nc, a, soil_profile_id")
+    .select("start_depth, end_depth, y_moist, y_sat, n_value, test_type, qca, qc, kc, a, soil_profile_id")
     .eq('id', soilId)
     .single()
     
@@ -50,7 +50,7 @@ export async function updateSoilInformation(soil: TeditSoilInformationSchema, so
       }
       
       else {
-        const dataWithDefaults = {...data, qs: (data.qs > 0) ? data.qs : Math.max(data.qc * 0.01, 50)}
+        const dataWithDefaults = {...data, qs: (data.qca > 0) ? data.qca : Math.max(data.qc * 0.01, 50)}
         soil = { ...soil, qs: dataWithDefaults.qs, ...await calculateResultsForSoilsCPT(dataWithDefaults, data.soil_profile_id)}
       }
     }
