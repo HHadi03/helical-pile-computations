@@ -5,10 +5,9 @@ import { getLuminance } from "@/lib/utils"
 
 export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter, hideBearingCapacity, showMobileLayout}: { profileSoils: ToverviewSoilSchema[], profile: ToverviewSoilProfileSchema, profileIndex: number, pileDiameter: string, hideBearingCapacity: boolean, showMobileLayout?: boolean }) {
   
-  const BASE_HEIGHT = 161 // Base height in pixels
-  const SCALE_FACTOR = 50 // Additional pixels per meter of depth
-  
-  // Calculate height for each layer based on its thickness
+  const BASE_HEIGHT = 161 
+  const SCALE_FACTOR = 50
+
   const getLayerHeight = (soil: ToverviewSoilSchema) => {
     const thickness = soil.end_depth - soil.start_depth
     return Math.max(BASE_HEIGHT, BASE_HEIGHT + (thickness * SCALE_FACTOR))
@@ -22,21 +21,21 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
 
   const ultimateBearingCapacity = ultimatePulloutCapacity + bearingCapacity
 
-  // Calculate pile height with scaled layers
   const pileHeight = profileSoils.reduce((height, soil) => {
     const layerHeight = getLayerHeight(soil)
-    
+
     if (soil.id === lastLayer.id) {
       if (lastLayer.end_depth <= profile.effective_pile_length) {
-        // Full layers up to and including the last layer
         return height + layerHeight
-      } else {
-        // Partial last layer
+      } 
+      
+      else {
         const portionOfLayer = (profile.effective_pile_length - soil.start_depth) / (soil.end_depth - soil.start_depth)
         return height + (portionOfLayer * layerHeight)
       }
-    } else if (soil.start_depth < profile.effective_pile_length) {
-      // Full layer before the last layer
+    } 
+    
+    else if (soil.start_depth < profile.effective_pile_length) {
       return height + layerHeight
     }
     return height

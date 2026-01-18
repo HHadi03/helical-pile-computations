@@ -17,7 +17,7 @@ export async function duplicateProfile(profileId: string) {
 
     const { data: soilData, error: soilFetchError } = await supabase
     .from('soils')
-    .select("user_id, soil_type, density, soil, soil_name, description, colour, start_depth, end_depth, test_type, n_value, y_moist, y_sat, qs, qc, kc, ks, nk, nc, a, po, angle, t, su, qult, shaft_capacity60, shaft_capacity100, bearing_capacity60, bearing_capacity100")
+    .select("user_id, soil_type, density, soil, soil_name, description, colour, start_depth, end_depth, test_type, n_value, y_moist, y_sat, qc, qca, kc, a, po, angle, t, su, qult, shaft_capacity60, shaft_capacity100, bearing_capacity60, bearing_capacity100")
     .eq("soil_profile_id", profileId)
     
     if (soilFetchError) {

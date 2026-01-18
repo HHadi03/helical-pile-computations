@@ -38,9 +38,8 @@ export function EditSoilInformation({ soil, soilId }: { soil: TeditSoilInformati
       const result = await updateSoilInformation(values, soilId, dirtyFields)
 
       if (result.errors) {
-        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TeditSoilInformationSchema, {message: value[0]})})
         toast.error(result.message)
-      } 
+      }
       
       else {
         handleClose()

@@ -45,6 +45,17 @@ export const overviewSoilSchema = z.object({
 export type ToverviewSoilSchema = z.infer<typeof overviewSoilSchema>
 
 
+//visualisation soil schema
+export const visualisationSoilSchema = z.object({
+  end_depth: z.number(),
+  shaft_capacity60: z.number().optional(),
+  bearing_capacity60: z.number().optional(),
+  shaft_capacity100: z.number().optional(),
+  bearing_capacity100: z.number().optional(),
+})
+export type TvisualisationSoilSchema = z.infer<typeof visualisationSoilSchema>
+
+
 //export soil schema
 export const exportSoilSchema = z.object({
   id: z.uuid(),
@@ -70,24 +81,13 @@ export const exportSoilSchema = z.object({
 export type TexportSoilSchema = z.infer<typeof exportSoilSchema>
 
 
-//visualisation soil schema
-export const visualisationSoilSchema = z.object({
-  end_depth: z.number(),
-  shaft_capacity60: z.number().optional(),
-  bearing_capacity60: z.number().optional(),
-  shaft_capacity100: z.number().optional(),
-  bearing_capacity100: z.number().optional(),
-})
-export type TvisualisationSoilSchema = z.infer<typeof visualisationSoilSchema>
-
-
 //insert soil schema
 export const insertSoilSchema = z.object({
   soil_type: z.enum(["coarse", "fine", "manmade"], { error: "Please select soil type" }),
   density: z.enum(["loose", "dense"], { error: "Please select soil density" }),
   soil: z.string().min(1, { error: "Please select a soil" }),
-  soil_name: z.string().optional(),
-  description: z.string().optional(),
+  soil_name: z.string().max(30, { error: "Name must be less than 30 characters long" }).optional(),
+  description: z.string().max(60, { error: "Description must be less than 60 characters long" }).optional(),
   colour: z.string(),
   start_depth: z.coerce.number().gte(0, { error: "Start Depth is required" }),
   end_depth: z.coerce.number().positive({ error: "End Depth is required" }).transform((val) => Number(roundToOneDecimal(val))),
@@ -96,10 +96,9 @@ export const insertSoilSchema = z.object({
   test_type: z.enum(["spt", "cpt"], { error: "Please select a test method" }),
   n_value: z.coerce.number(),
   qc: z.coerce.number(),
+  a: z.coerce.number(),
   qca: z.coerce.number(),
   kc:z.coerce.number(),
-  a: z.coerce.number(),
-  
 })
 
 .refine(
@@ -107,22 +106,6 @@ export const insertSoilSchema = z.object({
   {
     path: ['end_depth'], 
     error: "End Depth must be greater than Start Depth",
-  }
-)
-
-.refine(
-  (data) => data.soil_name === undefined || data.soil_name.length <= 30,
-  {
-    path: ['soil_name'],
-    error: "Name must be less than 30 characters long"
-  }
-)
-
-.refine(
-  (data) => data.description === undefined || data.description.length <= 60,
-  {
-    path: ['description'],
-    error: "Description must be less than 60 characters long"
   }
 )
 
@@ -141,6 +124,30 @@ export const insertSoilSchema = z.object({
     error: "Cone Tip Resistance is required",
   }
 )
+
+.refine(
+  (data) => data.test_type !== "cpt" || data.qca > 0,
+  {
+    path: ['qca'],
+    error: "Cone Tip Resistance is required",
+  }
+)
+
+.refine(
+  (data) => data.test_type !== "cpt" || data.a > 0,
+  {
+    path: ['a'],
+    error: "Alpha Required",
+  }
+)
+
+.refine(
+  (data) => data.test_type !== "cpt" || data.kc > 0,
+  {
+    path: ['kc'],
+    error: "Bearing Required",
+  }
+)
 export type TinsertSoilSchema = z.infer<typeof insertSoilSchema>
 
 
@@ -149,28 +156,10 @@ export const editSoilInformationSchema = z.object({
   soil_type: z.enum(["coarse", "fine", "manmade"], { error: "Please select a soil type" }),
   density: z.enum(["loose", "dense"], { error: "Please select soil density" }),
   soil: z.string().min(1, { error: "Please select a soil" }),
-  soil_name: z.string().optional(),
-  description: z.string().optional(),
+  soil_name: z.string().max(30, { error: "Name must be less than 30 characters long" }).optional(),
+  description: z.string().max(60, { error: "Description must be less than 60 characters long" }).optional(),
   colour: z.string(),
-  qs: z.number().optional(),
 })
-
-.refine(
-  (data) => data.soil_name === undefined || data.soil_name.length <= 30,
-  {
-    path: ['soil_name'],
-    error: "Name must be less than 30 characters long"
-  }
-)
-
-.refine(
-  (data) => data.description === undefined || data.description.length <= 60,
-  {
-    path: ['description'],
-    error: "Description must be less than 60 characters long"
-  }
-)
-
 export type TeditSoilInformationSchema = z.infer<typeof editSoilInformationSchema>
 
 
@@ -213,6 +202,30 @@ export const editSoilParametersSchema = z.object({
   {
     path: ['qc'],
     error: "Cone Tip Resistance is required",
+  }
+)
+
+.refine(
+  (data) => data.test_type !== "cpt" || data.qca > 0,
+  {
+    path: ['qca'],
+    error: "Cone Tip Resistance is required",
+  }
+)
+
+.refine(
+  (data) => data.test_type !== "cpt" || data.a > 0,
+  {
+    path: ['a'],
+    error: "Alpha Required",
+  }
+)
+
+.refine(
+  (data) => data.test_type !== "cpt" || data.kc > 0,
+  {
+    path: ['kc'],
+    error: "Bearing Required",
   }
 )
 export type TeditSoilParametersSchema = z.infer<typeof editSoilParametersSchema>
@@ -259,7 +272,6 @@ export const editSoilEngineeredSchema = z.object({
     error: "Angle of Internal Friction cannot be greater than 45°"
   }
 )
-
 export type TeditSoilEngineeredSchema = z.infer<typeof editSoilEngineeredSchema>
 
 
@@ -283,7 +295,7 @@ export const fineSoilCalculationsSchema = z.object({
 export type TfineSoilCalculationsSchema = z.infer<typeof fineSoilCalculationsSchema>
 
 
-//calculations cpt coarse soil schema
+//calculations cpt soil schema
 export const soilCalculationsCPTSchema = z.object({
   start_depth: z.number(),
   end_depth: z.number(),
@@ -294,59 +306,35 @@ export const soilCalculationsCPTSchema = z.object({
 })
 export type TsoilCalculationsCPTSchema = z.infer<typeof soilCalculationsCPTSchema>
 
-
-//calculations cpt fine soil schema
-export const fineSoilCalculationsCPTSchema = z.object({
-  start_depth: z.number(),
-  end_depth: z.number(),
-  y_moist: z.number(),
-  y_sat: z.number(),
-  qc: z.number(),
-  qs: z.number(),
-  nk: z.number(),
-  nc: z.number(),
-  a: z.number(),
-})
-export type TfineSoilCalculationsCPTSchema = z.infer<typeof fineSoilCalculationsCPTSchema>
-
+//full soil schema for saving/loading
 export const fullSoilSchema = z.object({
-  idx: z.number(),
-  id: z.string().uuid(),
-  soil_profile_id: z.string().uuid(),
-  user_id: z.string().uuid(),
-
+  id: z.uuid(),
+  soil_profile_id: z.uuid(),
+  user_id: z.uuid(),
   soil_type: z.enum(["coarse", "fine", "manmade"]),
   density: z.enum(["loose", "dense"]),
-
   soil: z.string(),
   soil_name: z.string().optional(),
   description: z.string().optional(),
   colour: z.string(),
-
   start_depth: z.coerce.number(),
   end_depth: z.coerce.number(),
   n_value: z.coerce.number(),
-
-  po: z.coerce.number().optional().nullable(),
-  angle: z.coerce.number().optional().nullable(),
-  t: z.coerce.number().optional().nullable(),
-  su: z.coerce.number().optional().nullable(),
-
+  y_moist: z.coerce.number(),
+  y_sat: z.coerce.number(),
+  test_type: z.enum(["spt", "cpt"]),
+  po: z.coerce.number().nullish(),
+  angle: z.coerce.number().nullish(),
+  t: z.coerce.number().nullish(),
+  su: z.coerce.number().nullish(),
+  qult: z.coerce.number(),
   shaft_capacity60: z.coerce.number(),
   shaft_capacity100: z.coerce.number(),
   bearing_capacity60: z.coerce.number(),
   bearing_capacity100: z.coerce.number(),
-  qult: z.coerce.number(),
-
-  ks: z.coerce.number(),
   kc: z.coerce.number(),
   qc: z.coerce.number(),
-  qs: z.coerce.number(),
+  qca: z.coerce.number(),
   a: z.coerce.number(),
-  nk: z.coerce.number(),
-  nc: z.coerce.number(),
-
-  test_type: z.enum(["spt", "cpt"]),
 })
-
 export type TfullSoilSchema = z.infer<typeof fullSoilSchema>

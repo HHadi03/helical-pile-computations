@@ -42,20 +42,11 @@ export type TexportSoilProfileSchema = z.infer<typeof exportSoilProfileSchema>
 
 //insert soil profile schema
 export const insertSoilProfileSchema = z.object({
-  profile_name: z.string().optional(),
+  profile_name: z.string().max(45, { error: "Name must be less than 45 characters long" }).optional(),
   pile_stick_out: z.coerce.number().positive({ error: "Pile Stick Out is required" }).transform((val) => Number(roundToOneDecimal(val))),
   pile_length: z.coerce.number().positive({ error: "Pile Length is required" }).transform((val) => Number(roundToOneDecimal(val))),
   water_depth: z.coerce.number().positive({ error: "Water Depth is required" }).transform((val) => Number(roundToOneDecimal(val))),
 })
-
-.refine(
-  (data) => data.profile_name === undefined || data.profile_name.length <= 45,
-  {
-    path: ['profile_name'],
-    error: "Name must be less than 45 characters long"
-  }
-)
-
 .refine(
   (data) => data.pile_stick_out < data.pile_length,
   {
@@ -63,5 +54,4 @@ export const insertSoilProfileSchema = z.object({
     error: "Pile Stick Out must be less than Pile Length",
   }
 )
-
 export type TinsertSoilProfileSchema = z.infer<typeof insertSoilProfileSchema>

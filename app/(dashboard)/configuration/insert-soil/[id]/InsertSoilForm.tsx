@@ -83,7 +83,6 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
       const result = await insertSoil(values, profileId)
 
       if (result.errors) {
-        Object.entries(result.errors).forEach(([key, value]) => {form.setError(key as keyof TinsertSoilSchema, {message: Array.isArray(value) ? value[0] : String(value)})})
         toast.error(result.message)
       }
 
@@ -297,7 +296,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
               />
 
               <p className="text-sm leading-none mb-1.5 ml-1">Soil Test Method</p>
-              <div className="border border-input rounded-sm p-2 space-y-4">
+              <div className="border border-input dark:bg-input/30 rounded-sm p-2 space-y-4">
                 <FormField
                   control={form.control}
                   name="test_type"
@@ -351,17 +350,14 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
 
                 {testType === "cpt" && (
                  <>
-                  {/* Shaft capacity */}
+                  <p className="text-sm mb-1.5 sm:text-center italic">Shaft Capacity</p>
                   <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
                     <FormField
                       control={form.control}
                       name="qc"
                       render={({ field }) => (
                         <FormItem className="flex-1">
-                          <FormLabel>
-                            Cone Tip Resistance
-                            <span className="font-semibold -ml-1">(kPa)</span>
-                          </FormLabel>
+                          <FormLabel>Cone Tip Resistance <span className="font-semibold -ml-1">(kPa)</span></FormLabel>
                           <FormControl>
                             <NumberInput field={field} placeholder="0" />
                           </FormControl>
@@ -374,10 +370,8 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                       control={form.control}
                       name="a"
                       render={({ field }) => (
-                        <FormItem className="w-40">
-                          <FormLabel>
-                            Alpha Factor
-                          </FormLabel>
+                        <FormItem className="sm:w-40">
+                          <FormLabel>Alpha Factor</FormLabel>
                           <FormControl>
                             <NumberInput field={field} placeholder="0" />
                           </FormControl>
@@ -386,18 +380,15 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                       )}
                     />
                   </div>
-
-                  {/* Bearing capacity */}
-                  <div className="flex flex-col sm:flex-row gap-4 sm:items-start pt-4">
+                  
+                  <p className="text-sm mb-1.5 sm:text-center italic">Bearing Capacity</p>
+                  <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
                     <FormField
                       control={form.control}
                       name="qca"
                       render={({ field }) => (
                         <FormItem className="flex-1">
-                          <FormLabel>
-                            Cone Tip Resistance
-                            <span className="font-semibold -ml-1">(kPa)</span>
-                          </FormLabel>
+                          <FormLabel>Cone Tip Resistance<span className="font-semibold -ml-1">(kPa)</span></FormLabel>
                           <FormControl>
                             <NumberInput field={field} placeholder="0" />
                           </FormControl>
@@ -410,10 +401,8 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                       control={form.control}
                       name="kc"
                       render={({ field }) => (
-                        <FormItem className="w-40">
-                          <FormLabel>
-                            Bearing Factor
-                          </FormLabel>
+                        <FormItem className="sm:w-40">
+                          <FormLabel>Bearing Factor</FormLabel>
                           <FormControl>
                             <NumberInput field={field} placeholder="0" />
                           </FormControl>
@@ -423,7 +412,6 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                     />
                   </div>
                 </>
-
                 )}
               </div>
             </div>

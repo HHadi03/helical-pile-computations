@@ -207,10 +207,8 @@ export async function calculateResultsForFineSoilNoFetch (soil: TfineSoilCalcula
 }
 
 // Coarse OR Manmade Soil Algorithm CPT
-export async function calculateResultsForSoilsCPT(
-  soil: TsoilCalculationsCPTSchema,
-  profileId: string
-) {
+export async function calculateResultsForSoilsCPT(soil: TsoilCalculationsCPTSchema, profileId: string) {
+  
   let shaft_capacity60 = 0
   let shaft_capacity100 = 0
   let bearing_capacity60 = 0
@@ -229,16 +227,10 @@ export async function calculateResultsForSoilsCPT(
 
   const h = roundToOneDecimal(soil.end_depth - soil.start_depth)
 
-  // NEW equations
   const t = roundToTwoDecimals(soil.qc * soil.a)
   const qult = roundToTwoDecimals(soil.qca * soil.kc)
 
-  const soilHeight = calculateSoilHeight(
-    soil.start_depth,
-    soil.end_depth,
-    h,
-    data.effective_pile_length
-  )
+  const soilHeight = calculateSoilHeight(soil.start_depth, soil.end_depth, h, data.effective_pile_length)
 
   if (soilHeight > 0) {
     shaft_capacity60 = roundToTwoDecimals(t * soilHeight * pileDiameter60)
@@ -257,12 +249,9 @@ export async function calculateResultsForSoilsCPT(
   }
 }
 
-
 // Fine Soil Algorithm CPT
-export async function calculateResultsForFineSoilCPT(
-  soil: TsoilCalculationsCPTSchema,
-  profileId: string
-) {
+export async function calculateResultsForFineSoilCPT(soil: TsoilCalculationsCPTSchema, profileId: string) {
+
   let shaft_capacity60 = 0
   let shaft_capacity100 = 0
   let bearing_capacity60 = 0
@@ -281,16 +270,10 @@ export async function calculateResultsForFineSoilCPT(
 
   const h = roundToOneDecimal(soil.end_depth - soil.start_depth)
 
-  // NEW equations
   const su = roundToTwoDecimals(soil.qc * soil.a)
   const qult = roundToTwoDecimals(soil.qca * soil.kc)
 
-  const soilHeight = calculateSoilHeight(
-    soil.start_depth,
-    soil.end_depth,
-    h,
-    data.effective_pile_length
-  )
+  const soilHeight = calculateSoilHeight(soil.start_depth, soil.end_depth, h, data.effective_pile_length)
 
   if (soilHeight > 0) {
     shaft_capacity60 = roundToTwoDecimals(su * soilHeight * pileDiameter60)
@@ -308,7 +291,6 @@ export async function calculateResultsForFineSoilCPT(
     bearing_capacity100
   }
 }
-
 
 //Coarse OR Manmade Soil Algorithm CPT - NO FETCH
 export async function calculateResultsForSoilsCPTNoFetch (soil: TsoilCalculationsCPTSchema, pileLength: number) {

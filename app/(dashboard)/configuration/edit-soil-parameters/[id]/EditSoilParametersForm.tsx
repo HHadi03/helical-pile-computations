@@ -118,7 +118,7 @@ export function EditSoilParameters({ soil, soilId }: { soil: TeditSoilParameters
           />
 
           <p className="text-sm leading-none mb-1.5 ml-1">Soil Test Method</p>
-          <div className="border border-input rounded-sm p-2 space-y-4">
+          <div className="border border-input dark:bg-input/30 rounded-sm p-2 space-y-4">
             <FormField
               control={form.control}
               name="test_type"
@@ -171,79 +171,69 @@ export function EditSoilParameters({ soil, soilId }: { soil: TeditSoilParameters
             )}
 
             {testType === "cpt" && (
-               <>
-                  {/* Shaft capacity */}
-                  <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
-                    <FormField
-                      control={form.control}
-                      name="qc"
-                      render={({ field }) => (
-                        <FormItem className="flex-1">
-                          <FormLabel>
-                            Cone Tip Resistance
-                            <span className="font-semibold -ml-1">(kPa)</span>
-                          </FormLabel>
-                          <FormControl>
-                            <NumberInput field={field} placeholder="0" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+              <>
+              <p className="text-sm mb-1.5 sm:text-center italic">Shaft Capacity</p>
+              <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
+                <FormField
+                  control={form.control}
+                  name="qc"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Cone Tip Resistance <span className="font-semibold -ml-1">(kPa)</span></FormLabel>
+                      <FormControl>
+                        <NumberInput field={field} placeholder="0" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                    <FormField
-                      control={form.control}
-                      name="a"
-                      render={({ field }) => (
-                        <FormItem className="w-40">
-                          <FormLabel>
-                            Alpha Factor
-                          </FormLabel>
-                          <FormControl>
-                            <NumberInput field={field} placeholder="0" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                <FormField
+                  control={form.control}
+                  name="a"
+                  render={({ field }) => (
+                    <FormItem className="sm:w-40">
+                      <FormLabel>Alpha Factor</FormLabel>
+                      <FormControl>
+                        <NumberInput field={field} placeholder="0" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <p className="text-sm mb-1.5 sm:text-center italic">Bearing Capacity</p>
+              <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
+                <FormField
+                  control={form.control}
+                  name="qca"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Cone Tip Resistance<span className="font-semibold -ml-1">(kPa)</span></FormLabel>
+                      <FormControl>
+                        <NumberInput field={field} placeholder="0" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                  {/* Bearing capacity */}
-                  <div className="flex flex-col sm:flex-row gap-4 sm:items-start pt-4">
-                    <FormField
-                      control={form.control}
-                      name="qca"
-                      render={({ field }) => (
-                        <FormItem className="flex-1">
-                          <FormLabel>
-                            Cone Tip Resistance
-                            <span className="font-semibold -ml-1">(kPa)</span>
-                          </FormLabel>
-                          <FormControl>
-                            <NumberInput field={field} placeholder="0" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="kc"
-                      render={({ field }) => (
-                        <FormItem className="w-40">
-                          <FormLabel>
-                            Bearing Factor
-                          </FormLabel>
-                          <FormControl>
-                            <NumberInput field={field} placeholder="0" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </>
+                <FormField
+                  control={form.control}
+                  name="kc"
+                  render={({ field }) => (
+                    <FormItem className="sm:w-40">
+                      <FormLabel>Bearing Factor</FormLabel>
+                      <FormControl>
+                        <NumberInput field={field} placeholder="0" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </>
             )}
           </div>
         </div>

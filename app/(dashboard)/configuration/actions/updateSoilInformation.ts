@@ -37,21 +37,11 @@ export async function updateSoilInformation(soil: TeditSoilInformationSchema, so
 
     else {
       if (soil.soil_type === "fine") {
-        const calculatedResults = await calculateResultsForFineSoilCPT(data, data.soil_profile_id)
-
-        if (calculatedResults.su < 0) {
-          return { 
-            message: `Unable to modify soil type as layer has negative results, please modify its parameters.`,
-            errors: { soil_type: ["Soil type change leads to negative results"] } 
-          }
-        }
-        
-        soil = { ...soil, ...calculatedResults }
+        soil = { ...soil,...await calculateResultsForFineSoilCPT(data, data.soil_profile_id)}
       }
       
       else {
-        const dataWithDefaults = {...data, qs: (data.qca > 0) ? data.qca : Math.max(data.qc * 0.01, 50)}
-        soil = { ...soil, qs: dataWithDefaults.qs, ...await calculateResultsForSoilsCPT(dataWithDefaults, data.soil_profile_id)}
+        soil = { ...soil,...await calculateResultsForSoilsCPT(data, data.soil_profile_id)}
       }
     }
   }

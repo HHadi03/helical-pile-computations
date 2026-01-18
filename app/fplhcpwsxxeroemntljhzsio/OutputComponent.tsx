@@ -987,7 +987,7 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
             <img
               src={imageUrl}
               alt="Uploaded appendix image"
-              className="w-full rounded-lg shadow"
+              className="max-w-xl rounded-lg shadow"
             />
           ) : (
            null
