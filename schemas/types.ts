@@ -1,3 +1,46 @@
+export type CalculationResult = 
+| {
+    testType: 'spt'
+    soilType: 'fine'
+    su: number
+    qult: number
+    shaft_capacity60: number
+    shaft_capacity100: number
+    bearing_capacity60: number
+    bearing_capacity100: number
+  }
+| {
+    testType: 'spt'
+    soilType: 'coarse' | 'manmade'
+    angle: number
+    t: number
+    qult: number
+    shaft_capacity60: number
+    shaft_capacity100: number
+    bearing_capacity60: number
+    bearing_capacity100: number
+  }
+| {
+    testType: 'cpt'
+    soilType: 'fine'
+    su: number
+    qult: number
+    shaft_capacity60: number
+    shaft_capacity100: number
+    bearing_capacity60: number
+    bearing_capacity100: number
+  }
+| {
+    testType: 'cpt'
+    soilType: 'coarse' | 'manmade'
+    t: number
+    qult: number
+    shaft_capacity60: number
+    shaft_capacity100: number
+    bearing_capacity60: number
+    bearing_capacity100: number
+  }
+
 export type DynamicParamsType =
   | {
       design_method: "method_bs"
@@ -76,6 +119,10 @@ export type PileStructureType = {
   pitch_diameter: number,
   pile_gross_area: number,
   proof_strength: number,
+  l: number,
+  e: number,
+  k: number,
+  i: number,
   partial_safety_factor_1: number,
   partial_safety_factor_2: number,
   horizontal_load: number,

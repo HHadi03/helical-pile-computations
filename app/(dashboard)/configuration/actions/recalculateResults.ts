@@ -1,49 +1,7 @@
 'use server'
 import { createClient } from "@/utils/supabase/server"
 import { calculateResultsForFineSoil, calculateResultsForSoils, calculateResultsForFineSoilCPT, calculateResultsForSoilsCPT } from "@/lib/equations"
-
-type CalculationResult = 
-| {
-    testType: 'spt'
-    soilType: 'fine'
-    su: number
-    qult: number
-    shaft_capacity60: number
-    shaft_capacity100: number
-    bearing_capacity60: number
-    bearing_capacity100: number
-  }
-| {
-    testType: 'spt'
-    soilType: 'coarse' | 'manmade'
-    angle: number
-    t: number
-    qult: number
-    shaft_capacity60: number
-    shaft_capacity100: number
-    bearing_capacity60: number
-    bearing_capacity100: number
-  }
-| {
-    testType: 'cpt'
-    soilType: 'fine'
-    su: number
-    qult: number
-    shaft_capacity60: number
-    shaft_capacity100: number
-    bearing_capacity60: number
-    bearing_capacity100: number
-  }
-| {
-    testType: 'cpt'
-    soilType: 'coarse' | 'manmade'
-    t: number
-    qult: number
-    shaft_capacity60: number
-    shaft_capacity100: number
-    bearing_capacity60: number
-    bearing_capacity100: number
-  }
+import type { CalculationResult } from "@/schemas/types"
 
 export async function recalculateResults(soilId: string, testType: string, soilType: string): Promise<{ data: CalculationResult; errors: null } | { errors: Record<string, unknown>; data?: never }> {
   try {

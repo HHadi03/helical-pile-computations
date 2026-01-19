@@ -89,8 +89,12 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
       ultimate_tensile_strength_lm25m: 160,
       thread_engagement_length: 70,
       pitch_diameter: "",
-      pile_gross_area: 2678,
+      pile_gross_area: "",
       proof_strength: 80,
+      e: 80000,
+      k: 0.7,
+      l: "",
+      i: "",
       partial_safety_factor_1: 1.1,
       partial_safety_factor_2: 1.25,
       pile_notes: "",
@@ -107,11 +111,15 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
     if (pileDiameter === "60") {
       form.setValue("nominal_stress_area", 84.3)
       form.setValue("pitch_diameter", 10.863)
+      form.setValue("pile_gross_area", 1228)
+      form.setValue("i", 146526)
     }
 
     else {
       form.setValue("nominal_stress_area", 245)
       form.setValue("pitch_diameter", 18.376)
+      form.setValue("pile_gross_area", 2678)
+      form.setValue("i", 788777)
     }
   }, [form, pileDiameter])
 
@@ -163,7 +171,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
         window.URL.revokeObjectURL(url)
         document.body.removeChild(a)
         
-        handleClose()
+        // handleClose()
       }
     }
 
@@ -1092,6 +1100,22 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
             <div className="space-y-4 border-y-2 py-3">
               <FormField
                 control={form.control}
+                name="l"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Pile Length in Liquefiable Soil <span className="font-semibold -ml-1">(mm)</span>
+                    </FormLabel>
+                    <FormControl>
+                      <NumberInput field={field} placeholder="0" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="nominal_stress_area"
                 render={({ field }) => (
                   <FormItem>
@@ -1202,6 +1226,52 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                 )}
               />
 
+              <FormField
+                control={form.control}
+                name="e"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Modulus of Elasticity <span className="font-semibold -ml-1">(N/mm²)</span>
+                    </FormLabel>
+                    <FormControl>
+                      <NumberInput field={field} placeholder="0" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="i"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Area Moment of Inertia <span className="font-semibold -ml-1">(mm⁴)</span>
+                    </FormLabel>
+                    <FormControl>
+                      <NumberInput field={field} placeholder="0" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="k"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Effective Length Factor (K)</FormLabel>
+                    <FormControl>
+                      <NumberInput field={field} placeholder="1.0" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
               <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
                 <FormField
                   control={form.control}

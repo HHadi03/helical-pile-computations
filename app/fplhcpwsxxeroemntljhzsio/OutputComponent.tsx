@@ -6,17 +6,25 @@ import { getLuminance, roundToOneDecimal, roundToTwoDecimals } from "@/lib/utils
 import { Triangle, MoveUp } from "lucide-react"
 import { OutputSoilGraph } from "./OutputSoilGraph"
 import { Arimo } from "next/font/google"
-import { Space_Mono } from "next/font/google"
+import { JetBrains_Mono } from "next/font/google"
 
 const arimo = Arimo({subsets: ["latin"], weight: ['400', '700']})
-const spaceMono = Space_Mono({subsets: ["latin"], weight: ['400', '700'], variable: '--font-space-mono'})
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"], 
+  weight: ['400', '700'], 
+  variable: '--font-jetbrains-mono'
+})
 
 export function OutputComponent({ baseParams, dynamicParams, soilsData, profileData, pileStructure, imageUrl }: { baseParams: BaseParamsType, dynamicParams: DynamicParamsType, pileStructure: PileStructureType, soilsData: TexportSoilSchema[], profileData: TexportSoilProfileSchema, imageUrl: string | null }) {
   
   const ultimatePulloutCapacity = baseParams.pile_diameter === "60" ? soilsData.reduce((sum, soil) => sum + soil.shaft_capacity60, 0) : soilsData.reduce((sum, soil) => sum + soil.shaft_capacity100, 0)
+  
   const lastLayer = soilsData.find(soil => soil.start_depth <= profileData.effective_pile_length && profileData.effective_pile_length <= soil.end_depth) || soilsData[soilsData.length - 1]
+  
   const rbIndex = soilsData.findIndex(soil => soil.id === lastLayer.id)
+  
   const bearingCapacity = baseParams.pile_diameter === "60" ? lastLayer.bearing_capacity60 : lastLayer.bearing_capacity100
+  
   const ultimateBearingCapacity = ultimatePulloutCapacity + bearingCapacity
   
   let effectivePileLength = profileData.effective_pile_length
@@ -24,7 +32,6 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
   
   const totalTensionLoad = dynamicParams.design_method === "method_bs" ? dynamicParams.applied_tension_load : dynamicParams.permanent_tension_load + dynamicParams.variable_tension_load
   const totalCompressionLoad = dynamicParams.design_method === "method_bs" ? dynamicParams.applied_compression_load : dynamicParams.permanent_compression_load + dynamicParams.variable_compression_load
-  const ExternalLoad = totalTensionLoad + totalCompressionLoad
   
   const calculateRowHeight = () => {
     let height = 40
@@ -474,20 +481,21 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
   const renderPileStructuralCheck = () => {
     const horizontalLoad = roundToTwoDecimals(pileStructure.horizontal_load * pileStructure.horizontal_load_safety_factor)
 
-    const Ftra = roundToTwoDecimals(pileStructure.k2 * pileStructure.ultimate_tensile_strength_a480 * pileStructure.nominal_stress_area / (pileStructure.partial_safety_factor_2 * 1000))
-    
-    const Fvra = roundToTwoDecimals(0.6 * pileStructure.ultimate_tensile_strength_a480 * pileStructure.nominal_stress_area / (pileStructure.partial_safety_factor_2 * 1000))
+    const FtRd = roundToTwoDecimals(pileStructure.k2 * pileStructure.ultimate_tensile_strength_a480 * pileStructure.nominal_stress_area / (pileStructure.partial_safety_factor_2 * 1000))
+    const FvRd = roundToTwoDecimals(0.6 * pileStructure.ultimate_tensile_strength_a480 * pileStructure.nominal_stress_area / (pileStructure.partial_safety_factor_2 * 1000))
+    const designedShearAndTension = roundToTwoDecimals((horizontalLoad / FvRd) + (totalTensionLoad / (1.4 * FtRd)))
 
-    const designedShearAndTension = roundToTwoDecimals((horizontalLoad / Fvra) + (totalTensionLoad / (1.4 * Ftra)))
+    const FtvRd = roundToTwoDecimals(Math.PI * pileStructure.pitch_diameter * pileStructure.thread_engagement_length / 2 * 0.65 * pileStructure.ultimate_tensile_strength_lm25m / (pileStructure.partial_safety_factor_2 * 1000))
+    
+    const NoRd = roundToTwoDecimals(pileStructure.pile_gross_area * pileStructure.proof_strength / (pileStructure.partial_safety_factor_1 * 1000))
+    const Anet = Math.round(baseParams.pile_diameter === "60" ? pileStructure.pile_gross_area - (3.14 * (12 ** 2) / 4) : pileStructure.pile_gross_area - (3.14 * (20 ** 2) / 4))
+    const NuRd = roundToTwoDecimals(0.9 * Anet * pileStructure.ultimate_tensile_strength_lm25m / (pileStructure.partial_safety_factor_2 * 1000))
+    const NtRd = Math.min(NoRd, NuRd)
+    const isCalc1Selected = NoRd <= NuRd
 
-    const Ftvra = roundToTwoDecimals(Math.PI * pileStructure.pitch_diameter * pileStructure.thread_engagement_length / 2 * 0.65 * pileStructure.ultimate_tensile_strength_lm25m / (pileStructure.partial_safety_factor_2 * 1000))
-    
-    const ntraCalc1 = roundToTwoDecimals(pileStructure.pile_gross_area * pileStructure.proof_strength / (pileStructure.partial_safety_factor_1 * 1000))
-    const ntraCalc2 = roundToTwoDecimals(0.9 * 242 * pileStructure.ultimate_tensile_strength_lm25m / (pileStructure.partial_safety_factor_2 * 1000))
-    const Ntra = Math.min(ntraCalc1, ntraCalc2)
-    const isCalc1Selected = ntraCalc1 <= ntraCalc2
-    
-    const Nura = roundToTwoDecimals(242 * pileStructure.ultimate_tensile_strength_lm25m / (pileStructure.partial_safety_factor_2 * 1000))
+    const NcRd = roundToTwoDecimals(pileStructure.pile_gross_area * pileStructure.proof_strength / (pileStructure.partial_safety_factor_1 * 1000))
+
+    const NcR =roundToTwoDecimals((Math.PI ** 2 * pileStructure.e * pileStructure.i) / (Math.pow(pileStructure.k * pileStructure.l, 2)) / 1000)
     return (
       <div className="space-y-8">
         <div className="bg-gray-50 p-6 rounded-lg border break-inside-avoid">
@@ -506,22 +514,22 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
 
                 <div className="flex items-center justify-between">
                   <p>Designed Resistance:</p>
-                  <p className="font-mono">{Ftra} kN</p>
+                  <p className="font-mono">{FtRd} kN</p>
                 </div>
 
                 <div className="pt-2 border-t border-gray-200">
-                  <p className="font-mono text-sm text-center mb-1">F<sub>t,Ed</sub> ≤ F<sub>t,Rd</sub></p>
+                  <p className="font-mono text-sm text-center mb-1">F<sub>t,</sub>E<sub>d</sub> ≤ F<sub>t,</sub>R<sub>d</sub></p>
                   <p className="font-mono text-xs text-center">{`${roundToTwoDecimals(totalTensionLoad)} ≤ (${pileStructure.k2} × ${pileStructure.ultimate_tensile_strength_a480} × ${pileStructure.nominal_stress_area} / ${pileStructure.partial_safety_factor_2})`}</p>
                 </div>
 
                 <div className="pt-2 border-t border-gray-200 flex items-center gap-1 text-sm mb-2">
                   <p>Utilisation Rate:</p>
-                  <p className="font-mono">{roundToOneDecimal((totalTensionLoad / Ftra) * 100)}%</p>
+                  <p className="font-mono">{roundToOneDecimal((totalTensionLoad / FtRd) * 100)}%</p>
                 </div>
               </div>
 
-              <div className={`mt-auto text-center py-2 rounded-md font-semibold ${totalTensionLoad <= Ftra ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                {totalTensionLoad <= Ftra ? 'PASS' : 'FAIL'}
+              <div className={`mt-auto text-center py-2 rounded-md font-semibold ${totalTensionLoad <= FtRd ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                {totalTensionLoad <= FtRd ? 'PASS' : 'FAIL'}
               </div>  
             </div>
 
@@ -537,22 +545,22 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
 
                 <div className="flex items-center justify-between">
                   <p>Designed Resistance:</p>
-                  <p className="font-mono">{Fvra} kN</p>
+                  <p className="font-mono">{FvRd} kN</p>
                 </div>
 
                 <div className="pt-2 border-t border-gray-200">
-                  <p className="font-mono text-sm text-center mb-1">F<sub>v,Ed</sub>γ ≤ F<sub>v,Rd</sub></p>
+                  <p className="font-mono text-sm text-center mb-1">F<sub>v,</sub>E<sub>d</sub>γ ≤ F<sub>v,</sub>R<sub>d</sub></p>
                   <p className="font-mono text-xs text-center">{`${pileStructure.horizontal_load} × ${pileStructure.horizontal_load_safety_factor} ≤ (0.6 × ${pileStructure.ultimate_tensile_strength_a480} × ${pileStructure.nominal_stress_area} / ${pileStructure.partial_safety_factor_2})`}</p>
                 </div>
 
                 <div className="pt-2 border-t border-gray-200 flex items-center gap-1 text-sm mb-2">
                   <p>Utilisation Rate:</p>
-                  <p className="font-mono">{roundToOneDecimal((horizontalLoad / Fvra) * 100)}%</p>
+                  <p className="font-mono">{roundToOneDecimal((horizontalLoad / FvRd) * 100)}%</p>
                 </div>
               </div>
 
-              <div className={`mt-auto text-center py-2 rounded-md font-semibold ${horizontalLoad < Fvra ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                {horizontalLoad <= Fvra ? 'PASS' : 'FAIL'}
+              <div className={`mt-auto text-center py-2 rounded-md font-semibold ${horizontalLoad < FvRd ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                {horizontalLoad <= FvRd ? 'PASS' : 'FAIL'}
               </div>
             </div>
           </div>
@@ -569,12 +577,12 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
 
               <div className="flex items-center justify-between">
                 <p>Designed Resistance:</p>
-                <p className="font-mono">{designedShearAndTension}</p>
+                <p className="font-mono">N/A</p>
               </div>
 
               <div className="pt-2 border-t border-gray-200">
-                <p className="font-mono text-sm text-center mb-1">F<sub>v,Ed</sub>γ / F<sub>v,Rd</sub> + F<sub>t,Ed</sub> / 1.4F<sub>t,Rd</sub></p>
-                <p className="font-mono text-xs text-center">{`(${pileStructure.horizontal_load} × ${pileStructure.horizontal_load_safety_factor} / ${Fvra}) + (${roundToTwoDecimals(totalTensionLoad)} / 1.4 × ${Ftra})`}</p>
+                <p className="font-mono text-sm text-center mb-1">F<sub>v,</sub>E<sub>d</sub>γ ≤ F<sub>v,</sub>R<sub>d</sub> + F<sub>t,</sub>E<sub>d</sub> / 1.4F<sub>t,</sub>R<sub>d</sub></p>
+                <p className="font-mono text-xs text-center">{`(${pileStructure.horizontal_load} × ${pileStructure.horizontal_load_safety_factor} / ${FvRd}) + [${roundToTwoDecimals(totalTensionLoad)} / (1.4 × ${FtRd})]`}</p>
               </div>
 
               <div className="pt-2 border-t border-gray-200 flex items-center gap-1 text-sm mb-2">
@@ -603,24 +611,24 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
 
               <div className="flex items-center justify-between">
                 <p>Designed Resistance:</p>
-                <p className="font-mono">{Ftvra} kN</p>
+                <p className="font-mono">{FtvRd} kN</p>
               </div>
 
               <div className="pt-2 border-t border-gray-200">
-                <p className="font-mono text-sm text-center mb-1">F<sub>tv,Ed</sub> ≤ F<sub>tv,Rd</sub></p>
+                <p className="font-mono text-sm text-center mb-1">F<sub>tv,</sub>E<sub>d</sub> ≤ F<sub>tv,</sub>R<sub>d</sub></p>
                 <p className="font-mono text-xs text-center">
-                  {`${roundToTwoDecimals(totalTensionLoad)} ≤ (π × ${pileStructure.pitch_diameter} × ${pileStructure.thread_engagement_length} / 2) × (0.65 × ${pileStructure.ultimate_tensile_strength_lm25m} / ${pileStructure.partial_safety_factor_2})`}
+                  {`${roundToTwoDecimals(totalTensionLoad)} ≤ (3.14 × ${pileStructure.pitch_diameter} × ${pileStructure.thread_engagement_length} / 2) × (0.65 × ${pileStructure.ultimate_tensile_strength_lm25m} / ${pileStructure.partial_safety_factor_2})`}
                 </p>
               </div>
 
               <div className="pt-2 border-t border-gray-200 flex items-center gap-1 text-sm mb-2">
                 <p>Utilisation Rate:</p>
-                <p className="font-mono">{roundToOneDecimal((totalTensionLoad / Ftvra) * 100)}%</p>
+                <p className="font-mono">{roundToOneDecimal((totalTensionLoad / FtvRd) * 100)}%</p>
               </div>
             </div>
 
-            <div className={`text-center py-2 rounded-md font-semibold ${totalTensionLoad <= Ftvra ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-              {totalTensionLoad <= Ftvra ? 'PASS' : 'FAIL'}
+            <div className={`text-center py-2 rounded-md font-semibold ${totalTensionLoad <= FtvRd ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+              {totalTensionLoad <= FtvRd ? 'PASS' : 'FAIL'}
             </div>
           </div>
         </div>
@@ -641,22 +649,22 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
 
                 <div className="flex items-center justify-between">
                   <p>Designed Resistance:</p>
-                  <p className="font-mono">{Ntra} kN</p>
+                  <p className="font-mono">{NtRd} kN</p>
                 </div>
 
                 <div className="pt-2 border-t border-gray-200">
-                  <p className="font-mono text-sm text-center mb-1">N<sub>t,Ed</sub> ≤ N<sub>t,Rd</sub></p>
-                  <p className="font-mono text-xs text-center">{`${roundToTwoDecimals(totalTensionLoad)} ≤ ${isCalc1Selected ? `(${pileStructure.pile_gross_area} × ${pileStructure.proof_strength} / ${pileStructure.partial_safety_factor_1})` : `(0.9 × 242 × ${pileStructure.ultimate_tensile_strength_lm25m} / ${pileStructure.partial_safety_factor_2})`}`}</p>
+                  <p className="font-mono text-sm text-center mb-1">N<sub>t,</sub>E<sub>d</sub> ≤ N<sub>t,</sub>R<sub>d</sub></p>
+                  <p className="font-mono text-xs text-center">{`${(totalTensionLoad)} ≤ ${isCalc1Selected ? `(${pileStructure.pile_gross_area} × ${pileStructure.proof_strength} / ${pileStructure.partial_safety_factor_1})` : `(0.9 × ${Anet} × ${pileStructure.ultimate_tensile_strength_lm25m} / ${pileStructure.partial_safety_factor_2})`}`}</p>
                 </div>
 
                 <div className="pt-2 border-t border-gray-200 flex items-center gap-1 text-sm mb-2">
                   <p>Utilisation Rate:</p>
-                  <p className="font-mono">{roundToOneDecimal((totalTensionLoad / Ntra) * 100)}%</p>
+                  <p className="font-mono">{roundToOneDecimal((totalTensionLoad / NtRd) * 100)}%</p>
                 </div>
               </div>
 
-              <div className={`mt-auto text-center py-2 rounded-md font-semibold ${totalTensionLoad <= Ntra ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                {totalTensionLoad <= Ntra ? 'PASS' : 'FAIL'}
+              <div className={`mt-auto text-center py-2 rounded-md font-semibold ${totalTensionLoad <= NtRd ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                {totalTensionLoad <= NtRd ? 'PASS' : 'FAIL'}
               </div>
             </div>
 
@@ -672,22 +680,53 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
 
                 <div className="flex items-center justify-between">
                   <p>Designed Resistance:</p>
-                  <p className="font-mono">{Nura} kN</p>
+                  <p className="font-mono">{NcRd} kN</p>
                 </div>
 
                 <div className="pt-2 border-t border-gray-200">
-                  <p className="font-mono text-sm text-center mb-1">N<sub>c,Ed</sub> ≤ N<sub>c,Rd</sub></p>
-                  <p className="font-mono text-xs text-center">{`${roundToTwoDecimals(totalCompressionLoad)} ≤ (242 × ${pileStructure.ultimate_tensile_strength_lm25m} / ${pileStructure.partial_safety_factor_2})`}</p>
+                  <p className="font-mono text-sm text-center mb-1">N<sub>c,</sub>E<sub>d</sub> ≤ N<sub>c,</sub>R<sub>d</sub></p>
+                  <p className="font-mono text-xs text-center">{`${roundToTwoDecimals(totalCompressionLoad)} ≤ (${pileStructure.pile_gross_area} × ${pileStructure.proof_strength} / ${pileStructure.partial_safety_factor_1})`}</p>
                 </div>
 
                 <div className="pt-2 border-t border-gray-200 flex items-center gap-1 text-sm mb-2">
                   <p>Utilisation Rate:</p>
-                  <p className="font-mono">{roundToOneDecimal((totalCompressionLoad / Nura) * 100)}%</p>
+                  <p className="font-mono">{roundToOneDecimal((totalCompressionLoad / NcRd) * 100)}%</p>
                 </div>
               </div>
 
-              <div className={`mt-auto text-center py-2 rounded-md font-semibold ${totalCompressionLoad <= Nura ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                {totalCompressionLoad <= Nura ? 'PASS' : 'FAIL'}
+              <div className={`mt-auto text-center py-2 rounded-md font-semibold ${totalCompressionLoad <= NcRd ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                {totalCompressionLoad <= NcRd ? 'PASS' : 'FAIL'}
+              </div>
+            </div>
+          </div>
+
+          {/*Critical Buckling Force of the pile */}
+          <div className="bg-white p-4 rounded-md border mt-6 shadow-lg">
+            <h4 className="font-semibold mb-2">Critical buckling force of the pile</h4>
+            
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center justify-between">
+                <p>Designed Load:</p>
+                <p className="font-mono">{roundToTwoDecimals(totalCompressionLoad)} kN</p>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <p>Designed Resistance:</p>
+                <p className="font-mono">{roundToTwoDecimals(NcR)} kN</p>
+              </div>
+
+              <div className="pt-2 border-t border-gray-200">
+                <p className="font-mono text-sm text-center mb-1">N<sub>c,</sub>E<sub>d</sub> ≤ N<sub>c,</sub>R</p>
+                <p className="font-mono text-xs text-center">{`${roundToTwoDecimals(totalCompressionLoad)} ≤ (3.14^2 × ${pileStructure.e} × ${pileStructure.i} / (${pileStructure.k} × ${pileStructure.l})^2)`}</p>
+              </div>
+
+              <div className="pt-2 border-t border-gray-200 flex items-center gap-1 text-sm mb-2">
+                <p>Utilisation Rate:</p>
+                <p className="font-mono">{roundToOneDecimal((totalCompressionLoad / NcR) * 100)}%</p>
+              </div>
+
+              <div className={`mt-auto text-center py-2 rounded-md font-semibold ${totalCompressionLoad <= NcR ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                {totalCompressionLoad <= NcR ? 'PASS' : 'FAIL'}
               </div>
             </div>
           </div>
@@ -697,7 +736,7 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
   }
 
   return (
-    <div className={`${arimo.className} ${spaceMono.variable} `}>
+    <div className={`${arimo.className} ${jetbrainsMono.variable} `}>
       {/* --- PAGE 1: Title Page --- */}
       <div className="flex flex-col justify-between h-screen">
         <div className="flex justify-center mr-5 mt-7">
@@ -794,7 +833,7 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
 
                   {soil.start_depth < profileData.water_depth && profileData.water_depth <= soil.end_depth && (
                     <div className={`absolute left-0 right-0 z-10 border-b-2 border-dashed ${isDefaultColour ? 'border-blue-400 dark:border-blue-800' :  isDark ? 'border-blue-400' : 'border-blue-800'}`} style={{ top: `${Math.max(33, Math.min(100, ((profileData.water_depth - soil.start_depth) / (soil.end_depth - soil.start_depth)) * 100))}%`}}>
-                      <div className={`absolute bottom-0.5 left-2 flex flex-row text-xs gap-2 ${isDefaultColour ? 'text-foreground' : textColor}`}>
+                      <div className={`absolute bottom-0.5 right-2 flex flex-row text-xs gap-2 ${isDefaultColour ? 'text-foreground' : textColor}`}>
                         <Triangle className={`text-muted-foreground rotate-180 size-4 ${isDefaultColour ? 'fill-blue-400 dark:fill-blue-800' : isDark ? 'fill-blue-400' : 'fill-blue-800'}`}/><span className="-ml-1 -mr-1">Water Table:</span>{profileData.water_depth} m
                       </div>
                     </div>
@@ -803,7 +842,7 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
               )
             })}
 
-            <div className={`absolute z-20 top-[-25px] left-[220px] transform -translate-x-1/2 ${baseParams.pile_diameter === "60" ? 'w-[30px] bg-size-[30px] bg-[url(/60mm-pile.png)]' : 'w-10 bg-size-[40px] bg-[url(/100mm-pile.png)]'}`} style={{height: `${pileHeight + 25}px`}}/>
+            <div className={`absolute z-20 -top-6.25 left-55 transform -translate-x-1/2 ${baseParams.pile_diameter === "60" ? 'w-7.5 bg-size-[30px] bg-[url(/60mm-pile.png)]' : 'w-10 bg-size-[40px] bg-[url(/100mm-pile.png)]'}`} style={{height: `${pileHeight + 25}px`}}/>
           </div>
         </div>
       </div>
@@ -838,8 +877,8 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
                 <p ><span className="font-semibold">Ultimate Bearing Capacity <span className="italic">∑R<sub>s</sub> + R<sub>b</sub></span> = </span> {ultimateBearingCapacity.toFixed(2)} kN</p>
               </div>
 
-              <div className="size-[45px] bg-[url('/up-down-arrow.png')] bg-contain bg-center bg-no-repeat absolute top-1 transform -translate-x-1/2 left-[305px]"/>
-              <div className="absolute top-4 left-80 text-sm font-semibold"> {ExternalLoad.toFixed(2)} kN </div>
+              <div className="size-11.25 bg-[url('/up-down-arrow.png')] bg-contain bg-center bg-no-repeat absolute top-1 transform -translate-x-1/2 left-76.25"/>
+              <div className="absolute top-4 left-80 text-sm font-semibold"> {(totalTensionLoad + totalCompressionLoad).toFixed(2)} kN </div>
 
             </div>
           </div>
@@ -885,9 +924,9 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
               )
             })}
 
-            <div className={`absolute z-20 top-[-25px] left-[305px] transform -translate-x-1/2 ${baseParams.pile_diameter === "60" ? 'w-[30px] bg-size-[30px] bg-[url(/60mm-pile.png)]' : 'w-10 bg-size-[40px] bg-[url(/100mm-pile.png)]'}`} style={{height: `${secondPileHeight + 25}px`}}/>
+            <div className={`absolute z-20 -top-6.25 left-76.25 transform -translate-x-1/2 ${baseParams.pile_diameter === "60" ? 'w-7.5 bg-size-[30px] bg-[url(/60mm-pile.png)]' : 'w-10 bg-size-[40px] bg-[url(/100mm-pile.png)]'}`} style={{height: `${secondPileHeight + 25}px`}}/>
             
-            <div className="absolute z-20 bottom-0 left-[275px] w-[60px] h-10" style={{ top: `${secondPileHeight}px` }}>
+            <div className="absolute z-20 bottom-0 left-68.75 w-15 h-10" style={{ top: `${secondPileHeight}px` }}>
               <svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
                 {/* Base line */}
                 <line x1="0" y1="70" x2="100" y2="70" stroke="black" strokeWidth="3"/>
@@ -914,13 +953,13 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
               </svg>
             </div>
             
-            <div className="absolute z-20 flex flex-col gap-4 top-0 left-[275px] transform -translate-x-1/2" style={{height: `${secondPileHeight}px`}}>
+            <div className="absolute z-20 flex flex-col gap-4 top-0 left-68.75 transform -translate-x-1/2" style={{height: `${secondPileHeight}px`}}>
               {Array.from({ length: Math.ceil(secondPileHeight / 40) }).map((_, i) => (
                 <MoveUp key={`left-${i}`} className="size-6"/>
               ))}
             </div>
 
-            <div className={`absolute z-20 flex flex-col gap-4 top-0 left-[335px] transform -translate-x-1/2`} style={{height: `${secondPileHeight}px`}}>
+            <div className={`absolute z-20 flex flex-col gap-4 top-0 left-83.75 transform -translate-x-1/2`} style={{height: `${secondPileHeight}px`}}>
               {Array.from({ length: Math.ceil(secondPileHeight / 40) }).map((_, i) => (
                 <MoveUp key={`right-${i}`} className="size-6"/>
               ))}
@@ -996,7 +1035,6 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
       </div>
     </div>
   )
-  
 }
 
 
