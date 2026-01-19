@@ -500,7 +500,7 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
             
             {/* Check 1: M20 A4-80 bolt tension resistance */}
             <div className="bg-white p-4 rounded-md border flex flex-col shadow-lg">
-              <h4 className="font-semibold mb-2">M20 A4-80 bolt tension resistance</h4>
+              <h4 className="font-semibold mb-2">{baseParams.pile_diameter === "60" ? "M12" : "M20"} A4-80 bolt tension resistance</h4>
               
               <div className="space-y-2 text-sm">
                 <div className="flex items-center justify-between">
@@ -713,7 +713,7 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
 
               <div className="pt-2 border-t border-gray-200">
                 <p className="font-mono text-sm text-center mb-1">N<sub>c,</sub>E<sub>d</sub> ≤ N<sub>c,</sub>R</p>
-                <p className="font-mono text-xs text-center">{`${roundToTwoDecimals(totalCompressionLoad)} ≤ (3.14^2 × ${pileStructure.e} × ${pileStructure.i} / (${pileStructure.k} × ${pileStructure.l})^2)`}</p>
+                <p className="font-mono text-xs text-center">{roundToTwoDecimals(totalCompressionLoad)} ≤ (3.14<sup>2</sup> × {pileStructure.e} × {pileStructure.i} / ({pileStructure.k} × {pileStructure.l})<sup>2</sup>)</p>
               </div>
 
               <div className="pt-2 border-t border-gray-200 flex items-center gap-1 text-sm mb-2">

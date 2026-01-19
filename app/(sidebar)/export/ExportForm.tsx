@@ -291,7 +291,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                     <FormControl>
                       <Checkbox checked={field.value} onCheckedChange={field.onChange} name={field.name} id="show_spt"/>
                     </FormControl>
-                    <FormLabel htmlFor="show_spt">Show SPT N-Value</FormLabel>
+                    <FormLabel htmlFor="show_spt">Show SPT/CPT Route</FormLabel>
                     <FormMessage />
                   </FormItem>
                 )}
