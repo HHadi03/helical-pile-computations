@@ -6,14 +6,10 @@ import { getLuminance, roundToOneDecimal, roundToTwoDecimals } from "@/lib/utils
 import { Triangle, MoveUp } from "lucide-react"
 import { OutputSoilGraph } from "./OutputSoilGraph"
 import { Arimo } from "next/font/google"
-import { JetBrains_Mono } from "next/font/google"
+import { Space_Mono } from "next/font/google"
 
 const arimo = Arimo({subsets: ["latin"], weight: ['400', '700']})
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"], 
-  weight: ['400', '700'], 
-  variable: '--font-jetbrains-mono'
-})
+const spaceMono = Space_Mono({subsets: ["latin"], weight: ['400', '700'], variable: '--font-space-mono'})
 
 export function OutputComponent({ baseParams, dynamicParams, soilsData, profileData, pileStructure, imageUrl }: { baseParams: BaseParamsType, dynamicParams: DynamicParamsType, pileStructure: PileStructureType, soilsData: TexportSoilSchema[], profileData: TexportSoilProfileSchema, imageUrl: string | null }) {
   
@@ -736,7 +732,7 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
   }
 
   return (
-    <div className={`${arimo.className} ${jetbrainsMono.variable} `}>
+    <div className={`${arimo.className} ${spaceMono.variable} `}>
       {/* --- PAGE 1: Title Page --- */}
       <div className="flex flex-col justify-between h-screen">
         <div className="flex justify-center mr-5 mt-7">
@@ -913,8 +909,8 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
                     <p className="font-semibold uppercase">{soil.soil_name || soil.soil}</p>
                     {!isLayerBeyondPile && (
                       <>
-                        <p>R<sub>s,{index + 1}</sub> = q<sub>s,{index + 1}</sub> ⋅ h<sub>{index + 1}</sub>  ⋅ πD = <span className="font-mono">{baseParams.pile_diameter === "60" ? soil.shaft_capacity60 : soil.shaft_capacity100} kN</span></p>
-                        {soil.id === lastLayer.id && (<p>R<sub>b,{rbIndex + 1}</sub> = q<sub>b,{rbIndex + 1}</sub> ⋅ A<sub>base</sub> = <span className="font-mono">{baseParams.pile_diameter === "60" ? soil.bearing_capacity60 : soil.bearing_capacity100} kN</span></p>)}
+                        <p>R<sub>s,{index + 1}</sub> = q<sub>s,{index + 1}</sub> × h<sub>{index + 1}</sub>  × πD = <span className="font-mono">{baseParams.pile_diameter === "60" ? soil.shaft_capacity60 : soil.shaft_capacity100} kN</span></p>
+                        {soil.id === lastLayer.id && (<p>R<sub>b,{rbIndex + 1}</sub> = q<sub>b,{rbIndex + 1}</sub> × A<sub>base</sub> = <span className="font-mono">{baseParams.pile_diameter === "60" ? soil.bearing_capacity60 : soil.bearing_capacity100} kN</span></p>)}
                       </>
                     )}
                   </div>

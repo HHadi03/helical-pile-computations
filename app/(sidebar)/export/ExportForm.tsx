@@ -171,7 +171,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
         window.URL.revokeObjectURL(url)
         document.body.removeChild(a)
         
-        // handleClose()
+        handleClose()
       }
     }
 
@@ -1271,7 +1271,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                   </FormItem>
                 )}
               />
-              
+
               <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
                 <FormField
                   control={form.control}
