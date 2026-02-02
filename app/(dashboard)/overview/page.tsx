@@ -38,7 +38,7 @@ async function getSoils(): Promise<ToverviewSoilSchema[]> {
     const supabase = await createClient()
     const { data, error } = await supabase
     .from('soils')
-    .select("id, soil_profile_id, soil, soil_name, soil_type, description, colour, start_depth, end_depth, n_value, test_type, y_moist, y_sat, su, t, shaft_capacity60, shaft_capacity100, bearing_capacity60, bearing_capacity100")
+    .select("id, soil_profile_id, soil, soil_name, soil_type, description, colour, start_depth, end_depth, n_value, test_type, y_moist, y_sat, su, t, shaft_capacity60, shaft_capacity100, bearing_capacity60, bearing_capacity100, a, qc, kc, qca")
     .order('start_depth', { ascending: true })
 
     if (error) {

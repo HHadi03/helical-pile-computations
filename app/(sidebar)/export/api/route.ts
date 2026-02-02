@@ -34,7 +34,7 @@ async function getSoils(profileId: string): Promise<TexportSoilSchema[]> {
     const supabase = await createClient()
     const { data, error } = await supabase
     .from('soils')
-    .select("id, soil, soil_name, soil_type, soil_profile_id, description, test_type, colour, start_depth, end_depth, n_value, y_moist, y_sat, su, t, qult, shaft_capacity60, shaft_capacity100, bearing_capacity60, bearing_capacity100")
+    .select("id, soil, soil_name, soil_type, soil_profile_id, description, test_type, colour, start_depth, end_depth, n_value, y_moist, y_sat, su, t, qult, shaft_capacity60, shaft_capacity100, bearing_capacity60, bearing_capacity100, qc, qca, kc, a")
     .order('start_depth', { ascending: true })
     .eq("soil_profile_id", profileId)
 

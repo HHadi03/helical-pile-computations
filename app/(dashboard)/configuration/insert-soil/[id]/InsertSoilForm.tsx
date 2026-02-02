@@ -123,7 +123,7 @@ export function InsertSoilForm({ previousEndDepth, profileId }: { previousEndDep
                         <SelectContent>
                           <SelectItem value="coarse">Coarse Grain</SelectItem>
                           <SelectItem value="fine">Fine Grain</SelectItem>
-                          <SelectItem value="manmade">Man Made</SelectItem>
+                          <SelectItem value="manmade">Fill Material</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage/>

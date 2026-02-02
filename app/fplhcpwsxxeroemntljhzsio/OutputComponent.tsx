@@ -819,7 +819,7 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
                   <div className={`space-y-2 text-sm leading-tight @container ${isDefaultColour ? 'text-foreground' : textColor}`}>
                     <p className="font-semibold uppercase">{soil.soil_name || soil.soil}</p>
                     {baseParams.show_description && <p className="overflow-hidden whitespace-nowrap">Description: {soil.description || "N/A"}</p>}
-                    {baseParams.show_spt && <p>SPT N-Value: {soil.test_type === "spt" ? soil.n_value : '—'}</p>}
+                    {baseParams.show_spt && <p>{soil.test_type === "spt" ? (<>SPT N-Value: {soil.n_value}</>) : ( <>CPT Values: q<sub>c</sub> = {soil.qc} kPa, α = {soil.a} {soil.id === lastLayer.id && (<>{" || "}q<sub>ca</sub> = {soil.qca} kPa, k<sub>c</sub> = {soil.kc}</>)}</> )}</p>}
                     {baseParams.show_moist && <p>Moist Weight: {soil.y_moist} kN/m³</p>}
                     {baseParams.show_sat && <p>Saturated Weight: {soil.y_sat} kN/m³</p>}
                     {baseParams.show_shear_strength && <p>{soil.soil_type === 'fine' ? 'Undrained Shear Strength:' : 'Shear Strength:'} {soil.soil_type === 'fine' ? soil.su : soil.t} kPa</p>}
@@ -909,8 +909,8 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
                     <p className="font-semibold uppercase">{soil.soil_name || soil.soil}</p>
                     {!isLayerBeyondPile && (
                       <>
-                        <p>R<sub>s,{index + 1}</sub> = q<sub>s,{index + 1}</sub> × h<sub>{index + 1}</sub>  × πD = <span className="font-mono">{baseParams.pile_diameter === "60" ? soil.shaft_capacity60 : soil.shaft_capacity100} kN</span></p>
-                        {soil.id === lastLayer.id && (<p>R<sub>b,{rbIndex + 1}</sub> = q<sub>b,{rbIndex + 1}</sub> × A<sub>base</sub> = <span className="font-mono">{baseParams.pile_diameter === "60" ? soil.bearing_capacity60 : soil.bearing_capacity100} kN</span></p>)}
+                        <p>R<sub>s,{index + 1}</sub> = q<sub>s,{index + 1}</sub> • h<sub>{index + 1}</sub> • πD = <span className="font-mono">{baseParams.pile_diameter === "60" ? soil.shaft_capacity60 : soil.shaft_capacity100} kN</span></p>
+                        {soil.id === lastLayer.id && (<p>R<sub>b,{rbIndex + 1}</sub> = q<sub>b,{rbIndex + 1}</sub> • A<sub>base</sub> = <span className="font-mono">{baseParams.pile_diameter === "60" ? soil.bearing_capacity60 : soil.bearing_capacity100} kN</span></p>)}
                       </>
                     )}
                   </div>

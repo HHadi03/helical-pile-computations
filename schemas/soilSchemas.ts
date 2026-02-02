@@ -16,6 +16,10 @@ export const configSoilSchema = z.object({
   n_value: z.number(),
   y_moist: z.number(),
   y_sat: z.number(),
+  kc: z.number(),
+  qc: z.number(),
+  qca: z.number(),
+  a: z.number(),
 })
 export type TconfigSoilSchema = z.infer<typeof configSoilSchema>
 
@@ -41,6 +45,10 @@ export const overviewSoilSchema = z.object({
   shaft_capacity100: z.number(),
   bearing_capacity60: z.number(),
   bearing_capacity100: z.number(),
+  kc: z.number(),
+  qc: z.number(),
+  qca: z.number(),
+  a: z.number(),
 })
 export type ToverviewSoilSchema = z.infer<typeof overviewSoilSchema>
 
@@ -77,6 +85,10 @@ export const exportSoilSchema = z.object({
   shaft_capacity100: z.number(),
   bearing_capacity60: z.number(),
   bearing_capacity100: z.number(),
+  kc: z.number(),
+  qc: z.number(),
+  qca: z.number(),
+  a: z.number(),
 })
 export type TexportSoilSchema = z.infer<typeof exportSoilSchema>
 
@@ -126,14 +138,6 @@ export const insertSoilSchema = z.object({
 )
 
 .refine(
-  (data) => data.test_type !== "cpt" || data.qca > 0,
-  {
-    path: ['qca'],
-    error: "Cone Tip Resistance is required",
-  }
-)
-
-.refine(
   (data) => data.test_type !== "cpt" || data.a > 0,
   {
     path: ['a'],
@@ -141,13 +145,21 @@ export const insertSoilSchema = z.object({
   }
 )
 
-.refine(
-  (data) => data.test_type !== "cpt" || data.kc > 0,
-  {
-    path: ['kc'],
-    error: "Bearing Required",
-  }
-)
+// .refine(
+//   (data) => data.test_type !== "cpt" || data.qca > 0,
+//   {
+//     path: ['qca'],
+//     error: "Cone Tip Resistance is required",
+//   }
+// )
+
+// .refine(
+//   (data) => data.test_type !== "cpt" || data.kc > 0,
+//   {
+//     path: ['kc'],
+//     error: "Bearing Required",
+//   }
+// )
 export type TinsertSoilSchema = z.infer<typeof insertSoilSchema>
 
 
@@ -206,14 +218,6 @@ export const editSoilParametersSchema = z.object({
 )
 
 .refine(
-  (data) => data.test_type !== "cpt" || data.qca > 0,
-  {
-    path: ['qca'],
-    error: "Cone Tip Resistance is required",
-  }
-)
-
-.refine(
   (data) => data.test_type !== "cpt" || data.a > 0,
   {
     path: ['a'],
@@ -221,13 +225,21 @@ export const editSoilParametersSchema = z.object({
   }
 )
 
-.refine(
-  (data) => data.test_type !== "cpt" || data.kc > 0,
-  {
-    path: ['kc'],
-    error: "Bearing Required",
-  }
-)
+// .refine(
+//   (data) => data.test_type !== "cpt" || data.qca > 0,
+//   {
+//     path: ['qca'],
+//     error: "Cone Tip Resistance is required",
+//   }
+// )
+
+// .refine(
+//   (data) => data.test_type !== "cpt" || data.kc > 0,
+//   {
+//     path: ['kc'],
+//     error: "Bearing Required",
+//   }
+// )
 export type TeditSoilParametersSchema = z.infer<typeof editSoilParametersSchema>
 
 

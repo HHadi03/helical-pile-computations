@@ -4,17 +4,21 @@ export const soilOptions = {
       "Well graded sand and gravel",
       "Coarse or medium sand",
       "Well graded sand",
-      "Fine or silty sand"
+      "Fine or silty sand",
+      "Chalk"
     ],
     fine: [
+      "Peat",
       "Very soft clay",
       "Soft clay",
       "Firm clay",
+      "Silt",
       "Stiff clay",
+      "Chalk",
       "Very stiff clay",
       "Hard clay",
-      "Peat",
       "Organic clay",
+      "Loam",
       "Stiff or hard glacial clay"
     ],
     manmade: [
@@ -105,6 +109,39 @@ export const soilOptions = {
       dense: {
         yMoist: 18.0,
         ySat: 18.0
+      }
+    },
+
+    "Loam": {
+      loose: {
+        yMoist: 12.5,
+        ySat: 16.0
+      },
+      dense: {
+        yMoist: 17.0,
+        ySat: 19.0
+      }
+    },
+
+    "Silt": {
+      loose: {
+        yMoist: 13.5,
+        ySat: 18.0
+      },
+      dense: {
+        yMoist: 18.0,
+        ySat: 21.0
+      }
+    },
+
+    "Chalk": {
+      loose: {
+        yMoist: 15.5,
+        ySat: 18.5
+      },
+      dense: {
+        yMoist: 19.5,
+        ySat: 22.5
       }
     },
 

@@ -18,7 +18,7 @@ import { deleteAll } from './actions/deleteAll'
 const soilTypeCapitalisation = {
   'fine': 'Fine Grain',
   'coarse': 'Coarse Grain',
-  'manmade': 'Man Made'
+  'manmade': 'Fill Material'
 }
 
 const soilDensityCapitalisation = {
@@ -140,6 +140,7 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
       <Accordion type="multiple" className="space-y-6">
         {profilesData.map((profile, index) => {
           const profileSoils = soilsByProfile[profile.id] || []
+          const testType = profileSoils[0].test_type
           return (
             <AccordionItem key={profile.id} value={profile.id}>
             
@@ -200,7 +201,17 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
                           <TableHead>End Depth</TableHead>
                           <TableHead>Sat Weight</TableHead>
                           <TableHead>Moist Weight</TableHead>
-                          <TableHead>SPT N-Value</TableHead>
+                          {testType === "spt" ? 
+                            (<TableHead>SPT N-Value</TableHead>
+                          ) : ( 
+                            <>
+                              <TableHead>q<sub>c</sub></TableHead>
+                              <TableHead>α</TableHead>
+                              <TableHead>q<sub>ca</sub></TableHead>
+                              <TableHead>k<sub>c</sub></TableHead>
+                            </>
+                          )}
+
                           <TableHead className='hidden 2xl:table-cell'>Description</TableHead>
                           <TableHead></TableHead>
                         </TableRow>
@@ -211,16 +222,26 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
                             <TableCell>{index + 1}</TableCell>
                             <TableCell>{soilTypeCapitalisation[soil.soil_type]}</TableCell>
                             <TableCell>{soilDensityCapitalisation[soil.density]}</TableCell>
-                            <TableCell className='truncate max-w-[120px]'>{soil.soil_name || soil.soil}</TableCell>
-                            <TableCell>{`${soil.start_depth} m`}</TableCell>
-                            <TableCell>{`${soil.end_depth} m`}</TableCell>
-                            <TableCell>{`${soil.y_sat} kN/m³`}</TableCell>
-                            <TableCell>{`${soil.y_moist} kN/m³`}</TableCell>
-                            <TableCell>{soil.test_type === "spt" ? soil.n_value : '—'}</TableCell>
+                            <TableCell className='truncate max-w-30'>{soil.soil_name || soil.soil}</TableCell>
+                            <TableCell>{soil.start_depth} m</TableCell>
+                            <TableCell>{soil.end_depth} m</TableCell>
+                            <TableCell>{soil.y_sat} kN/m³</TableCell>
+                            <TableCell>{soil.y_moist} kN/m³</TableCell>
+                            {testType === "spt" ? (
+                              <TableCell>{soil.n_value}</TableCell>
+                            ) : (
+                              <>
+                                <TableCell>{soil.qc} kPa</TableCell>
+                                <TableCell>{soil.a}</TableCell>
+                                <TableCell>{soil.qca} kPa</TableCell>
+                                <TableCell>{soil.kc}</TableCell>
+                              </>
+                            )}
+                        
                             <TableCell className='hidden 2xl:table-cell'>{soil.description ? soil.description : 'N/A'}</TableCell>
                             <TableCell className="text-right">
+                              
                               <DropdownMenu>
-                                
                                 <DropdownMenuTrigger asChild>
                                   <Button title='Soil Menu' variant="outline" size="sm" className='hover:bg-foreground/7 dark:hover:bg-foreground/15'><Ellipsis className='size-5 text-muted-foreground'/></Button>
                                 </DropdownMenuTrigger>
@@ -239,8 +260,8 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
                                   <DropdownMenuSeparator/>
                                   <DropdownMenuItem variant='destructive' onClick={() => {setSelectedSoil({ id: soil.id, name: soil.soil_name || soil.soil, profileId: profile.id }); setisSoilDeleteDialogOpen(true)}} className='hover:cursor-pointer'><Trash2/>Delete</DropdownMenuItem>
                                 </DropdownMenuContent>
-
                               </DropdownMenu>
+
                             </TableCell>
                           </TableRow>
                         ))}                      

@@ -32,7 +32,7 @@ async function getSoils(): Promise<TconfigSoilSchema[]> {
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('soils')
-      .select("id, soil_profile_id, soil_type, density, soil, soil_name, description, start_depth, end_depth, n_value, test_type, y_moist, y_sat")
+      .select("id, soil_profile_id, soil_type, density, soil, soil_name, description, start_depth, end_depth, n_value, test_type, y_moist, y_sat, kc, qc, qca, a")
       .order('start_depth', { ascending: true })
 
     if (error) {

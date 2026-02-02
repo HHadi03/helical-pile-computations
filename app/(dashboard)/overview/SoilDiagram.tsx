@@ -76,22 +76,22 @@ export function SoilDiagram ({ profileSoils, profile, profileIndex, pileDiameter
           return (
             <div key={soil.id} className={`relative p-2 flex flex-col sm:grid sm:grid-cols-[190px_50px_1fr] whitespace-nowrap ${isDefaultColour && index < profileSoils.length - 1 ? 'after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-[oklch(0.87_0.01_258)] dark:after:bg-[oklch(1_0_0/25%)]' : ''}`} style={{ backgroundColor: isDefaultColour ? "" : soil.colour, minHeight: `${layerHeight}px` }}>
 
-              <div className={`flex flex-col space-y-2 text-sm leading-snug ${isDefaultColour ? 'text-foreground' : textColor}`}>
+              <div className={`flex flex-col justify-center space-y-2 text-sm leading-snug ${isDefaultColour ? 'text-foreground' : textColor}`}>
                 {profile.effective_pile_length > soil.start_depth && (
                   <>
                     <p><span className="font-semibold">Shaft Capacity:</span> {pileDiameter === "60" ? soil.shaft_capacity60 : soil.shaft_capacity100} kN</p>
                     {!hideBearingCapacity && (soil.id === lastLayer.id && (<p><span className="font-semibold">Bearing Capacity:</span> {bearingCapacity} kN</p>))}
                   </>
                 )}
-                <div className="mt-auto text-xs"><span className="font-semibold">Depth:</span> {soil.start_depth} – {soil.end_depth} m</div>
+                <div className="text-xs"><span className="font-semibold">Depth:</span> {soil.start_depth} – {soil.end_depth} m</div>
               </div>
 
               <div></div>
                 
-              <div className={`space-y-2 text-sm leading-tight @container ${isDefaultColour ? 'text-foreground' : textColor}`}>
+              <div className={`space-y-2 text-sm leading-tight flex flex-col justify-center @container ${isDefaultColour ? 'text-foreground' : textColor}`}>
                 <p className="font-semibold uppercase">{soil.soil_name || soil.soil}</p>
                 <p className="truncate" title={soil.description || "N/A"}>Description: {soil.description || "N/A"}</p>
-                <p>SPT N-Value: {soil.test_type === "spt" ? soil.n_value : '—'}</p>
+                <p className="truncate">{soil.test_type === "spt" ? (<>SPT N-Value: {soil.n_value}</>) : ( <>CPT Values: q<sub>c</sub> = {soil.qc} kPa, α = {soil.a} {!hideBearingCapacity && soil.id === lastLayer.id && (<>{" || "}q<sub>ca</sub> = {soil.qca} kPa, k<sub>c</sub> = {soil.kc}</>)}</> )}</p>
                 <p>Moist Weight: {soil.y_moist} kN/m³</p>
                 <p>Saturated Weight: {soil.y_sat} kN/m³</p>
                 <p>{soil.soil_type === 'fine' ? 'Undrained Shear Strength:' : 'Shear Strength:'} {soil.soil_type === 'fine' ? soil.su : soil.t} kPa</p>
