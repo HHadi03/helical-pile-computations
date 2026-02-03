@@ -6,12 +6,16 @@ import { updateSoilParameters } from "../../actions/updateSoilParameters"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { useRouter } from "next/navigation"
-import { NumberInput } from "@/components/NumberInput"
+import { NumberInput, FactorsNumberInput } from "@/components/NumberInput"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { useTheme } from 'next-themes'
 import lightSPTImage from '@/public/SPTNPicture.png'
 import darkSPTImage from '@/public/SPTNPictureDark.png'
+import lightShaftImage from '@/public/LightShaftFactorsImage.png'
+import lightBearingImage from '@/public/LightBearingFactorsImage.png'
+import darkBearingImage from '@/public/DarkBearingFactorsImage.png'
+import darkShaftImage from '@/public/DarkShaftFactorsImage.png'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import Image from "next/image"
@@ -155,7 +159,7 @@ export function EditSoilParameters({ soil, soilId }: { soil: TeditSoilParameters
                     <FormLabel>SPT N-Value</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
-                          <Button variant="link" className="hidden sm:block text-blue-500 text-xs absolute -top-0.5 -right-2">I dont have SPT N-Value</Button>
+                          <Button variant="link" className="hidden sm:block text-blue-500 text-xs absolute -top-0.5 -right-2">I don't have SPT N-Value</Button>
                         </PopoverTrigger>
                         <PopoverContent align="end" side="top" sideOffset={-2} className="w-xl md:w-2xl dark:bg-black rounded-none p-1">
                           <Image src={resolvedTheme === "dark" ? darkSPTImage : lightSPTImage} placeholder="blur" alt="SPT N-Value Guide Picture"/>
@@ -172,7 +176,18 @@ export function EditSoilParameters({ soil, soilId }: { soil: TeditSoilParameters
 
             {testType === "cpt" && (
               <>
-              <p className="text-sm mb-1.5 sm:text-center italic">Shaft Capacity</p>
+              <div className="flex items-center justify-between mb-0.5 sm:pl-4">
+                <p className="text-sm italic">Shaft Capacity</p>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="link" className="hidden sm:block text-blue-500 text-xs">I don't have Shaft Capacity Factors</Button>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" side="top" sideOffset={-2} className="w-xl md:w-2xl dark:bg-black rounded-none p-1">
+                    <Image src={resolvedTheme === "dark" ? darkShaftImage : lightShaftImage} alt="CPT Guide Picture" placeholder="blur"/>
+                  </PopoverContent>
+                </Popover>
+              </div>
+
               <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
                 <FormField
                   control={form.control}
@@ -195,7 +210,7 @@ export function EditSoilParameters({ soil, soilId }: { soil: TeditSoilParameters
                     <FormItem className="sm:w-40">
                       <FormLabel>Alpha Factor</FormLabel>
                       <FormControl>
-                        <NumberInput field={field} placeholder="0" />
+                        <FactorsNumberInput field={field} placeholder="0" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -203,7 +218,18 @@ export function EditSoilParameters({ soil, soilId }: { soil: TeditSoilParameters
                 />
               </div>
               
-              <p className="text-sm mb-1.5 sm:text-center italic">Bearing Capacity</p>
+              <div className="flex items-center justify-between mb-0.5 sm:pl-4">
+                <p className="text-sm italic">Bearing Capacity</p>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="link" className="hidden sm:block text-blue-500 text-xs">I don't have Bearing Capacity Factors</Button>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" side="top" sideOffset={-2} className="w-sm dark:bg-black rounded-none p-1">
+                    <Image src={resolvedTheme === "dark" ? darkBearingImage : lightBearingImage} alt="CPT Guide Picture" placeholder="blur"/>
+                  </PopoverContent>
+                </Popover>
+              </div>
+
               <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
                 <FormField
                   control={form.control}
@@ -226,7 +252,7 @@ export function EditSoilParameters({ soil, soilId }: { soil: TeditSoilParameters
                     <FormItem className="sm:w-40">
                       <FormLabel>Bearing Factor</FormLabel>
                       <FormControl>
-                        <NumberInput field={field} placeholder="0" />
+                        <FactorsNumberInput field={field} placeholder="0" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
