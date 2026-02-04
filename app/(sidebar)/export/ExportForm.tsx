@@ -1104,7 +1104,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Pile Length in Liquefiable Soil <span className="font-semibold -ml-1">(mm)</span>
+                      Pile Length in Liquid Soils <span className="font-semibold -ml-1">(mm)</span>
                     </FormLabel>
                     <FormControl>
                       <NumberInput field={field} placeholder="0" />

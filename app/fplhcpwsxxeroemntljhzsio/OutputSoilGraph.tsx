@@ -67,7 +67,7 @@ export function OutputSoilGraph ({ soilsData, effectivePileLength, pileDiameter 
   
   const chartData = createDenseChartData()
 	return (
-    <div className="mt-12 break-inside-avoid max-w-[700px] h-100 border">
+    <div className="max-w-175 h-120 border">
       <LineChart data={chartData} layout="vertical" width={'100%'} height={'100%'} margin={{ top: 15, right: 40, left: 0, bottom: 30 }}>
 
         <CartesianGrid 

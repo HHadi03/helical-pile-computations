@@ -1,5 +1,5 @@
 "use client"
-import { TconfigSoilProfileSchema, TvisualisationSoilProfileSchema } from "@/schemas/soilProfileSchemas"
+import { TvisualisationSoilProfilePileLengthSchema, TvisualisationSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { TvisualisationSoilSchema } from "@/schemas/soilSchemas"
 import { useState, useEffect } from "react" 
 import { createClient } from "@/utils/supabase/client"
@@ -23,7 +23,7 @@ import html2canvas from 'html2canvas-pro'
 import { roundToTwoDecimals } from "@/lib/utils"
 
 type ChartDataItem = {
-  selection: TvisualisationSoilProfileSchema & { selection_name: string }
+  selection: TvisualisationSoilProfileSchema & { selection_name: string, effective_pile_length: number }
   soilsData: TvisualisationSoilSchema[]
 }
 
@@ -32,7 +32,7 @@ type ChartDataPoint = {
   [key: string]: number
 }
 
-export function VisualisationComponent({ profilesData, selectionsData }: { profilesData: TconfigSoilProfileSchema[], selectionsData: TvisualisationSoilProfileSchema[] }) {
+export function VisualisationComponent({ profilesData, selectionsData }: { profilesData: TvisualisationSoilProfilePileLengthSchema[], selectionsData: TvisualisationSoilProfileSchema[] }) {
   const [isFetchingData, setIsFetchingData] = useState(false)
   const [chartData, setChartData] = useState<ChartDataItem[]>([])
   const [hideBearingCapacity, setHideBearingCapacity] = useState(false)
@@ -101,13 +101,13 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
           
           if (error) {
             return {
-              selection: {...selection, selection_name: profile.profile_name ? `${profile.profile_name} - (${selection.pile_diameter} mm)` : `Soil Profile ${profileIndex + 1} - (${selection.pile_diameter} mm)`},
+              selection: {...selection, effective_pile_length: profile.effective_pile_length, selection_name: profile.profile_name ? `${profile.profile_name} - (${selection.pile_diameter} mm)` : `Soil Profile ${profileIndex + 1} - (${selection.pile_diameter} mm)`},
               soilsData: [],
             }
           }
 
           return {
-            selection: {...selection, selection_name: profile.profile_name ? `${profile.profile_name} - (${selection.pile_diameter} mm)` : `Soil Profile ${profileIndex + 1} - (${selection.pile_diameter} mm)`},
+            selection: {...selection, effective_pile_length: profile.effective_pile_length, selection_name: profile.profile_name ? `${profile.profile_name} - (${selection.pile_diameter} mm)` : `Soil Profile ${profileIndex + 1} - (${selection.pile_diameter} mm)`},
             soilsData: data,
           }
         }))
@@ -152,8 +152,10 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
     }, [] as ChartDataPoint[])
 
     const lastBaseChartEntry = baseChartData[baseChartData.length - 1]
+
     if (!hideBearingCapacity) {lastBaseChartEntry[shaftCapacityKey] = lastBaseChartEntry[shaftCapacityKey] += bearingCapacity!}
     lastBaseChartEntry[shaftCapacityKey] = roundToTwoDecimals(lastBaseChartEntry[shaftCapacityKey])
+    if (lastBaseChartEntry.end_depth > selection.effective_pile_length) {lastBaseChartEntry.end_depth = selection.effective_pile_length}
     
     const interpolateCapacity = (targetDepth: number): number => {
       for (let i = 0; i < baseChartData.length; i++) {
@@ -352,6 +354,12 @@ export function VisualisationComponent({ profilesData, selectionsData }: { profi
   const isMediumScreen = windowWidth < 768
   return (
     <>
+      <div className="max-w-5xl mx-auto my-2 flex items-center gap-3">
+        <span className="h-px flex-1 bg-foreground/20" />
+        <p className="text-center font-semibold">Total Pile Capacity</p>
+        <span className="h-px flex-1 bg-foreground/20" />
+      </div>
+
       <div className="flex flex-col md:flex-row max-w-5xl mx-auto gap-5">
         <div className="flex-auto h-[70dvh] border-2 p-5" id="VisualisationGraph">
           <LineChart data={chartDisplayData} layout="vertical" responsive width="100%" height="100%" margin={{ top: 5, right: 20, left: -5, bottom: 15 }}>

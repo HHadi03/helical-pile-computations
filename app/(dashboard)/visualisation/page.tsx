@@ -2,17 +2,17 @@ import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { ArrowBigRight, FolderOpen, FolderX } from "lucide-react"
-import { TconfigSoilProfileSchema, TvisualisationSoilProfileSchema } from "@/schemas/soilProfileSchemas"
+import { TvisualisationSoilProfilePileLengthSchema, TvisualisationSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { VisualisationSelection } from "./VisualisationSelection"
 import { VisualisationComponent } from "./VisualisationComponent"
 import Link from "next/link"
 
-async function getProfiles(): Promise<TconfigSoilProfileSchema[]>{
+async function getProfiles(): Promise<TvisualisationSoilProfilePileLengthSchema[]>{
   try {
     const supabase = await createClient()
     const {data, error} = await supabase
     .from("soil_profiles")
-    .select("profile_name, id")
+    .select("profile_name, id, effective_pile_length")
     .order("created_at", { ascending: true })
 
     if (error) {

@@ -120,7 +120,7 @@ function Carousel({
     >
       <div
         onKeyDownCapture={handleKeyDown}
-        className={cn("relative", className)}
+        className={cn("relative mx-auto max-w-2xl lg:max-w-3xl", className)}
         role="region"
         aria-roledescription="carousel"
         data-slot="carousel"
@@ -185,17 +185,14 @@ function CarouselPrevious({
       variant={variant}
       size={size}
       className={cn(
-        "absolute size-8 rounded-full",
-        orientation === "horizontal"
-          ? "top-40 -left-12 -translate-y-1/2"
-          : "-top-12 left-1/2 -translate-x-1/2 rotate-90",
+        "absolute size-8 rounded-full border-muted-foreground", orientation === "horizontal" ? "top-40 -left-12" : "-top-12 left-1/2 -translate-x-1/2 rotate-90",
         className
       )}
       disabled={!canScrollPrev}
       onClick={scrollPrev}
       {...props}
     >
-      <ArrowLeft className="size-5"/>
+      <ArrowLeft className="size-6"/>
       <span className="sr-only">Previous slide</span>
     </Button>
   )
@@ -215,17 +212,14 @@ function CarouselNext({
       variant={variant}
       size={size}
       className={cn(
-        "absolute size-8 rounded-full",
-        orientation === "horizontal"
-          ? "top-40 -right-12 -translate-y-1/2"
-          : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90",
+        "absolute size-8 rounded-full border-muted-foreground", orientation === "horizontal" ? "top-40 -right-12" : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90",
         className
       )}
       disabled={!canScrollNext}
       onClick={scrollNext}
       {...props}
     >
-      <ArrowRight className="size-5"/>
+      <ArrowRight className="size-6"/>
       <span className="sr-only">Next slide</span>
     </Button>
   )

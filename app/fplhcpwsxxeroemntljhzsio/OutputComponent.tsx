@@ -960,12 +960,29 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
                 <MoveUp key={`right-${i}`} className="size-6"/>
               ))}
             </div>
-          </div> 
+          </div>
 
-          <OutputSoilGraph soilsData={soilsData} effectivePileLength={profileData.effective_pile_length} pileDiameter={baseParams.pile_diameter} />
         </div>
       </div>
       
+      {/* PAGE 3 Part 2: Pile Capacities */}
+      <div className="break-before-page">
+        <h2 className={`text-2xl font-semibold tracking-tight ${profileData.profile_name || baseParams.soil_notes ? '' : 'ml-13'}`}>Helical Pile Capacity</h2>
+
+        <ul className="text-sm space-y-1 mt-2 list-disc list-inside">
+          {profileData.profile_name && (
+            <li><span className="font-semibold">Soil Profile:</span> {profileData.profile_name}</li>
+          )}
+
+          {baseParams.soil_notes && (
+            <li><span className="font-semibold">Description:</span> {baseParams.soil_notes}</li>
+          )}
+        </ul>
+        <div className={`scale-85 origin-top ${profileData.profile_name || baseParams.soil_notes ? 'mt-6' : 'mt-2'}`}>
+          <OutputSoilGraph soilsData={soilsData} effectivePileLength={profileData.effective_pile_length} pileDiameter={baseParams.pile_diameter} />
+        </div>
+      </div>
+
       {/* PAGE 4: Ultimate Limit State GEO */}
       <div className="break-before-page">
         <h2 className="text-2xl font-semibold tracking-tight">Ultimate Limit State (GEO)</h2>
@@ -1011,10 +1028,11 @@ export function OutputComponent({ baseParams, dynamicParams, soilsData, profileD
           {renderPileStructuralCheck()}
         </div>
       </div>
-
+      
+      {/* --- APPENDIX: Uploaded Image --- */}
       <div className="break-before-page">
         <div className="text-2xl font-semibold tracking-tight">
-          Appendix I
+          Appendix
         </div>
 
         <div className="scale-85 origin-top mt-6">

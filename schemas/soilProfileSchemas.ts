@@ -8,7 +8,6 @@ export const configSoilProfileSchema = z.object({
 })
 export type TconfigSoilProfileSchema = z.infer<typeof configSoilProfileSchema>
 
-
 //overview soil profile schema
 export const overviewSoilProfileSchema = z.object({
   id: z.uuid(),
@@ -18,6 +17,14 @@ export const overviewSoilProfileSchema = z.object({
   water_depth: z.number(),
 })
 export type ToverviewSoilProfileSchema = z.infer<typeof overviewSoilProfileSchema>
+
+//visualisation soil profile with pilelength schema
+export const visualisationSoilProfilePileLengthSchema = z.object({
+  id: z.uuid(),
+  profile_name: z.string().optional(),
+  effective_pile_length: z.number(),
+})
+export type TvisualisationSoilProfilePileLengthSchema = z.infer<typeof visualisationSoilProfilePileLengthSchema>
 
 
 //visualisation soil profile schema

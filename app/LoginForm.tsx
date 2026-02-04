@@ -39,14 +39,14 @@ export function LoginForm() {
   }
 
   return (
-    <div className="bg-background dark:bg-secondary px-8 py-6 rounded-lg shadow-lg w-sm">
+    <div className="border border-white/20 px-8 py-6 rounded-lg shadow-lg w-sm">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
           
           {globalError && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertCircle className="size-4" />
-              <AlertDescription>
+            <Alert variant="destructive" className="mb-4 bg-red-500/20 border-red-500/50 text-white">
+              <AlertCircle className="size-4 text-white" />
+              <AlertDescription className="text-white">
                 {globalError}
               </AlertDescription>
             </Alert>
@@ -58,11 +58,17 @@ export function LoginForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel className="text-white">Email</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="Email" {...field} autoComplete='email'/>
+                    <Input 
+                      type="email" 
+                      placeholder="Email" 
+                      {...field} 
+                      autoComplete='email'
+                      className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-blue-400 focus:ring-blue-400/20"
+                    />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-300" />
                 </FormItem>
               )}
             />
@@ -72,11 +78,17 @@ export function LoginForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel className="text-white">Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="Password" {...field} autoComplete='current-password'/>
+                    <Input 
+                      type="password" 
+                      placeholder="Password" 
+                      {...field} 
+                      autoComplete='current-password'
+                      className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-blue-400 focus:ring-blue-400/20"
+                    />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-300" />
                 </FormItem>
               )}
             />
@@ -85,7 +97,9 @@ export function LoginForm() {
           <Button disabled={isPending} type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg">
             {isPending ? <Loader2 className="size-6 animate-spin"/> : "Login"}
           </Button>
-          <Button variant="link" type='button' className="text-muted-foreground hover:text-foreground/90 -ml-3 mt-2">Forgotten Password?</Button>
+          <Button variant="link" type='button' className="text-white/70 hover:text-white -ml-3 mt-2">
+            Forgotten Password?
+          </Button>
         </form>
       </Form>
     </div>

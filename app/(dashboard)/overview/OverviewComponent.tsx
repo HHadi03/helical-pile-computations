@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 import { Toggle } from "@/components/ui/toggle"
@@ -96,7 +95,7 @@ export function OverviewComponent({ soilsData, profilesData }: { soilsData: Tove
             <TooltipTrigger asChild>
               <div>
                 <Toggle variant="outline" pressed={pileDiameter === "60"} onPressedChange={(pressed) => setPileDiameter(pressed ? "60" : "100")} aria-label="Toggle pile diameter" className="w-10.5">
-                  <CircleSlash2 className="size-5 text-foreground/70"/>
+                  <CircleSlash2 className="size-6 text-foreground/70"/>
                 </Toggle>
               </div>
             </TooltipTrigger>
@@ -121,7 +120,7 @@ export function OverviewComponent({ soilsData, profilesData }: { soilsData: Tove
       </div>
       
       {displayCarousel ? (
-        <Carousel className="mx-auto max-w-2xl lg:max-w-3xl" setApi={setApi}>
+        <Carousel setApi={setApi}>
           <CarouselContent>
             {profilesData.map((profile, index) => {
               const profileSoils = soilsByProfile[profile.id] || []
