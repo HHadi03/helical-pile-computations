@@ -22,7 +22,7 @@ export function InsertProfileForm() {
     defaultValues: {
       profile_name: "",
       pile_length: "",
-      pile_stick_out: "",
+      pile_stick_out: 0.1,
       water_depth:"",
     }
   })
@@ -136,7 +136,7 @@ export function InsertProfileForm() {
                   <FormItem>
                     <FormLabel>Pile Stick Out <span className="font-semibold -ml-1">(m)</span></FormLabel>
                     <FormControl>
-                      <NumberInput field={field} placeholder="0"/>
+                      <NumberInput field={field} placeholder="0.1"/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

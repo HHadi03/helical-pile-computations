@@ -8,6 +8,7 @@ export const configSoilProfileSchema = z.object({
 })
 export type TconfigSoilProfileSchema = z.infer<typeof configSoilProfileSchema>
 
+
 //overview soil profile schema
 export const overviewSoilProfileSchema = z.object({
   id: z.uuid(),
@@ -17,6 +18,7 @@ export const overviewSoilProfileSchema = z.object({
   water_depth: z.number(),
 })
 export type ToverviewSoilProfileSchema = z.infer<typeof overviewSoilProfileSchema>
+
 
 //visualisation soil profile with pilelength schema
 export const visualisationSoilProfilePileLengthSchema = z.object({
@@ -50,9 +52,9 @@ export type TexportSoilProfileSchema = z.infer<typeof exportSoilProfileSchema>
 //insert soil profile schema
 export const insertSoilProfileSchema = z.object({
   profile_name: z.string().max(45, { error: "Name must be less than 45 characters long" }).optional(),
-  pile_stick_out: z.coerce.number().positive({ error: "Pile Stick Out is required" }).transform((val) => Number(roundToOneDecimal(val))),
-  pile_length: z.coerce.number().positive({ error: "Pile Length is required" }).transform((val) => Number(roundToOneDecimal(val))),
-  water_depth: z.coerce.number().positive({ error: "Water Depth is required" }).transform((val) => Number(roundToOneDecimal(val))),
+  pile_stick_out: z.preprocess((val) => val === "" ? undefined : val, z.coerce.number().min(0.05, { error: "Pile Stick Out is required" }).transform((val) => Number(roundToOneDecimal(val))).default(0.1)),
+  pile_length: z.coerce.number().min(0.05, { error: "Pile Length is required" }).transform((val) => Number(roundToOneDecimal(val))),
+  water_depth: z.coerce.number().min(0.05, { error: "Water Depth is required" }).transform((val) => Number(roundToOneDecimal(val))),
 })
 .refine(
   (data) => data.pile_stick_out < data.pile_length,

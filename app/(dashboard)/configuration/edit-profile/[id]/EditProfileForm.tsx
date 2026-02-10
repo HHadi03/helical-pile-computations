@@ -129,7 +129,7 @@ export function EditProfileForm({ profile, profileId }: { profile: TinsertSoilPr
                   <FormItem>
                     <FormLabel>Pile Stick Out <span className="font-semibold -ml-1">(m)</span></FormLabel>
                     <FormControl>
-                      <NumberInput field={field} placeholder="0"/>
+                      <NumberInput field={field} placeholder="0.1"/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

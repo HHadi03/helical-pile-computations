@@ -140,7 +140,7 @@ export function ConfigurationComponent({ soilsData, profilesData}: { soilsData: 
       <Accordion type="multiple" className="space-y-6">
         {profilesData.map((profile, index) => {
           const profileSoils = soilsByProfile[profile.id] || []
-          const testType = profileSoils[0].test_type
+          const testType = profileSoils[0]?.test_type
           return (
             <AccordionItem key={profile.id} value={profile.id}>
             
