@@ -1,7 +1,7 @@
 "use client"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { TconfigSoilProfileSchema } from "@/schemas/soilProfileSchemas"
+import { TexportSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { exportFormSchema, TexportFormSchema } from "@/schemas/exportSchema"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, } from "@/components/ui/form"
@@ -18,10 +18,11 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileSchema[] }) {
+export function ExportForm({ soilProfiles }: { soilProfiles: TexportSoilProfileSchema[] }) {
   const router = useRouter()
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [activeTab, setActiveTab] = useState("soil")
+  const [isDragging, setIsDragging] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(exportFormSchema),
@@ -103,9 +104,55 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
 
   const { formState: { isSubmitting } } = form
   const selectedMethod = form.watch("design_method")
+  const pileDiameter = form.watch("pile_diameter")
+  const soilProfileId = form.watch("soil_profile_id")
   const selectedCountry = form.watch("country")
   const showCharacteristic = form.watch("use_characteristic")
-  const pileDiameter = form.watch("pile_diameter")
+ 
+  const showStep2 = Boolean(soilProfileId && selectedMethod && pileDiameter)  
+
+  const isBS =
+    selectedMethod === "method_bs" &&
+    form.watch("applied_tension_load") &&
+    form.watch("applied_compression_load") &&
+    form.watch("horizontal_load")
+
+  const isEN =
+    selectedMethod === "method_en" &&
+    form.watch("permanent_tension_load") &&
+    form.watch("variable_tension_load") &&
+    form.watch("permanent_compression_load") &&
+    form.watch("variable_compression_load") &&
+    form.watch("horizontal_load") &&
+    selectedCountry
+
+  const isTEST =
+    selectedMethod === "method_test" &&
+    form.watch("permanent_tension_load") &&
+    form.watch("variable_tension_load") &&
+    form.watch("permanent_compression_load") &&
+    form.watch("variable_compression_load") &&
+    form.watch("horizontal_load") &&
+    selectedCountry &&
+    (
+      showCharacteristic
+        ? form.watch("mean_compressive_resistance") &&
+          form.watch("min_compressive_resistance") &&
+          form.watch("mean_tensile_resistance") &&
+          form.watch("min_tensile_resistance")
+        : form.watch("standard_compressive_resistance") &&
+          form.watch("standard_tensile_resistance")
+    )
+
+  const showStep3 = Boolean(showStep2 && (isBS || isEN || isTEST))
+
+  const selectedSoilProfile = soilProfiles.find((soilProfile) => soilProfile.id === soilProfileId)
+  
+  useEffect(() => {
+    if (selectedSoilProfile !== undefined) {
+      form.setValue("l", selectedSoilProfile.pile_stick_out * 1000)
+    }
+  }, [form, selectedSoilProfile])
 
   useEffect(() => {
     if (pileDiameter === "60") {
@@ -142,17 +189,17 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
     try {
       const formData = new FormData()
       
-      // Append all form values as JSON string
       formData.append('data', JSON.stringify(values))
+
+      formData.append('soil_profiles', JSON.stringify(selectedSoilProfile))
       
-      // Append file if one was selected
       if (uploadedFile) {
         formData.append('file', uploadedFile)
       }
 
       const response = await fetch('/export/api', {
         method: 'POST',
-        body: formData, // Send FormData instead of JSON
+        body: formData, 
       })
  
       if (!response.ok) {
@@ -176,7 +223,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
     }
 
     catch {
-      console.log("Unexpected error occured")
+      alert("An error has occurred while generating the design report. Please try again later.")
     }
   }
   
@@ -186,9 +233,9 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
          <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="soil">Step 1</TabsTrigger>
-            <TabsTrigger value="design">Step 2</TabsTrigger>
-            <TabsTrigger value="pile">Step 3</TabsTrigger>
-            <TabsTrigger value="project">Step 4</TabsTrigger>
+            <TabsTrigger value="design" disabled={!showStep2}>Step 2</TabsTrigger>
+            <TabsTrigger value="pile" disabled={!showStep3}>Step 3</TabsTrigger>
+            <TabsTrigger value="project" disabled={!showStep3}>Step 4</TabsTrigger>
           </TabsList>
       
           <TabsContent value="soil" className="focus-visible:ring-transparent">
@@ -246,7 +293,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                 control={form.control}
                 name="pile_diameter"
                 render={({ field }) => (
-                  <FormItem className="border border-input rounded-sm p-2">
+                  <FormItem className="border border-input dark:bg-input/30 rounded-sm p-2">
                     <FormControl>
                       <RadioGroup onValueChange={field.onChange} defaultValue={field.value} name={field.name} className="flex flex-col space-x-4 sm:flex-row pt-1 px-2">
                         <FormItem className="flex items-center">
@@ -273,7 +320,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                 control={form.control}
                 name="show_description"
                 render={({ field }) => (
-                  <FormItem className="flex items-center border py-3 px-2 rounded-md">
+                  <FormItem className="flex items-center border border-input dark:bg-input/30 py-3 px-2 rounded-md">
                     <FormControl>
                       <Checkbox checked={field.value} onCheckedChange={field.onChange} name={field.name} id="show_description"/>
                     </FormControl>
@@ -287,7 +334,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                 control={form.control}
                 name="show_spt"
                 render={({ field }) => (
-                  <FormItem className="flex items-center border py-3 px-2 rounded-md">
+                  <FormItem className="flex items-center border border-input dark:bg-input/30 py-3 px-2 rounded-md">
                     <FormControl>
                       <Checkbox checked={field.value} onCheckedChange={field.onChange} name={field.name} id="show_spt"/>
                     </FormControl>
@@ -301,7 +348,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                 control={form.control}
                 name="show_moist"
                 render={({ field }) => (
-                  <FormItem className="flex items-center border py-3 px-2 rounded-md">
+                  <FormItem className="flex items-center border border-input dark:bg-input/30 py-3 px-2 rounded-md">
                     <FormControl>
                       <Checkbox checked={field.value} onCheckedChange={field.onChange} name={field.name} id="show_moist"/>
                     </FormControl>
@@ -315,7 +362,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                 control={form.control}
                 name="show_sat"
                 render={({ field }) => (
-                  <FormItem className="flex items-center border py-3 px-2 rounded-md">
+                  <FormItem className="flex items-center border border-input dark:bg-input/30 py-3 px-2 rounded-md">
                     <FormControl>
                       <Checkbox checked={field.value} onCheckedChange={field.onChange} name={field.name} id="show_sat"/>
                     </FormControl>
@@ -329,7 +376,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                 control={form.control}
                 name="show_shear_strength"
                 render={({ field }) => (
-                  <FormItem className="flex items-center border py-3 px-2 rounded-md">
+                  <FormItem className="flex items-center border border-input dark:bg-input/30 py-3 px-2 rounded-md">
                     <FormControl>
                       <Checkbox checked={field.value} onCheckedChange={field.onChange} name={field.name} id="show_shear_strength"/>
                     </FormControl>
@@ -344,7 +391,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                 name="soil_notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description <span className="font-semibold -ml-1">(optional)</span></FormLabel>
+                    <FormLabel>Additional Information <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                     <FormControl>
                       <Textarea {...field} placeholder="Enter any additional information" className="resize-none"/>
                     </FormControl>
@@ -356,7 +403,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
 
             <div className="pt-2 flex justify-end gap-2">
               <Button type="button" className="w-18" variant="outline" onClick={handleClose}>Close</Button>
-              <Button type="button" className="w-32" onClick={() => setActiveTab("design")}>Next</Button>
+              <Button type="button" className="w-32" onClick={() => setActiveTab("design")} disabled={!showStep2}>Next</Button>
             </div>
           </TabsContent>
           
@@ -531,7 +578,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                     control={form.control}
                     name="use_characteristic"
                     render={({ field }) => (
-                      <FormItem className="flex items-center border py-3 px-2 rounded-md">
+                      <FormItem className="flex items-center border border-input dark:bg-input/30 py-3 px-2 rounded-md">
                         <FormControl>
                           <Checkbox checked={field.value} onCheckedChange={field.onChange} name={field.name} id="use_characteristic"/>
                         </FormControl>
@@ -549,7 +596,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                     control={form.control}
                     name="structure_rigid"
                     render={({ field }) => (
-                      <FormItem className="flex items-center border py-3 px-2 rounded-md">
+                      <FormItem className="flex items-center border border-input dark:bg-input/30 py-3 px-2 rounded-md">
                         <FormControl>
                           <Checkbox checked={field.value} onCheckedChange={field.onChange} name={field.name} id="structure_rigid"/>
                         </FormControl>
@@ -698,7 +745,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                     <FormLabel>Safety Factors</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
-                        <Button variant="outline">Toggle</Button>
+                        <Button variant="outline">Show</Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-full" align="end" side="top">
                         
@@ -1092,7 +1139,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
 
              <div className="pt-2 flex justify-end gap-2">
               <Button type="button" className="w-18" variant="outline" onClick={() => setActiveTab("soil")}>Back</Button>
-              <Button type="button" className="w-32" onClick={() => setActiveTab("pile")}>Next</Button>
+              <Button type="button" className="w-32" onClick={() => setActiveTab("pile")} disabled={!showStep3}>Next</Button>
             </div>
           </TabsContent>
 
@@ -1330,7 +1377,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                 name="pile_number"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Pile Number</FormLabel>
+                    <FormLabel>Pile Number <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                     <FormControl>
                       <Input placeholder="HP-003" {...field}/>
                     </FormControl>
@@ -1344,7 +1391,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                 name="job_location"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Job Location</FormLabel>
+                    <FormLabel>Job Location <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                     <FormControl>
                       <Input placeholder="Farnborough, Hampshire" {...field}/>
                     </FormControl>
@@ -1358,7 +1405,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                 name="job_number"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Job Number</FormLabel>
+                    <FormLabel>Job Number <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                     <FormControl>
                       <Input placeholder="Project-AX34" {...field}/>
                     </FormControl>
@@ -1372,7 +1419,7 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
                 name="checked_by"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Checked By</FormLabel>
+                    <FormLabel>Checked By <span className="font-semibold -ml-1">(optional)</span></FormLabel>
                     <FormControl>
                       <Input placeholder="John Doe" {...field}/>
                     </FormControl>
@@ -1382,21 +1429,65 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TconfigSoilProfileS
               />
 
               <div className="space-y-2">
-                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                  Upload Document {uploadedFile && <span className="text-muted-foreground">({uploadedFile.name})</span>}
-                </label>
-                <Input 
-                  type="file" 
-                  className="cursor-pointer border"
-                  onChange={handleFileChange}
-                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                />
-              </div>
+  <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+    Upload Images {uploadedFile && <span className="text-muted-foreground">({uploadedFile.name})</span>}
+  </label>
+  <div
+    className={`relative border-2 border-dashed rounded-lg p-8 transition-colors ${
+      isDragging 
+        ? 'border-primary bg-primary/5' 
+        : 'border-gray-300 hover:border-gray-400'
+    }`}
+    onDragOver={(e) => {
+      e.preventDefault();
+      setIsDragging(true);
+    }}
+    onDragLeave={(e) => {
+      e.preventDefault();
+      setIsDragging(false);
+    }}
+    onDrop={(e) => {
+      e.preventDefault();
+      setIsDragging(false);
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleFileChange({ target: { files } } as any);
+      }
+    }}
+  >
+    <Input 
+      type="file" 
+      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+      onChange={handleFileChange}
+      accept=".jpg,.jpeg,.png"
+    />
+    <div className="flex flex-col items-center justify-center text-center pointer-events-none">
+      <svg
+        className="w-12 h-12 mb-3 text-gray-400"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+        />
+      </svg>
+      <p className="mb-1 text-sm font-medium text-gray-700">
+        {isDragging ? 'Drop your image here' : 'Drag and drop your image here'}
+      </p>
+      <p className="text-xs text-gray-500">or click to browse</p>
+      <p className="text-xs text-gray-400 mt-2">JPG, JPEG, or PNG</p>
+    </div>
+  </div>
+</div>
             </div>
 
             <div className="pt-2 flex justify-end gap-2">
               <Button type="button" className="w-18" variant="outline" disabled={isSubmitting} onClick={() => setActiveTab("pile")}>Back</Button> 
-              <Button type="submit" className="w-32" disabled={isSubmitting}> {isSubmitting ? (<> <Loader2 className="mr-2 size-4 animate-spin"/>Exporting... </>) : ("Export")}</Button>
+              <Button type="submit" className="w-32" disabled={isSubmitting}> {isSubmitting ? (<> <Loader2 className="size-4 animate-spin"/>Generating... </>) : ("Generate")}</Button>
             </div>
           </TabsContent>
         </Tabs>

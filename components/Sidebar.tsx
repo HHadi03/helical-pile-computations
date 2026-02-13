@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect, Fragment } from 'react'
 import { logOut } from '@/app/actions'
-import { ArrowLeftToLine, ArrowRightToLine, LogOut, Save, FolderOpen, Upload, MessageSquareText, CircleHelp, Loader2 } from 'lucide-react'
+import { ArrowLeftToLine, ArrowRightToLine, LogOut, Save, FolderOpen, FileDown, MessageSquareText, CircleHelp, Loader2 } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -47,7 +47,7 @@ export const Sidebar = () => {
       items: [
         { icon: Save, text: "Save", href: "/save"},
         { icon: FolderOpen, text: "Load", href: "/load"},
-        { icon: Upload, text: "Export", href: "/export"},
+        { icon: FileDown, text: "Export", href: "/export"},
       ]
     },
     {
@@ -61,10 +61,10 @@ export const Sidebar = () => {
 
   const allNavigationItems = navigationSections.flatMap(section => section.items)
   return (
-    <aside className={`bg-sidebar flex flex-col shrink-0 border-r border-sidebar-border p-2 shadow-inner overflow-y-auto overflow-x-clip scrollbar-thin scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-500 ${expanded ? 'w-[260px] animate-in ease-in-out duration-500' : 'w-[70px] animate-out ease-out duration-500'}`}>
+    <aside className={`hidden bg-sidebar sm:flex flex-col shrink-0 border-r border-sidebar-border p-2 shadow-inner overflow-y-auto overflow-x-clip scrollbar-thin scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thumb-slate-400 scrollbar-track-slate-200 scrollbar-hover:scrollbar-thumb-slate-500 scrollbar-active:scrollbar-thumb-slate-500 ${expanded ? 'w-70 animate-in ease-in-out duration-500' : 'w-17.5 animate-out ease-out duration-500'}`}>
       {expanded ? (
         <div className="flex flex-row items-center justify-between mt-2">
-          <Image src={logo} alt='Company Logo' className='w-[195px]'/>
+          <Image src={logo} alt='Company Logo' className='w-54'/>
           <Button title='Collapse Sidebar' variant="ghost" size="icon" onClick={() => setExpanded(false)} aria-label="Collapse Sidebar" aria-expanded={expanded} className='hover:bg-sidebar-foreground/7 dark:hover:bg-sidebar-foreground/7'><ArrowLeftToLine className="size-6 text-muted-foreground"/></Button>
         </div>
       ) : (

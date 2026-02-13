@@ -20,31 +20,33 @@ export const overviewSoilProfileSchema = z.object({
 export type ToverviewSoilProfileSchema = z.infer<typeof overviewSoilProfileSchema>
 
 
-//visualisation soil profile with pilelength schema
-export const visualisationSoilProfilePileLengthSchema = z.object({
+//visualisation soil profile schema
+export const visualisationSoilProfileSchema = z.object({
   id: z.uuid(),
   profile_name: z.string().optional(),
   effective_pile_length: z.number(),
 })
-export type TvisualisationSoilProfilePileLengthSchema = z.infer<typeof visualisationSoilProfilePileLengthSchema>
+export type TvisualisationSoilProfileSchema = z.infer<typeof visualisationSoilProfileSchema>
 
 
-//visualisation soil profile schema
-export const visualisationSoilProfileSchema = z.object({
+//selections soil profile schema
+export const selectionsSchema = z.object({
   id: z.uuid(),
   soil_profile_id: z.uuid(),
   pile_diameter: z.number(),
   colour: z.string(),
   stroke_width: z.number(),
 })
-export type TvisualisationSoilProfileSchema = z.infer<typeof visualisationSoilProfileSchema>
+export type TselectionsSchema = z.infer<typeof selectionsSchema>
 
 
 //export soil profile schema
 export const exportSoilProfileSchema = z.object({
+  id: z.uuid(),
   profile_name: z.string().optional(),
   effective_pile_length: z.number(),
   water_depth: z.number(),
+  pile_stick_out: z.number(),
 })
 export type TexportSoilProfileSchema = z.infer<typeof exportSoilProfileSchema>
 

@@ -17,7 +17,7 @@ export default async function ExportPage() {
 
   const { data: soilProfiles, error: soilProfilesError } = await supabase
   .from("soil_profiles")
-  .select("profile_name, id")
+  .select("profile_name, id, pile_stick_out, effective_pile_length, water_depth")
   .order("created_at", { ascending: true })
 
   if (soilProfilesError) {

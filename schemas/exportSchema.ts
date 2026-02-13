@@ -7,16 +7,16 @@ export const exportFormSchema = z.object({
   checked_by: z.string().max(30, { error: "Checked By must be less than 30 characters" }).optional(),
 
   soil_profile_id: z.uuid({ error: "Soil Profile is required" }),
+  pile_diameter: z.enum(["60", "100"], { error: "Pile Diameter is required" }),
   show_description: z.boolean(),
   show_spt: z.boolean(),
   show_moist: z.boolean(),
   show_sat: z.boolean(),
   show_shear_strength: z.boolean(),
   soil_notes: z.string().optional(),
-  pile_diameter: z.enum(["60", "100"], { error: "Pile Diameter is required" }),
   
   design_method: z.enum(["method_bs", "method_en", "method_test"], { error: "Please select a design method" }),
-  country: z.enum(["uk", "pl", "nl"]).optional(),
+  country: z.enum(["uk", "pl", "nl"], { error: "Please select a country" }).optional(),
   applied_tension_load: z.coerce.number(),
   applied_compression_load: z.coerce.number(),
   permanent_tension_load: z.coerce.number(),
@@ -72,8 +72,8 @@ export const exportFormSchema = z.object({
   proof_strength: z.coerce.number().positive({ error: "0.2% Proof Strength is required" }),
   e: z.coerce.number().positive({ error: "Modulus of Elasticity is required" }),
   i: z.coerce.number().positive({ error: "Area Moment of Inertia is required" }),
-  l: z.coerce.number().positive({ error: "Pile Length in Liquefiable Soil is required" }),
-  k: z.coerce.number().positive({ error: "K is required" }),
+  l: z.coerce.number().positive({ error: "Pile Length in Liquid Soil is required" }),
+  k: z.coerce.number().positive({ error: "Effective Length Factor (K) is required" }),
   partial_safety_factor_1: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().default(1.1)),
   partial_safety_factor_2: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().default(1.25)),
   pile_notes: z.string().optional(),
@@ -152,6 +152,14 @@ export const exportFormSchema = z.object({
 )
 
 .refine(
+  (data) => data.design_method !== "method_test" || !data.use_characteristic || data.number_of_tests > 0,
+  {
+    path: ["number_of_tests"],
+    message: "Number Of Tests is required",
+  }
+)
+
+.refine(
   (data) => data.design_method !== "method_test" || !data.use_characteristic || data.mean_tensile_resistance > 0,
   {
     path: ["mean_tensile_resistance"],
@@ -163,7 +171,7 @@ export const exportFormSchema = z.object({
   (data) => data.design_method !== "method_test" || !data.use_characteristic || data.min_tensile_resistance > 0,
   {
     path: ["min_tensile_resistance"],
-    message: "Min Tensile Resistance is required",
+    message: "Minimum Tensile Resistance is required",
   }
 )
 
@@ -179,7 +187,7 @@ export const exportFormSchema = z.object({
   (data) => data.design_method !== "method_test" || !data.use_characteristic || data.min_compressive_resistance > 0,
   {
     path: ["min_compressive_resistance"],
-    message: "Min Compressive Resistance is required",
+    message: "Minimum Compressive Resistance is required",
   }
 )
 

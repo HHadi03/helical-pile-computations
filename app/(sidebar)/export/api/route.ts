@@ -1,33 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { exportFormSchema, TexportFormSchema } from '@/schemas/exportSchema'
+import { exportSoilProfileSchema, TexportSoilProfileSchema } from '@/schemas/soilProfileSchemas'
 import { createClient } from '@/utils/supabase/server'
-import { TexportSoilProfileSchema } from '@/schemas/soilProfileSchemas'
 import { TexportSoilSchema } from '@/schemas/soilSchemas'
 import { roundToTwoDecimals, capitaliseFirstLetter } from '@/lib/utils'
 import type { Browser } from 'puppeteer'
 import { PDFDocument } from 'pdf-lib'
 import fs from 'fs'
-
-async function getProfiles(profileId: string): Promise<TexportSoilProfileSchema> {
-  try {
-    const supabase = await createClient()
-    const {data, error} = await supabase
-    .from("soil_profiles")
-    .select("profile_name, water_depth, effective_pile_length")
-    .eq("id", profileId)
-    .single()
-
-    if (error) {
-      throw new Error()
-    }
-
-    return data
-  }
-
-  catch {
-    throw new Error("Failed to export data, please try again later.")
-  }
-}
 
 async function getSoils(profileId: string): Promise<TexportSoilSchema[]> {
   try {
@@ -46,7 +25,7 @@ async function getSoils(profileId: string): Promise<TexportSoilSchema[]> {
   }
   
   catch {
-   throw new Error('Please insert soil layers before attempting to export data.')
+   throw new Error('Please insert soil layers before attempting to generate report.')
   }
 }
 
@@ -85,37 +64,32 @@ const nObjectMethodTest: { [key: number]: { s1: number; s2: number } } = {
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData()
+    
     const dataString = formData.get('data') as string
     const temp = JSON.parse(dataString)
     const body: TexportFormSchema = exportFormSchema.parse(temp)
+  
+    const soilProfileString = formData.get('soil_profiles') as string
+    const temp2 = JSON.parse(soilProfileString)
+    const profileData: TexportSoilProfileSchema = exportSoilProfileSchema.parse(temp2)
+    
     const file = formData.get('file') as File | null
-
+  
     let imageUrl: string | null = null
 
     let soilsData: TexportSoilSchema[]
-    let profileData: TexportSoilProfileSchema 
     let dynamicParams
     
     switch (body.design_method) {
       case "method_bs":
-       
         soilsData = await getSoils(body.soil_profile_id)
-        profileData = await getProfiles(body.soil_profile_id)
-
+       
         const tension = body.pile_diameter === "60" ? soilsData.reduce((sum, soil) => sum + soil.shaft_capacity60, 0) : soilsData.reduce((sum, soil) => sum + soil.shaft_capacity100, 0)
         
         const lastLayer = soilsData.find(soil => soil.start_depth <= profileData.effective_pile_length && profileData.effective_pile_length <= soil.end_depth) || soilsData[soilsData.length - 1]
         const bearingCapacity = body.pile_diameter === "60" ? lastLayer.bearing_capacity60 : lastLayer.bearing_capacity100
         const compression = tension + bearingCapacity
           
-        if (body.applied_tension_load > (tension / body.global_safety_factor)) {
-          console.log("Designed tension load is greater than the designed tensile resistance.")
-        }
-        
-        if (body.applied_compression_load > (compression / body.global_safety_factor)) {
-          console.log("Designed compression load is greater than the designed compressive resistance.")
-        }
-
         dynamicParams = {
           tension: roundToTwoDecimals(tension),
           compression: roundToTwoDecimals(compression),
@@ -126,10 +100,8 @@ export async function POST(req: NextRequest) {
       break;
 
       case "method_en":
-
         soilsData = await getSoils(body.soil_profile_id)
-        profileData = await getProfiles(body.soil_profile_id)
-
+       
         if (body.use_characteristic) {
           const supabase = await createClient()
           const { data, error } = await supabase
@@ -195,32 +167,6 @@ export async function POST(req: NextRequest) {
           const rckCompression = Math.min(meanCompression / s3, minCompression / s4)
 
           if (body.country === "uk") {
-            const compressionCombination1 = (body.uk_safety_factor_compression_yg1 * body.permanent_compression_load) + (body.uk_safety_factor_compression_yq1 * body.variable_compression_load)
-            const compressionCombination2 = (body.uk_safety_factor_compression_yg2 * body.permanent_compression_load) + (body.uk_safety_factor_compression_yq2 * body.variable_compression_load)
-            const compressionOutput1 = rckCompression / body.uk_safety_factor_compression_yt1
-            const compressionOutput2 = rckCompression / body.uk_safety_factor_compression_yt2
-
-            const tensionCombination1 = (body.uk_safety_factor_tension_yg2 * body.permanent_tension_load) + (body.uk_safety_factor_tension_yq2 * body.variable_tension_load)
-            const tensionCombination2 = (body.uk_safety_factor_tension_yg1 * body.permanent_tension_load) + (body.uk_safety_factor_tension_yq1 * body.variable_tension_load)
-            const tensionOutput1 = rckTension / body.uk_safety_factor_tension_yt1
-            const tensionOutput2 = rckTension / body.uk_safety_factor_tension_yt2
-
-            if (compressionCombination1 > compressionOutput1) {
-              console.log("Designed compression load is greater than the designed compressive resistance.")
-            }
-
-            if (compressionCombination2 > compressionOutput2) {
-              console.log("Designed compression load is greater than the designed compressive resistance.")
-            }
-
-            if (tensionCombination1 > tensionOutput1) {
-              console.log("Designed tension load is greater than the designed tensile resistance.")
-            }
-
-            if (tensionCombination2 > tensionOutput2) {
-              console.log("Designed tension load is greater than the designed tensile resistance.")
-            }
-            
             dynamicParams = {
               permanent_tension_load: body.permanent_tension_load,
               variable_tension_load: body.variable_tension_load,
@@ -244,20 +190,6 @@ export async function POST(req: NextRequest) {
           }
 
           else if (body.country === "nl") {
-            const compressionCombination1 = (body.nl_safety_factor_compression_yg * body.permanent_tension_load) + (body.nl_safety_factor_compression_yq * body.variable_tension_load)
-            const compressionOutput1 = rckCompression / body.nl_safety_factor_compression_yt
-
-            const tensionCombination1 = (body.nl_safety_factor_tension_yg * body.permanent_compression_load) + (body.nl_safety_factor_tension_yq * body.variable_tension_load)
-            const tensionOutput1 = rckTension / body.nl_safety_factor_tension_yt
-
-            if (compressionCombination1 > compressionOutput1) {
-              console.log("Designed compression load is greater than the designed compressive resistance.")
-            }
-
-            if (tensionCombination1 > tensionOutput1) {
-              console.log("Designed tension load is greater than the designed tensile resistance.")
-            }
-
             dynamicParams = {
               permanent_tension_load: body.permanent_tension_load,
               variable_tension_load: body.variable_tension_load,
@@ -275,20 +207,6 @@ export async function POST(req: NextRequest) {
           }
           
           else {
-            const compressionCombination1 = (body.pl_safety_factor_compression_yg * body.permanent_tension_load) + (body.pl_safety_factor_compression_yq * body.variable_tension_load)
-            const compressionOutput1 = rckCompression / body.pl_safety_factor_compression_yt
-
-            const tensionCombination1 = (body.pl_safety_factor_tension_yg * body.permanent_compression_load) + (body.pl_safety_factor_tension_yq * body.variable_compression_load)
-            const tensionOutput1 = rckTension / body.pl_safety_factor_tension_yt
-
-            if (compressionCombination1 > compressionOutput1) {
-              console.log("Designed compression load is greater than the designed compressive resistance.")
-            }
-
-            if (tensionCombination1 > tensionOutput1) {
-              console.log("Designed tension load is greater than the designed tensile resistance.")
-            }
-
             dynamicParams = {
               permanent_tension_load: body.permanent_tension_load,
               variable_tension_load: body.variable_tension_load,
@@ -314,32 +232,6 @@ export async function POST(req: NextRequest) {
           const compression = tension + bearingCapacity
           
           if (body.country === "uk") {
-            const compressionCombination1 = (body.uk_safety_factor_compression_yg1 * body.permanent_compression_load) + (body.uk_safety_factor_compression_yq1 * body.variable_compression_load)
-            const compressionCombination2 = (body.uk_safety_factor_compression_yg2 * body.permanent_compression_load) + (body.uk_safety_factor_compression_yq2 * body.variable_compression_load)
-            const compressionOutput1 = compression / body.uk_safety_factor_compression_yt1
-            const compressionOutput2 = compression / body.uk_safety_factor_compression_yt2
-
-            const tensionCombination1 = (body.uk_safety_factor_tension_yg2 * body.permanent_tension_load) + (body.uk_safety_factor_tension_yq2 * body.variable_tension_load)
-            const tensionCombination2 = (body.uk_safety_factor_tension_yg1 * body.permanent_tension_load) + (body.uk_safety_factor_tension_yq1 * body.variable_tension_load)
-            const tensionOutput1 = tension / body.uk_safety_factor_tension_yt1
-            const tensionOutput2 = tension / body.uk_safety_factor_tension_yt2
-
-            if (compressionCombination1 > compressionOutput1) {
-              console.log("Designed compression load is greater than the designed compressive resistance.")
-            }
-
-            if (compressionCombination2 > compressionOutput2) {
-              console.log("Designed compression load is greater than the designed compressive resistance.")
-            }
-
-            if (tensionCombination1 > tensionOutput1) {
-              console.log("Designed tension load is greater than the designed tensile resistance.")
-            }
-
-            if (tensionCombination2 > tensionOutput2) {
-              console.log("Designed tension load is greater than the designed tensile resistance.")
-            }
-            
             dynamicParams = {
               permanent_tension_load: body.permanent_tension_load,
               variable_tension_load: body.variable_tension_load,
@@ -363,20 +255,6 @@ export async function POST(req: NextRequest) {
           }
 
           else if (body.country === "nl") {
-            const compressionCombination1 = (body.nl_safety_factor_compression_yg * body.permanent_tension_load) + (body.nl_safety_factor_compression_yq * body.variable_tension_load)
-            const compressionOutput1 = compression / body.nl_safety_factor_compression_yt
-
-            const tensionCombination1 = (body.nl_safety_factor_tension_yg * body.permanent_compression_load) + (body.nl_safety_factor_tension_yq * body.variable_tension_load)
-            const tensionOutput1 = tension / body.nl_safety_factor_tension_yt
-
-            if (compressionCombination1 > compressionOutput1) {
-              console.log("Designed compression load is greater than the designed compressive resistance.")
-            }
-
-            if (tensionCombination1 > tensionOutput1) {
-              console.log("Designed tension load is greater than the designed tensile resistance.")
-            }
-
             dynamicParams = {
               permanent_tension_load: body.permanent_tension_load,
               variable_tension_load: body.variable_tension_load,
@@ -394,20 +272,6 @@ export async function POST(req: NextRequest) {
           }
           
           else {
-            const compressionCombination1 = (body.pl_safety_factor_compression_yg * body.permanent_tension_load) + (body.pl_safety_factor_compression_yq * body.variable_tension_load)
-            const compressionOutput1 = compression / body.pl_safety_factor_compression_yt
-
-            const tensionCombination1 = (body.pl_safety_factor_tension_yg * body.permanent_compression_load) + (body.pl_safety_factor_tension_yq * body.variable_compression_load)
-            const tensionOutput1 = tension / body.pl_safety_factor_tension_yt
-
-            if (compressionCombination1 > compressionOutput1) {
-              console.log("Designed compression load is greater than the designed compressive resistance.")
-            }
-
-            if (tensionCombination1 > tensionOutput1) {
-              console.log("Designed tension load is greater than the designed tensile resistance.")
-            }
-
             dynamicParams = {
               permanent_tension_load: body.permanent_tension_load,
               variable_tension_load: body.variable_tension_load,
@@ -427,10 +291,8 @@ export async function POST(req: NextRequest) {
       break;
 
       case "method_test":
-
         soilsData = await getSoils(body.soil_profile_id)
-        profileData = await getProfiles(body.soil_profile_id)
-        
+      
         if (body.use_characteristic) {
           const numberOfSoilProfiles = body.number_of_tests > 5 ? 5 : body.number_of_tests
           const s1 = nObjectMethodTest[numberOfSoilProfiles].s1
@@ -439,32 +301,6 @@ export async function POST(req: NextRequest) {
           const rckCompression = Math.min(body.mean_compressive_resistance / s1, body.min_compressive_resistance / s2)
 
           if (body.country === "uk") {
-            const compressionCombination1 = (body.uk_safety_factor_compression_yg1 * body.permanent_compression_load) + (body.uk_safety_factor_compression_yq1 * body.variable_compression_load)
-            const compressionCombination2 = (body.uk_safety_factor_compression_yg2 * body.permanent_compression_load) + (body.uk_safety_factor_compression_yq2 * body.variable_compression_load)
-            const compressionOutput1 = rckCompression / body.uk_safety_factor_compression_yt1
-            const compressionOutput2 = rckCompression / body.uk_safety_factor_compression_yt2
-
-            const tensionCombination1 = (body.uk_safety_factor_tension_yg2 * body.permanent_tension_load) + (body.uk_safety_factor_tension_yq2 * body.variable_tension_load)
-            const tensionCombination2 = (body.uk_safety_factor_tension_yg1 * body.permanent_tension_load) + (body.uk_safety_factor_tension_yq1 * body.variable_tension_load)
-            const tensionOutput1 = rckTension / body.uk_safety_factor_tension_yt1
-            const tensionOutput2 = rckTension / body.uk_safety_factor_tension_yt2
-
-            if (compressionCombination1 > compressionOutput1) {
-              throw new Error("Designed compression load is greater than the designed compressive resistance.")
-            }
-
-            if (compressionCombination2 > compressionOutput2) {
-              throw new Error("Designed compression load is greater than the designed compressive resistance.")
-            }
-
-            if (tensionCombination1 > tensionOutput1) {
-              throw new Error("Designed tension load is greater than the designed tensile resistance.")
-            }
-
-            if (tensionCombination2 > tensionOutput2) {
-              throw new Error("Designed tension load is greater than the designed tensile resistance.")
-            }
-            
             dynamicParams = {
               permanent_tension_load: body.permanent_tension_load,
               variable_tension_load: body.variable_tension_load,
@@ -488,20 +324,6 @@ export async function POST(req: NextRequest) {
           }
 
           else if (body.country === "nl") {
-            const compressionCombination1 = (body.nl_safety_factor_compression_yg * body.permanent_tension_load) + (body.nl_safety_factor_compression_yq * body.variable_tension_load)
-            const compressionOutput1 = rckCompression / body.nl_safety_factor_compression_yt
-
-            const tensionCombination1 = (body.nl_safety_factor_tension_yg * body.permanent_compression_load) + (body.nl_safety_factor_tension_yq * body.variable_tension_load)
-            const tensionOutput1 = rckTension / body.nl_safety_factor_tension_yt
-
-            if (compressionCombination1 > compressionOutput1) {
-              console.log("Designed compression load is greater than the designed compressive resistance.")
-            }
-
-            if (tensionCombination1 > tensionOutput1) {
-              console.log("Designed tension load is greater than the designed tensile resistance.")
-            }
-
             dynamicParams = {
               permanent_tension_load: body.permanent_tension_load,
               variable_tension_load: body.variable_tension_load,
@@ -519,20 +341,6 @@ export async function POST(req: NextRequest) {
           }
           
           else {
-            const compressionCombination1 = (body.pl_safety_factor_compression_yg * body.permanent_tension_load) + (body.pl_safety_factor_compression_yq * body.variable_tension_load)
-            const compressionOutput1 = rckCompression / body.pl_safety_factor_compression_yt
-
-            const tensionCombination1 = (body.pl_safety_factor_tension_yg * body.permanent_compression_load) + (body.pl_safety_factor_tension_yq * body.variable_compression_load)
-            const tensionOutput1 = rckTension / body.pl_safety_factor_tension_yt
-
-            if (compressionCombination1 > compressionOutput1) {
-              console.log("Designed compression load is greater than the designed compressive resistance.")
-            }
-
-            if (tensionCombination1 > tensionOutput1) {
-              console.log("Designed tension load is greater than the designed tensile resistance.")
-            }
-
             dynamicParams = {
               permanent_tension_load: body.permanent_tension_load,
               variable_tension_load: body.variable_tension_load,
@@ -555,32 +363,6 @@ export async function POST(req: NextRequest) {
           const compression = body.standard_compressive_resistance
 
           if (body.country === "uk") {
-            const compressionCombination1 = (body.uk_safety_factor_compression_yg1 * body.permanent_compression_load) + (body.uk_safety_factor_compression_yq1 * body.variable_compression_load)
-            const compressionCombination2 = (body.uk_safety_factor_compression_yg2 * body.permanent_compression_load) + (body.uk_safety_factor_compression_yq2 * body.variable_compression_load)
-            const compressionOutput1 = compression / body.uk_safety_factor_compression_yt1
-            const compressionOutput2 = compression / body.uk_safety_factor_compression_yt2
-
-            const tensionCombination1 = (body.uk_safety_factor_tension_yg2 * body.permanent_tension_load) + (body.uk_safety_factor_tension_yq2 * body.variable_tension_load)
-            const tensionCombination2 = (body.uk_safety_factor_tension_yg1 * body.permanent_tension_load) + (body.uk_safety_factor_tension_yq1 * body.variable_tension_load)
-            const tensionOutput1 = tension / body.uk_safety_factor_tension_yt1
-            const tensionOutput2 = tension / body.uk_safety_factor_tension_yt2
-
-            if (compressionCombination1 > compressionOutput1) {
-              console.log("Designed compression load is greater than the designed compressive resistance.")
-            }
-
-            if (compressionCombination2 > compressionOutput2) {
-              console.log("Designed compression load is greater than the designed compressive resistance.")
-            }
-
-            if (tensionCombination1 > tensionOutput1) {
-              console.log("Designed tension load is greater than the designed tensile resistance.")
-            }
-
-            if (tensionCombination2 > tensionOutput2) {
-              console.log("Designed tension load is greater than the designed tensile resistance.")
-            }
-            
             dynamicParams = {
               permanent_tension_load: body.permanent_tension_load,
               variable_tension_load: body.variable_tension_load,
@@ -604,20 +386,6 @@ export async function POST(req: NextRequest) {
           }
 
           else if (body.country === "nl") {
-            const compressionCombination1 = (body.nl_safety_factor_compression_yg * body.permanent_tension_load) + (body.nl_safety_factor_compression_yq * body.variable_tension_load)
-            const compressionOutput1 = compression / body.nl_safety_factor_compression_yt
-
-            const tensionCombination1 = (body.nl_safety_factor_tension_yg * body.permanent_compression_load) + (body.nl_safety_factor_tension_yq * body.variable_tension_load)
-            const tensionOutput1 = tension / body.nl_safety_factor_tension_yt
-
-            if (compressionCombination1 > compressionOutput1) {
-              console.log("Designed compression load is greater than the designed compressive resistance.")
-            }
-
-            if (tensionCombination1 > tensionOutput1) {
-              console.log("Designed tension load is greater than the designed tensile resistance.")
-            }
-
             dynamicParams = {
               permanent_tension_load: body.permanent_tension_load,
               variable_tension_load: body.variable_tension_load,
@@ -635,20 +403,6 @@ export async function POST(req: NextRequest) {
           }
           
           else {
-            const compressionCombination1 = (body.pl_safety_factor_compression_yg * body.permanent_tension_load) + (body.pl_safety_factor_compression_yq * body.variable_tension_load)
-            const compressionOutput1 = compression / body.pl_safety_factor_compression_yt
-
-            const tensionCombination1 = (body.pl_safety_factor_tension_yg * body.permanent_compression_load) + (body.pl_safety_factor_tension_yq * body.variable_compression_load)
-            const tensionOutput1 = tension / body.pl_safety_factor_tension_yt
-
-            if (compressionCombination1 > compressionOutput1) {
-              console.log("Designed compression load is greater than the designed compressive resistance.")
-            }
-
-            if (tensionCombination1 > tensionOutput1) {
-              console.log("Designed tension load is greater than the designed tensile resistance.")
-            }
-
             dynamicParams = {
               permanent_tension_load: body.permanent_tension_load,
               variable_tension_load: body.variable_tension_load,
@@ -665,7 +419,7 @@ export async function POST(req: NextRequest) {
             }
           }
         }
-      break;
+      break
 
       default:
       throw new Error(`Unknown design method: ${body.design_method}`)
@@ -746,13 +500,13 @@ export async function POST(req: NextRequest) {
       user_id: data?.claims.sub,
       image_url: imageUrl
     }
-
+    
     const { error } = await supabase
     .from('exports')
     .upsert(finalObject)
 
     if (error) {
-      throw new Error("Failed to export data, please try again later.")
+      throw new Error("Failed to generate design report, please try again later.")
     }
     
     const cookie = req.cookies.get('sb-kiasruegemqnakhmbels-auth-token')?.value
@@ -772,7 +526,7 @@ export async function POST(req: NextRequest) {
       const puppeteer = await import ("puppeteer-core")
       browser = await puppeteer.launch({
         args: chromium.args,
-        executablePath: await chromium.executablePath("https://github.com/Sparticuz/chromium/releases/download/v141.0.0/chromium-v141.0.0-pack.x64.tar"),
+        executablePath: await chromium.executablePath("https://github.com/Sparticuz/chromium/releases/download/v143.0.4/chromium-v143.0.4-pack.x64.tar"),
         defaultViewport: viewPort
       })
     }
@@ -853,6 +607,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 400 })
     }
     
-    return NextResponse.json({ error: "Invalid Request" }, { status: 500 })
+    return NextResponse.json({ error: "Failed to generate design report, please try again later." }, { status: 500 })
   }
 }

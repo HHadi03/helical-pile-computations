@@ -2,7 +2,7 @@
 import { useState } from "react"
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel } from "@/components/ui/alert-dialog"
 import { Checkbox } from "@/components/ui/checkbox"
-import { TconfigSoilProfileSchema } from "@/schemas/soilProfileSchemas"
+import { TvisualisationSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { Label } from "@/components/ui/label"
 import { Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
@@ -12,7 +12,7 @@ import { toast } from "sonner"
 
 const pileDiameters = ["60", "100"]
 
-export function VisualisationSelection({ profilesData, initialDialogOpen }: { profilesData: TconfigSoilProfileSchema[], initialDialogOpen: boolean }) {
+export function VisualisationSelection({ profilesData, initialDialogOpen }: { profilesData: TvisualisationSoilProfileSchema[], initialDialogOpen: boolean }) {
   const [isDialogOpen, setDialogOpen] = useState(initialDialogOpen)
   const [selections, setSelections] = useState<Set<string>>(new Set())
   const [isLoading, setIsLoading] = useState(false)
@@ -95,7 +95,7 @@ export function VisualisationSelection({ profilesData, initialDialogOpen }: { pr
             pileDiameters.map((diameter) => {
               const key = `${profile.id}-${diameter}`
               return (
-                <div key={key} className="space-y-3 p-3 border rounded-md">
+                <div key={key} className="space-y-3 p-3 border border-input dark:bg-input/30 rounded-md">
                   <div className="flex items-start gap-2">
                     <Checkbox id={key} checked={selections.has(key)} onCheckedChange={(checked: boolean) => handleCheckboxToggle(key, checked)}/>
                     <Label htmlFor={key}>{profile.profile_name ? `${profile.profile_name} - (${diameter} mm)` : `Soil Profile ${index + 1} - (${diameter} mm)`}</Label>

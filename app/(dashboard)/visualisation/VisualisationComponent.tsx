@@ -1,5 +1,5 @@
 "use client"
-import { TvisualisationSoilProfilePileLengthSchema, TvisualisationSoilProfileSchema } from "@/schemas/soilProfileSchemas"
+import { TselectionsSchema, TvisualisationSoilProfileSchema } from "@/schemas/soilProfileSchemas"
 import { TvisualisationSoilSchema } from "@/schemas/soilSchemas"
 import { useState, useEffect } from "react" 
 import { createClient } from "@/utils/supabase/client"
@@ -23,7 +23,7 @@ import html2canvas from 'html2canvas-pro'
 import { roundToTwoDecimals } from "@/lib/utils"
 
 type ChartDataItem = {
-  selection: TvisualisationSoilProfileSchema & { selection_name: string, effective_pile_length: number }
+  selection: TselectionsSchema & { selection_name: string, effective_pile_length: number }
   soilsData: TvisualisationSoilSchema[]
 }
 
@@ -32,7 +32,7 @@ type ChartDataPoint = {
   [key: string]: number
 }
 
-export function VisualisationComponent({ profilesData, selectionsData }: { profilesData: TvisualisationSoilProfilePileLengthSchema[], selectionsData: TvisualisationSoilProfileSchema[] }) {
+export function VisualisationComponent({ profilesData, selectionsData }: { profilesData: TvisualisationSoilProfileSchema[], selectionsData: TselectionsSchema[] }) {
   const [isFetchingData, setIsFetchingData] = useState(false)
   const [chartData, setChartData] = useState<ChartDataItem[]>([])
   const [hideBearingCapacity, setHideBearingCapacity] = useState(false)
