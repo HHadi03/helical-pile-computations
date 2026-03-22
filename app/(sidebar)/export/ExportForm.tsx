@@ -22,7 +22,6 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TexportSoilProfileS
   const router = useRouter()
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [activeTab, setActiveTab] = useState("soil")
-  const [isDragging, setIsDragging] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(exportFormSchema),
@@ -1429,60 +1428,16 @@ export function ExportForm({ soilProfiles }: { soilProfiles: TexportSoilProfileS
               />
 
               <div className="space-y-2">
-  <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-    Upload Images {uploadedFile && <span className="text-muted-foreground">({uploadedFile.name})</span>}
-  </label>
-  <div
-    className={`relative border-2 border-dashed rounded-lg p-8 transition-colors ${
-      isDragging 
-        ? 'border-primary bg-primary/5' 
-        : 'border-gray-300 hover:border-gray-400'
-    }`}
-    onDragOver={(e) => {
-      e.preventDefault();
-      setIsDragging(true);
-    }}
-    onDragLeave={(e) => {
-      e.preventDefault();
-      setIsDragging(false);
-    }}
-    onDrop={(e) => {
-      e.preventDefault();
-      setIsDragging(false);
-      const files = e.dataTransfer.files;
-      if (files.length > 0) {
-        handleFileChange({ target: { files } } as any);
-      }
-    }}
-  >
-    <Input 
-      type="file" 
-      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-      onChange={handleFileChange}
-      accept=".jpg,.jpeg,.png"
-    />
-    <div className="flex flex-col items-center justify-center text-center pointer-events-none">
-      <svg
-        className="w-12 h-12 mb-3 text-gray-400"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-        />
-      </svg>
-      <p className="mb-1 text-sm font-medium text-gray-700">
-        {isDragging ? 'Drop your image here' : 'Drag and drop your image here'}
-      </p>
-      <p className="text-xs text-gray-500">or click to browse</p>
-      <p className="text-xs text-gray-400 mt-2">JPG, JPEG, or PNG</p>
-    </div>
-  </div>
-</div>
+                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Upload Images {uploadedFile && <span className="text-muted-foreground">({uploadedFile.name})</span>}
+                </label>
+                <Input 
+                  type="file" 
+                  className="cursor-pointer border"
+                  onChange={handleFileChange}
+                  accept=".jpg,.jpeg,.png"
+                />
+              </div>
             </div>
 
             <div className="pt-2 flex justify-end gap-2">
