@@ -475,7 +475,7 @@ export async function POST(req: NextRequest) {
       const filePath = `exports/${data?.claims.sub}/${fileName}`
 
       const { error: uploadError } = await supabase.storage
-        .from("exports") // 👈 your storage bucket name
+        .from("exports") 
         .upload(filePath, file, { upsert: true })
 
       if (uploadError) {
@@ -483,7 +483,6 @@ export async function POST(req: NextRequest) {
         return new Response("Failed to upload file", { status: 500 })
       }
 
-      // --- Step 2: Get the public URL ---
       const { data: publicUrlData } = supabase.storage
         .from("exports")
         .getPublicUrl(filePath)
